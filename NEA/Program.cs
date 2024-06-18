@@ -10,12 +10,15 @@ namespace NEA
     {
         static void Main(string[] args)
         {
-            int size = 3;
+            int size = 15;
             Maze maze = new Maze(size);
             Dictionary<int, List<int>> adjList = maze.createGraph();
-            adjList[4] = new List<int>();
+            List<int> ints = maze.getEdges(42);
+            foreach (int i in ints.ToList())
+            {
+                maze.removeEdge(42, i);
+            }
             maze.displayGraph();
-            List<int> contains = adjList[5];
             Console.ReadKey();
         }
     }
