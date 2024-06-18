@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
@@ -38,12 +39,12 @@ namespace NEA
                 for (int x = 0; x < Xsize; x++)
                 {
                     int nodeNum = y * Xsize + x;
-                    Console.Write("+");
+                    Console.Write(" ");
                     if (adjList[nodeNum].Contains(nodeNum + 1))
                     {
-                        Console.Write("-");
+                        Console.Write(" ");
                     }
-                    else Console.Write(" ");
+                    else Console.Write("█");
                 }
                 Console.Write("|\n|");
                 // If it's the last line, it writes the bottom of the border
@@ -64,10 +65,10 @@ namespace NEA
                         // If this node shares an edge with the node below it, a bar is added.
                         if (adjList[nodeNum].Contains(nodeNum + Xsize))
                         {
-                            Console.Write("|");
+                            Console.Write(" ");
                         }
-                        else Console.Write(" ");
-                        Console.Write(" ");
+                        else Console.Write("█");
+                        Console.Write("█");
                     }
                 }
                 Console.Write("|");
@@ -154,9 +155,9 @@ namespace NEA
                 }
                 // Remove the edge between the current node and the last node.
                 removeEdge(currentNode, connectedNode);
-                // Console.Clear();
-                // displayGraph();
-                Thread.Sleep(1);
+                Console.Clear();
+                displayGraph();
+                Thread.Sleep(10);
             }
             return adjList;
         }
