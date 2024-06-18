@@ -109,8 +109,55 @@ namespace NEA
         }
         public Dictionary<int, List<int>> recursiveBacktracking(int startNode)
         {
+            // The stack will hold the integer number of each node
             Stack<int> stack = new Stack<int>();
-            List<int> copyOfNode = adjList[startNode];
+            // Parralel stack which will hold the edge that that node shares that wants removing
+            Stack<int> connectedNodes = new Stack<int>();
+            // nodeEdges will hold the nodes that the curent node connects to
+            List<int> nodeEdges = adjList[startNode];
+            // Visited will hold the boolean status of whether each node has been visited by the node's status in it's corresponing index.
+            // For example, to see if node number 43 has been visited, look at visited[43]
+            List<bool> visited = new List<bool>();
+            // Filling visited with all false
+            for (int i = 0; i < adjList.Count(); i++)
+            {
+                visited.Add(false);
+            }
+            visited[startNode] = true;
+            // Randomising nodeEdges and adding all items to the stack
+            nodeEdges = randomize(nodeEdges);
+            foreach (int nodeNum in nodeEdges)
+            {
+                stack.Push(nodeNum);
+                connectedNodes.Push(0);
+            }
+            // Actual recursive backtracking loop
+            while (stack.Count() > 0)
+            {
+                // Takes the current node and it's connection from the top of the stack
+                int currentNode = stack.Pop();
+                int connectedNode = connectedNodes.Pop();
+                // Retrieves and randomizes all connected nodes
+                nodeEdges = adjList[currentNode];
+                nodeEdges = randomize(nodeEdges);
+                // For each edge, check if that node has already been visited.
+                // If not, add it and the current node (it's connection) to the stack.
+                Console.Write($"Node {currentNode}: ");
+                foreach (int nodeNum in nodeEdges) Console.Write($"{nodeNum}, ");
+                Console.WriteLine("\n");
+                foreach (int nodeNum in nodeEdges)
+                {
+                    if (!visited[currentNode])
+                    {
+                        stack.Push(nodeNum);
+                        connectedNodes.Push(currentNode);
+                        Console.WriteLine($"Pushed {currentNode}");
+                        visited[currentNode] = true;
+                    }
+                }
+                // Remove the edge between the current node and the last node.
+                removeEdge(currentNode, connectedNode);
+            }
             return adjList;
         }
         public bool removeEdge(int node1, int node2)
@@ -133,20 +180,42 @@ namespace NEA
             return true;
             
         }
+        public bool addEdge(int node1, int node2)
+        {
+            if (!adjList.ContainsKey(node1) || !adjList.ContainsKey(node2))
+                return false;
+            if (!adjList[node1].Contains(node2))
+            {
+                adjList[node1].Add(node2);
+            }
+            else
+                return false;
+
+            if (!adjList[node2].Contains(node1))
+            {
+                adjList[node2].Add(node1);
+            }
+            else
+                return false;
+            return true;
+        }
         public List<int> getEdges(int node)
         {
             return adjList[node];
         }
         public List<int> randomize(List<int> ints)
         {
+            // Based on the Fisher-Yates Shuffling algorithm. Article cited in references.
             Random r = new Random();
-            List<int> returnList = new List<int>();
-            for (int i = ints.Count; i > 0; i--)
+            for (int i = ints.Count - 1; i > 1; i--)
             {
                 // i = size of list left
-                r.Next(0, i + 1);
+                int ran = r.Next(0, i + 1);
+                int temp = ints[i];
+                ints[i] = ints[ran];
+                ints[ran] = temp;
             }
-            return returnList;
+            return ints;
         }
         public Dictionary<int, List<int>> getAdjList()
         {

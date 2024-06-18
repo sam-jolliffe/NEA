@@ -13,13 +13,10 @@ namespace NEA
             int size = 15;
             Maze maze = new Maze(size);
             Dictionary<int, List<int>> adjList = maze.createGraph();
-            List<int> ints = maze.getEdges(42);
-            foreach (int i in ints.ToList())
-            {
-                maze.removeEdge(42, i);
-            }
+            maze.recursiveBacktracking(0);
             maze.displayGraph();
             Console.ReadKey();
+            // Console.WriteLine($"");
         }
     }
 }
