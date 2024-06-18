@@ -13,7 +13,7 @@ namespace NEA
             int size = 15;
             Maze maze = new Maze(size);
             Dictionary<int, List<int>> adjList = maze.createGraph();
-            maze.recursiveBacktracking(0);
+            adjList = maze.recursiveBacktracking(0);
             maze.displayGraph();
             Console.ReadKey();
             // Console.WriteLine($"");

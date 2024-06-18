@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
 
@@ -37,7 +38,7 @@ namespace NEA
                 for (int x = 0; x < Xsize; x++)
                 {
                     int nodeNum = y * Xsize + x;
-                    Console.Write("o");
+                    Console.Write("+");
                     if (adjList[nodeNum].Contains(nodeNum + 1))
                     {
                         Console.Write("-");
@@ -142,41 +143,45 @@ namespace NEA
                 nodeEdges = randomize(nodeEdges);
                 // For each edge, check if that node has already been visited.
                 // If not, add it and the current node (it's connection) to the stack.
-                Console.Write($"Node {currentNode}: ");
-                foreach (int nodeNum in nodeEdges) Console.Write($"{nodeNum}, ");
-                Console.WriteLine("\n");
                 foreach (int nodeNum in nodeEdges)
                 {
-                    if (!visited[currentNode])
+                    if (!visited[nodeNum])
                     {
                         stack.Push(nodeNum);
                         connectedNodes.Push(currentNode);
-                        Console.WriteLine($"Pushed {currentNode}");
-                        visited[currentNode] = true;
+                        visited[nodeNum] = true;
                     }
                 }
                 // Remove the edge between the current node and the last node.
                 removeEdge(currentNode, connectedNode);
+                // Console.Clear();
+                // displayGraph();
+                Thread.Sleep(1);
             }
             return adjList;
         }
         public bool removeEdge(int node1, int node2)
         {
             if (!adjList.ContainsKey(node1) || !adjList.ContainsKey(node2))
+            {
                 return false;
+            }
             if (adjList[node1].Contains(node2))
             {
                 adjList[node1].Remove(node2);
             }
             else
+            {
                 return false;
-
+            }
             if (adjList[node2].Contains(node1))
             {
                 adjList[node2].Remove(node1);
             }
-            else 
+            else
+            {
                 return false;
+            }
             return true;
             
         }
