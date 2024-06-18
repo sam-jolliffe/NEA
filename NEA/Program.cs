@@ -20,28 +20,22 @@ namespace NEA
             {
                 int y = nodeNum / size;
                 int x = nodeNum - (y * size);
-                Console.Write($" x: {nodeNum}, y: {y}");
                 if (x != 0)
                 {
                     adjList[nodeNum].Add(nodeNum - 1);
-                    Console.Write("y");
                 }
                 if (y != 0)
                 {
                     adjList[nodeNum].Add(nodeNum - size);
-                    Console.Write("y");
                 }
                 if (x != size - 1)
                 {
                     adjList[nodeNum].Add(nodeNum + 1);
-                    Console.Write("y");
                 }
                 if (y != size - 1)
                 {
                     adjList[nodeNum].Add(nodeNum + size);
-                    Console.Write("y");
                 }
-                Console.Write("\n");
             }
             return adjList;
         }
@@ -90,7 +84,7 @@ namespace NEA
         }
         static void Main(string[] args)
         {
-            int size = 3;
+            int size = 10;
             Dictionary<int, List<int>> adjList = createGraph(size);
             displayGraph(adjList, size);
             List<int> contains = adjList[5];
