@@ -28,31 +28,40 @@ namespace NEA
         public void displayGraph()
         {
             // Top of the border
-            for (int i = 0; i < Xsize * 2 + 1; i++)
+            for (int i = 0; i < Xsize * 2 + 2; i++)
             {
-                Console.Write("_");
+                Console.Write("██");
             }
             for (int y = 0; y < Ysize; y++)
             {
-                Console.Write("\n|");
-                // Writes each node and then a dash if there is an edge with the node to the right of it
+                Console.Write("\n██");
+                // Writes each node and then a blank space if there is an edge with the node to the right of it
                 for (int x = 0; x < Xsize; x++)
                 {
                     int nodeNum = y * Xsize + x;
-                    Console.Write(" ");
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    if (adjList[nodeNum].Count == 0)
+                    {
+                        Console.Write("██");
+                    }
+                    else
+                    {
+                        Console.Write("  ");
+                    }
+                    Console.ForegroundColor = ConsoleColor.Gray;
                     if (adjList[nodeNum].Contains(nodeNum + 1))
                     {
-                        Console.Write(" ");
+                        Console.Write("  ");
                     }
-                    else Console.Write("█");
+                    else Console.Write("██");
                 }
-                Console.Write("|\n|");
+                Console.Write("██\n██");
                 // If it's the last line, it writes the bottom of the border
                 if (y == Ysize - 1)
                 {
                     for (int i = 0; i < Xsize * 2; i++)
                     {
-                        Console.Write("_");
+                        Console.Write("██");
                     }
                 }
                 else
@@ -65,13 +74,31 @@ namespace NEA
                         // If this node shares an edge with the node below it, a bar is added.
                         if (adjList[nodeNum].Contains(nodeNum + Xsize))
                         {
-                            Console.Write(" ");
+                            Console.Write("  ");
                         }
-                        else Console.Write("█");
-                        Console.Write("█");
+                        else
+                        {
+                            Console.Write("██");
+                        }
+                        // For the space diagonally between nodes, to have an open space:
+                        // The top left node and bottom left node must share an edge AND
+                        // The top right node and bottom right node must share an edge OR
+                        // The top left node and the top right node share an edge AND
+                        // The bottom left node and the bottom right node share an edge
+                        // If not true, a corner wall is placed there.
+                        if ((adjList[nodeNum].Contains(nodeNum + Xsize) && adjList[nodeNum + 1].Contains(nodeNum + Xsize + 1)) || (adjList[nodeNum].Contains(nodeNum + 1) && adjList[nodeNum + Xsize].Contains(nodeNum + Xsize + 1)))
+                        {
+                            Console.Write("  ");
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write("██");
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                        }
                     }
                 }
-                Console.Write("|");
+                Console.Write("██");
             }
         }
         public Dictionary<int, List<int>> createGraph()
@@ -111,11 +138,10 @@ namespace NEA
         }
         public Dictionary<int, List<int>> recursiveBacktracking(int startNode)
         {
+            Console.WriteLine("Generating maze, please wait...");
             // The stack will hold the integer number of each node
             Stack<int> stack = new Stack<int>();
             // Parralel stack which will hold the edge that that node shares that wants removing
-            Stack<int> connectedNodes = new Stack<int>();
-            // nodeEdges will hold the nodes that the curent node connects to
             List<int> nodeEdges = adjList[startNode];
             // Visited will hold the boolean status of whether each node has been visited by the node's status in it's corresponing index.
             // For example, to see if node number 43 has been visited, look at visited[43]
@@ -131,40 +157,45 @@ namespace NEA
             foreach (int nodeNum in nodeEdges)
             {
                 stack.Push(nodeNum);
-                connectedNodes.Push(0);
             }
             // Actual recursive backtracking loop
             while (stack.Count() > 0)
             {
                 // Takes the current node and it's connection from the top of the stack
                 int currentNode = stack.Pop();
-                int connectedNode = connectedNodes.Pop();
+                // int connectedNode = connectedNodes.Pop();
                 // Retrieves and randomizes all connected nodes
                 nodeEdges = adjList[currentNode];
                 nodeEdges = randomize(nodeEdges);
                 // For each edge, check if that node has already been visited.
                 // If not, add it and the current node (it's connection) to the stack.
+                List<int> choices = new List<int>();
                 foreach (int nodeNum in nodeEdges)
                 {
                     if (!visited[nodeNum])
                     {
+                        choices.Add(nodeNum);
                         stack.Push(nodeNum);
-                        connectedNodes.Push(currentNode);
                         visited[nodeNum] = true;
                     }
                 }
                 // Remove the edge between the current node and the last node.
-                removeEdge(currentNode, connectedNode);
-                Console.Clear();
-                displayGraph();
-                Thread.Sleep(10);
+                // Console.Clear();
+                // displayGraph();
+                Thread.Sleep(1);
+                if (choices.Count() > 0)
+                {
+                    removeEdge(currentNode, choices[0]);
+                }
             }
+            // Console.Clear();
             return adjList;
         }
         public bool removeEdge(int node1, int node2)
         {
             if (!adjList.ContainsKey(node1) || !adjList.ContainsKey(node2))
             {
+                Console.WriteLine("NotInDict");
                 return false;
             }
             if (adjList[node1].Contains(node2))
@@ -173,6 +204,7 @@ namespace NEA
             }
             else
             {
+                Console.WriteLine("NotInList");
                 return false;
             }
             if (adjList[node2].Contains(node1))
@@ -181,6 +213,7 @@ namespace NEA
             }
             else
             {
+                Console.WriteLine("NotInList");
                 return false;
             }
             return true;
@@ -188,7 +221,7 @@ namespace NEA
         }
         public bool addEdge(int node1, int node2)
         {
-            if (!adjList.ContainsKey(node1) || !adjList.ContainsKey(node2))
+            if (adjList.ContainsKey(node1) || adjList.ContainsKey(node2))
                 return false;
             if (!adjList[node1].Contains(node2))
             {

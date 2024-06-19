@@ -10,10 +10,11 @@ namespace NEA
     {
         static void Main(string[] args)
         {
-            int size = 3;
+            int size = 10;
             Maze maze = new Maze(size);
-            Dictionary<int, List<int>> adjList = maze.createGraph();
-            adjList = maze.recursiveBacktracking(0);
+            maze.createGraph();
+            maze.recursiveBacktracking(0);
+            maze.displayGraph();
             Console.ReadKey();
             // Console.WriteLine($"");
         }
