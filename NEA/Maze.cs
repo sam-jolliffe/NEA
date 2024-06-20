@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
-namespace NEA
+namespace NEA_testing
 {
-    internal class Maze
+    public class Maze
     {
+        private static Random r = new Random();
         private int Xsize;
         private int Ysize;
         Dictionary<int, List<int>> adjList = new Dictionary<int, List<int>>();
@@ -25,44 +23,70 @@ namespace NEA
             Xsize = XSize;
             Ysize = YSize;
         }
-        public void displayGraph()
+        public void displayGraph(int currentNode)
         {
+            ConsoleColor borderColour = ConsoleColor.DarkMagenta;
+            ConsoleColor wallColour = ConsoleColor.Black;
             // Top of the border
-            for (int i = 0; i < Xsize * 2 + 2; i++)
+            Console.ForegroundColor = borderColour;
+            for (int i = 0; i < Xsize * 2 + 1; i++)
             {
                 Console.Write("██");
             }
+            Console.ForegroundColor = wallColour;
             for (int y = 0; y < Ysize; y++)
             {
+                // Writes the left-hand side of the border
+                Console.ForegroundColor = borderColour;
                 Console.Write("\n██");
+                Console.ForegroundColor = wallColour;
                 // Writes each node and then a blank space if there is an edge with the node to the right of it
                 for (int x = 0; x < Xsize; x++)
                 {
                     int nodeNum = y * Xsize + x;
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    if (adjList[nodeNum].Count == 0)
+                    // Writing node
+                    if (nodeNum == currentNode)
                     {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write("██");
+                        Console.ForegroundColor = wallColour;
                     }
                     else
                     {
                         Console.Write("  ");
                     }
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    if (adjList[nodeNum].Contains(nodeNum + 1))
+                    // To the right of the node
+                    if (x != Xsize - 1)
                     {
-                        Console.Write("  ");
+                        if (adjList[nodeNum].Contains(nodeNum + 1))
+                        {
+                            Console.Write("██");
+                        }
+                        else
+                        {
+                            Console.Write("  ");
+                        }
                     }
-                    else Console.Write("██");
                 }
-                Console.Write("██\n██");
+                Console.ForegroundColor = borderColour;
+                if (y == Ysize - 1)
+                {
+                    Console.Write("\n██");
+                }
+                else
+                {
+                    Console.Write("██\n██");
+                }
+                Console.ForegroundColor = wallColour;
                 // If it's the last line, it writes the bottom of the border
                 if (y == Ysize - 1)
                 {
+                    Console.ForegroundColor = borderColour;
                     for (int i = 0; i < Xsize * 2; i++)
                     {
                         Console.Write("██");
                     }
+                    Console.ForegroundColor = wallColour;
                 }
                 else
                 {
@@ -74,31 +98,21 @@ namespace NEA
                         // If this node shares an edge with the node below it, a bar is added.
                         if (adjList[nodeNum].Contains(nodeNum + Xsize))
                         {
-                            Console.Write("  ");
+                            Console.Write("██");
                         }
                         else
                         {
-                            Console.Write("██");
-                        }
-                        // For the space diagonally between nodes, to have an open space:
-                        // The top left node and bottom left node must share an edge AND
-                        // The top right node and bottom right node must share an edge OR
-                        // The top left node and the top right node share an edge AND
-                        // The bottom left node and the bottom right node share an edge
-                        // If not true, a corner wall is placed there.
-                        if ((adjList[nodeNum].Contains(nodeNum + Xsize) && adjList[nodeNum + 1].Contains(nodeNum + Xsize + 1)) || (adjList[nodeNum].Contains(nodeNum + 1) && adjList[nodeNum + Xsize].Contains(nodeNum + Xsize + 1)))
-                        {
                             Console.Write("  ");
                         }
-                        else
+                        // The right hand border of the maze
+                        if (x == Xsize - 1)
                         {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            Console.Write("██");
-                            Console.ForegroundColor = ConsoleColor.Gray;
+                            Console.ForegroundColor = borderColour;
                         }
+                        Console.Write("██");
+                        Console.ForegroundColor = wallColour;
                     }
                 }
-                Console.Write("██");
             }
         }
         public Dictionary<int, List<int>> createGraph()
@@ -111,91 +125,60 @@ namespace NEA
             // Adds connections with all adjacent nodes
             for (int nodeNum = 0; nodeNum < Xsize * Ysize; nodeNum++)
             {
-                int y = nodeNum / Xsize;
-                int x = nodeNum - (y * Xsize);
                 // Checks if it can place an edge to the left
-                if (x != 0)
+                if (getLeft(nodeNum) != -1)
                 {
-                    adjList[nodeNum].Add(nodeNum - 1);
+                    adjList[nodeNum].Add(getLeft(nodeNum));
                 }
                 // Checks if it can place an edge above
-                if (y != 0)
+                if (getYcoordinate(nodeNum) > 0)
                 {
-                    adjList[nodeNum].Add(nodeNum - Xsize);
+                    adjList[nodeNum].Add(getUp(nodeNum));
                 }
                 // Checks if it can place an edge to the right
-                if (x != Xsize - 1)
+                if (getRight(nodeNum) != -1)
                 {
-                    adjList[nodeNum].Add(nodeNum + 1);
+                    adjList[nodeNum].Add(getRight(nodeNum));
                 }
                 // Checks if it can place an edge below
-                if (y != Ysize - 1)
+                if (getYcoordinate(nodeNum) < Ysize - 1)
                 {
-                    adjList[nodeNum].Add(nodeNum + Xsize);
+                    adjList[nodeNum].Add(getDown(nodeNum));
                 }
             }
             return adjList;
         }
-        public Dictionary<int, List<int>> recursiveBacktracking(int startNode)
+        public void recursiveBacktrackingConstructor(int startNode)
         {
-            Console.WriteLine("Generating maze, please wait...");
-            // The stack will hold the integer number of each node
-            Stack<int> stack = new Stack<int>();
-            // Parralel stack which will hold the edge that that node shares that wants removing
-            List<int> nodeEdges = adjList[startNode];
-            // Visited will hold the boolean status of whether each node has been visited by the node's status in it's corresponing index.
-            // For example, to see if node number 43 has been visited, look at visited[43]
             List<bool> visited = new List<bool>();
-            // Filling visited with all false
             for (int i = 0; i < adjList.Count(); i++)
-            {
                 visited.Add(false);
-            }
+            recursiveBacktracking(startNode, ref visited);
+            return;
+        }
+        public void recursiveBacktracking(int startNode, ref List<bool> visited)
+        {
+            List<int> nodeEdges = randomize(adjList[startNode]);
+
             visited[startNode] = true;
-            // Randomising nodeEdges and adding all items to the stack
-            nodeEdges = randomize(nodeEdges);
-            foreach (int nodeNum in nodeEdges)
+
+            // Console.SetCursorPosition(0, 0);
+            foreach (int i in nodeEdges.ToList())
             {
-                stack.Push(nodeNum);
-            }
-            // Actual recursive backtracking loop
-            while (stack.Count() > 0)
-            {
-                // Takes the current node and it's connection from the top of the stack
-                int currentNode = stack.Pop();
-                // int connectedNode = connectedNodes.Pop();
-                // Retrieves and randomizes all connected nodes
-                nodeEdges = adjList[currentNode];
-                nodeEdges = randomize(nodeEdges);
-                // For each edge, check if that node has already been visited.
-                // If not, add it and the current node (it's connection) to the stack.
-                List<int> choices = new List<int>();
-                foreach (int nodeNum in nodeEdges)
+                if (!visited[i])
                 {
-                    if (!visited[nodeNum])
-                    {
-                        choices.Add(nodeNum);
-                        stack.Push(nodeNum);
-                        visited[nodeNum] = true;
-                    }
-                }
-                // Remove the edge between the current node and the last node.
-                // Console.Clear();
-                // displayGraph();
-                Thread.Sleep(1);
-                if (choices.Count() > 0)
-                {
-                    removeEdge(currentNode, choices[0]);
+                    removeEdge(startNode, i);
+                    // displayGraph(startNode);
+                    recursiveBacktracking(i, ref visited);
                 }
             }
-            // Console.Clear();
-            return adjList;
+            return;
         }
         public bool removeEdge(int node1, int node2)
         {
             if (!adjList.ContainsKey(node1) || !adjList.ContainsKey(node2))
             {
-                Console.WriteLine("NotInDict");
+                Console.WriteLine($"NotInDict");
                 return false;
             }
             if (adjList[node1].Contains(node2))
@@ -204,7 +187,7 @@ namespace NEA
             }
             else
             {
-                Console.WriteLine("NotInList");
+                Console.WriteLine($"NotInList. {node1}, {node2}");
                 return false;
             }
             if (adjList[node2].Contains(node1))
@@ -213,11 +196,11 @@ namespace NEA
             }
             else
             {
-                Console.WriteLine("NotInList");
+                Console.WriteLine($"NotInList. {node1}, {node2}");
                 return false;
             }
             return true;
-            
+
         }
         public bool addEdge(int node1, int node2)
         {
@@ -245,10 +228,8 @@ namespace NEA
         public List<int> randomize(List<int> ints)
         {
             // Based on the Fisher-Yates Shuffling algorithm. Article cited in references.
-            Random r = new Random();
-            for (int i = ints.Count - 1; i > 1; i--)
+            for (int i = ints.Count - 1; i > 0; i--)
             {
-                // i = size of list left
                 int ran = r.Next(0, i + 1);
                 int temp = ints[i];
                 ints[i] = ints[ran];
@@ -267,6 +248,46 @@ namespace NEA
         public int getYsize()
         {
             return Ysize;
+        }
+        public int getXcoordinate(int node)
+        {
+            return node % Xsize;
+        }
+        public int getYcoordinate(int node)
+        {
+            return node / Xsize;
+        }
+        public int getLeft(int node)
+        {
+            if (getXcoordinate(node) != 0)
+            {
+                return node - 1;
+            }
+            return -1;
+        }
+        public int getRight(int node)
+        {
+            if (getXcoordinate(node) < Xsize - 1)
+            {
+                return node + 1;
+            }
+            return -1;
+        }
+        public int getUp(int node)
+        {
+            if (getYcoordinate(node) != 0)
+            {
+                return node - Xsize;
+            }
+            return -1;
+        }
+        public int getDown(int node)
+        {
+            if (getYcoordinate(node) != Ysize - 1)
+            {
+                return node + Xsize;
+            }
+            return -1;
         }
     }
 }
