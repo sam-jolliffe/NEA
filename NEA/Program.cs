@@ -101,13 +101,19 @@ namespace NEA
         public static List<int> randomize(List<int> ints)
         {
             Random r = new Random();
-            List<int> retrunList = new List<int>();
+            List<int> returnList = new List<int>();
             for (int i = ints.Count; i > 0; i--)
             {
+                int index;
                 // i = size of list left
-                r.Next(0, i + 1);
+                index = r.Next(0, i + 1);
+                returnList.Add(ints[index]);
             }
-            return ints;
+            return returnList;
+        }
+        public static Dictionary<int, List<int>> removeEdge(int node1, int node2, Dictionary<int, List<int>> adjList, int size)
+        {
+            throw new NotImplementedException();
         }
         static void Main(string[] args)
         {
