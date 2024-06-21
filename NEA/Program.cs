@@ -11,27 +11,69 @@ namespace NEA
     {
         public static int size = 25;
         public static Maze maze = new Maze(size);
+        public static Random r = new Random();
         static void playGame()
         {
+            Console.WriteLine("Fullscreen the window, then press any key to continue");
+            Console.ReadKey();
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
-            Console.WriteLine("Fullscreen the window, then press any key to comtinue");
-            Console.ReadKey();
             maze.createGraph();
-            maze.recursiveBacktrackingConstructor(0);
-            int pos = 0;
-            while (true)
+            maze.generateMaze(0);
+            int newPos = 0;
+            int oldPos;
+            bool hasWon = false;
+            int endPoint = getRandom(maze.getXsize() * maze.getYsize());
+            Console.SetCursorPosition(0, 0);
+            maze.displayGraph(newPos, endPoint);
+            while (!hasWon)
             {
-                Console.SetCursorPosition(0, 0);
-                maze.displayGraph(pos);
-                takeTurn(ref pos);
+                oldPos = newPos;
+                newPos = takeTurn(oldPos);
+                if (newPos == endPoint)
+                {
+                    hasWon = true;
+                }
+                else if (newPos == -1)
+                {
+                    newPos = oldPos;
+                }
+                else if (!maze.getAdjList()[oldPos].Contains(newPos))
+                {
+                    Console.SetCursorPosition(0, 0);
+                    maze.displayGraph(newPos, endPoint);
+                }
+                else
+                {
+                    newPos = oldPos;
+                }
             }
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Clear();
+            Console.WriteLine(@"
+__   __                                        _                                             
+\ \ / /                                       | |                                            
+ \ V /   ___   _   _  __      __  ___   _ __  | |                                            
+  \ /   / _ \ | | | | \ \ /\ / / / _ \ | '_ \ | |                                            
+  | |  | (_) || |_| |  \ V  V / | (_) || | | ||_|                                            
+  \_/   \___/  \__,_|   \_/\_/   \___/ |_| |_|(_)                                            
+                                                                                             
+                                                                                             
+ _____                                    _           _         _    _                     _ 
+/  __ \                                  | |         | |       | |  (_)                   | |
+| /  \/  ___   _ __    __ _  _ __   __ _ | |_  _   _ | |  __ _ | |_  _   ___   _ __   ___ | |
+| |     / _ \ | '_ \  / _` || '__| / _` || __|| | | || | / _` || __|| | / _ \ | '_ \ / __|| |
+| \__/\| (_) || | | || (_| || |   | (_| || |_ | |_| || || (_| || |_ | || (_) || | | |\__ \|_|
+ \____/ \___/ |_| |_| \__, ||_|    \__,_| \__| \__,_||_| \__,_| \__||_| \___/ |_| |_||___/(_)
+                       __/ |                                                                 
+                      |___/                                                                  
+");
         }
-        static void takeTurn(ref int pos)
+        static int takeTurn(int pos)
         {
             Console.SetCursorPosition(0, 0);
             string move = Console.ReadKey().Key.ToString().ToUpper();
-            Console.WriteLine(move);
             if (move == "W")
             {
                 pos = maze.getUp(pos);
@@ -48,13 +90,16 @@ namespace NEA
             {
                 pos = maze.getRight(pos);
             }
-            return;
+            return pos;
+        }
+        static int getRandom(int maxNum)
+        {
+            return r.Next(maxNum + 1);
         }
         static void Main(string[] args)
         {
             playGame();
             Console.ReadKey();
-            // Console.WriteLine($"");
         }
     }
 }

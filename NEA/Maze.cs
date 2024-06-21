@@ -9,10 +9,10 @@ namespace NEA_testing
 {
     public class Maze
     {
-        private static Random r = new Random();
-        private int Xsize;
-        private int Ysize;
-        Dictionary<int, List<int>> adjList = new Dictionary<int, List<int>>();
+        private static readonly Random r = new Random();
+        private readonly int Xsize;
+        private readonly int Ysize;
+        private readonly Dictionary<int, List<int>> adjList = new Dictionary<int, List<int>>();
         public Maze(int sizeIn)
         {
             Xsize = sizeIn * 2;
@@ -23,7 +23,7 @@ namespace NEA_testing
             Xsize = XSize;
             Ysize = YSize;
         }
-        public void displayGraph(int currentNode)
+        public void displayGraph(int currentNode, int endPoint)
         {
             ConsoleColor borderColour = ConsoleColor.DarkMagenta;
             ConsoleColor wallColour = ConsoleColor.Black;
@@ -48,6 +48,12 @@ namespace NEA_testing
                     if (nodeNum == currentNode)
                     {
                         Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write("██");
+                        Console.ForegroundColor = wallColour;
+                    }
+                    else if (nodeNum == endPoint)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
                         Console.Write("██");
                         Console.ForegroundColor = wallColour;
                     }
@@ -148,7 +154,7 @@ namespace NEA_testing
             }
             return adjList;
         }
-        public void recursiveBacktrackingConstructor(int startNode)
+        public void generateMaze(int startNode)
         {
             List<bool> visited = new List<bool>();
             for (int i = 0; i < adjList.Count(); i++)
@@ -168,7 +174,7 @@ namespace NEA_testing
                 if (!visited[i])
                 {
                     removeEdge(startNode, i);
-                    // displayGraph(startNode);
+                    // displayGraph(startNode, 0);
                     recursiveBacktracking(i, ref visited);
                 }
             }
@@ -231,9 +237,7 @@ namespace NEA_testing
             for (int i = ints.Count - 1; i > 0; i--)
             {
                 int ran = r.Next(0, i + 1);
-                int temp = ints[i];
-                ints[i] = ints[ran];
-                ints[ran] = temp;
+                (ints[ran], ints[i]) = (ints[i], ints[ran]);
             }
             return ints;
         }
