@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -75,14 +76,7 @@ namespace NEA_testing
                     }
                 }
                 Console.ForegroundColor = borderColour;
-                if (y == Ysize - 1)
-                {
-                    Console.Write("\n██");
-                }
-                else
-                {
-                    Console.Write("██\n██");
-                }
+                Console.Write("██\n██");
                 Console.ForegroundColor = wallColour;
                 // If it's the last line, it writes the bottom of the border
                 if (y == Ysize - 1)
@@ -156,10 +150,39 @@ namespace NEA_testing
         }
         public void generateMaze(int startNode)
         {
+            // Creating and filling up visited with falses
             List<bool> visited = new List<bool>();
             for (int i = 0; i < adjList.Count(); i++)
                 visited.Add(false);
+            // Running recursive backtracking
             recursiveBacktracking(startNode, ref visited);
+            // Adding random pathways about the maze
+            for (int i = 0; i < Xsize * Ysize / 10; i++)
+            {
+                int node = getRandom(Xsize * Ysize - 1);
+                List<int> notEdges = new List<int>();
+                if (adjList[node].Contains(getLeft(node)) && getLeft(node) != -1)
+                {
+                    notEdges.Add(getLeft(node));
+                }
+                if (adjList[node].Contains(getRight(node)) && getRight(node) != -1)
+                {
+                    notEdges.Add(getRight(node));
+                }
+                if (adjList[node].Contains(getUp(node)) && getUp(node) != -1)
+                {
+                    notEdges.Add(getUp(node));
+                }
+                if (adjList[node].Contains(getUp(node)) && getUp(node) != -1)
+                {
+                    notEdges.Add(getUp(node));
+                }
+                notEdges = randomize(notEdges);
+                if (notEdges.Count > 0)
+                {
+                    removeEdge(notEdges[0], node);
+                }
+            }
             return;
         }
         public void recursiveBacktracking(int startNode, ref List<bool> visited)
@@ -210,21 +233,29 @@ namespace NEA_testing
         }
         public bool addEdge(int node1, int node2)
         {
-            if (adjList.ContainsKey(node1) || adjList.ContainsKey(node2))
+            if (!adjList.ContainsKey(node1) || !adjList.ContainsKey(node2))
+            {
+                Console.WriteLine($"NotInDict");
                 return false;
+            }
             if (!adjList[node1].Contains(node2))
             {
                 adjList[node1].Add(node2);
             }
             else
+            {
+                Console.WriteLine($"AlreadyInList. {node1}, {node2}");
                 return false;
-
+            }
             if (!adjList[node2].Contains(node1))
             {
                 adjList[node2].Add(node1);
             }
             else
+            {
+                Console.WriteLine($"AlreadyInList. {node1}, {node2}");
                 return false;
+            }
             return true;
         }
         public List<int> getEdges(int node)
@@ -292,6 +323,10 @@ namespace NEA_testing
                 return node + Xsize;
             }
             return -1;
+        }
+        public int getRandom(int maxNum)
+        {
+            return r.Next(maxNum + 1);
         }
     }
 }

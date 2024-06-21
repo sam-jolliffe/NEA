@@ -9,21 +9,27 @@ namespace NEA
 {
     internal class Program
     {
-        public static int size = 25;
-        public static Maze maze = new Maze(size);
-        public static Random r = new Random();
+        private readonly static int size = 25;
+        private readonly static Maze maze = new Maze(size);
         static void playGame()
         {
-            Console.WriteLine("Fullscreen the window, then press any key to continue");
-            Console.ReadKey();
-            Console.BackgroundColor = ConsoleColor.White;
-            Console.ForegroundColor = ConsoleColor.Black;
             maze.createGraph();
             maze.generateMaze(0);
             int newPos = 0;
             int oldPos;
             bool hasWon = false;
-            int endPoint = getRandom(maze.getXsize() * maze.getYsize());
+            // Makes sure that the end point isn't too close to the user
+            bool validEndPoint = false;
+            int endPoint = 0;
+            while (!validEndPoint)
+            {
+                endPoint = maze.getRandom(maze.getXsize() * maze.getYsize());
+                if (maze.getXcoordinate(endPoint) + maze.getYcoordinate(endPoint) > (maze.getXsize() + maze.getYsize()) / 2)
+                {
+                    validEndPoint = true;
+                }
+            }
+            // Keeps taking a move and re-displaying the board until the user reaches the end
             Console.SetCursorPosition(0, 0);
             maze.displayGraph(newPos, endPoint);
             while (!hasWon)
@@ -73,33 +79,38 @@ __   __                                        _
         static int takeTurn(int pos)
         {
             Console.SetCursorPosition(0, 0);
-            string move = Console.ReadKey().Key.ToString().ToUpper();
-            if (move == "W")
+            ConsoleKeyInfo key = Console.ReadKey(true);
+            if (key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow)
             {
                 pos = maze.getUp(pos);
             }
-            if (move == "A")
+            if (key.Key == ConsoleKey.A || key.Key == ConsoleKey.LeftArrow)
             {
                 pos = maze.getLeft(pos);
             }
-            if (move == "S")
+            if (key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow)
             {
                 pos = maze.getDown(pos);
             }
-            if (move == "D")
+            if (key.Key == ConsoleKey.D || key.Key == ConsoleKey.RightArrow)
             {
                 pos = maze.getRight(pos);
             }
             return pos;
         }
-        static int getRandom(int maxNum)
-        {
-            return r.Next(maxNum + 1);
-        }
         static void Main(string[] args)
         {
-            playGame();
-            Console.ReadKey();
+            Console.WriteLine("Fullscreen the window, then press any key to continue");
+            Console.ReadKey(true);
+            while (true)
+            {
+                Console.Clear();
+                Console.BackgroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.Black;
+                playGame();
+                Console.WriteLine("\n\n\n\n Press any key to play again");
+                Console.ReadKey(true);
+            }
         }
     }
 }
