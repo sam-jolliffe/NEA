@@ -4,17 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace NEA
 {
     internal class Program
     {
-        private readonly static int size = 25;
+        private readonly static int size = 10;
         private readonly static Maze maze = new Maze(size);
-        static void playGame()
+        static void playGame(bool showGeneration)
         {
             maze.createGraph();
-            maze.generateMaze(0);
+            maze.generateMaze(0, showGeneration);
             int newPos = 0;
             int oldPos;
             bool hasWon = false;
@@ -98,16 +97,51 @@ __   __                                        _
             }
             return pos;
         }
+        static bool getChoice()
+        {
+            int yPos = 1;
+            Console.Clear();
+            Console.WriteLine(@"Would you like to see the maze generate?
+  Yes
+  No");
+            ConsoleKeyInfo key;
+            while (true)
+            {
+                Console.CursorLeft = 0;
+                Console.Write(" ");
+                Console.SetCursorPosition(0, yPos);
+                Console.Write(">");
+                key = Console.ReadKey(true);
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    if (yPos == 1)
+                    {
+                        return true;
+                    }
+                    else if (yPos == 2)
+                    {
+                        return false;
+                    }
+                }
+                else if ((key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow) && yPos > 1)
+                {
+                    yPos--;
+                }
+                else if ((key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow) && yPos < 2)
+                {
+                    yPos++;
+                }
+            }
+        }
         static void Main(string[] args)
         {
-            Console.WriteLine("Fullscreen the window, then press any key to continue");
-            Console.ReadKey(true);
+            bool showAlgorithm = getChoice();
             while (true)
             {
                 Console.Clear();
                 Console.BackgroundColor = ConsoleColor.White;
                 Console.ForegroundColor = ConsoleColor.Black;
-                playGame();
+                playGame(showAlgorithm);
                 Console.WriteLine("\n\n\n\n Press any key to play again");
                 Console.ReadKey(true);
             }

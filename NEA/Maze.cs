@@ -26,7 +26,7 @@ namespace NEA_testing
         }
         public void displayGraph(int currentNode, int endPoint)
         {
-            ConsoleColor borderColour = ConsoleColor.DarkMagenta;
+            ConsoleColor borderColour = ConsoleColor.Black;
             ConsoleColor wallColour = ConsoleColor.Black;
             // Top of the border
             Console.ForegroundColor = borderColour;
@@ -148,17 +148,22 @@ namespace NEA_testing
             }
             return adjList;
         }
-        public void generateMaze(int startNode)
+        public void generateMaze(int startNode, bool showGeneration)
         {
             // Creating and filling up visited with falses
             List<bool> visited = new List<bool>();
             for (int i = 0; i < adjList.Count(); i++)
                 visited.Add(false);
             // Running recursive backtracking
-            recursiveBacktracking(startNode, ref visited);
+            recursiveBacktracking(startNode, ref visited, showGeneration);
             // Adding random pathways about the maze
             for (int i = 0; i < Xsize * Ysize / 10; i++)
             {
+                if (showGeneration)
+                {
+                    Console.SetCursorPosition(0, 0);
+                    displayGraph(startNode, -1);
+                }
                 int node = getRandom(Xsize * Ysize - 1);
                 List<int> notEdges = new List<int>();
                 if (adjList[node].Contains(getLeft(node)) && getLeft(node) != -1)
@@ -185,20 +190,24 @@ namespace NEA_testing
             }
             return;
         }
-        public void recursiveBacktracking(int startNode, ref List<bool> visited)
+        public void recursiveBacktracking(int startNode, ref List<bool> visited, bool showGeneration)
         {
             List<int> nodeEdges = randomize(adjList[startNode]);
-
             visited[startNode] = true;
-
-            // Console.SetCursorPosition(0, 0);
+            if (showGeneration)
+            {
+                Console.SetCursorPosition(0, 0);
+            }
             foreach (int i in nodeEdges.ToList())
             {
                 if (!visited[i])
                 {
                     removeEdge(startNode, i);
-                    // displayGraph(startNode, 0);
-                    recursiveBacktracking(i, ref visited);
+                    if (showGeneration)
+                    {
+                        displayGraph(startNode, -1);
+                    }
+                    recursiveBacktracking(i, ref visited, showGeneration);
                 }
             }
             return;
