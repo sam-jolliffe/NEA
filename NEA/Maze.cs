@@ -110,6 +110,7 @@ namespace NEA_testing
                         {
                             Console.ForegroundColor = borderColour;
                         }
+                        // The wall diagonally between nodes
                         Console.Write("██");
                         Console.ForegroundColor = wallColour;
                     }

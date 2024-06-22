@@ -8,7 +8,7 @@ namespace NEA
 {
     internal class Program
     {
-        private readonly static int size = 25;
+        private readonly static int size = 5;
         private readonly static Maze maze = new Maze(size);
         static void playGame(bool showGeneration)
         {
