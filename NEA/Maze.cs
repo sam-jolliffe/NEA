@@ -13,6 +13,7 @@ namespace NEA_testing
         private static readonly Random r = new Random();
         private readonly int Xsize;
         private readonly int Ysize;
+        private int endPoint = -1;
         private readonly Dictionary<int, List<int>> adjList = new Dictionary<int, List<int>>();
         public Maze(int sizeIn)
         {
@@ -24,7 +25,7 @@ namespace NEA_testing
             Xsize = XSize;
             Ysize = YSize;
         }
-        public void displayGraph(int currentNode, int endPoint)
+        public void displayGraph(int currentNode)
         {
             ConsoleColor borderColour = ConsoleColor.Black;
             ConsoleColor wallColour = ConsoleColor.Black;
@@ -162,7 +163,7 @@ namespace NEA_testing
                 if (showGeneration)
                 {
                     Console.SetCursorPosition(0, 0);
-                    displayGraph(startNode, -1);
+                    displayGraph(startNode);
                 }
                 int node = getRandom(Xsize * Ysize - 1);
                 List<int> notEdges = new List<int>();
@@ -188,6 +189,7 @@ namespace NEA_testing
                     removeEdge(notEdges[0], node);
                 }
             }
+            makeEndPoint();
             return;
         }
         public void recursiveBacktracking(int startNode, ref List<bool> visited, bool showGeneration)
@@ -205,7 +207,7 @@ namespace NEA_testing
                     removeEdge(startNode, i);
                     if (showGeneration)
                     {
-                        displayGraph(startNode, -1);
+                        displayGraph(startNode);
                     }
                     recursiveBacktracking(i, ref visited, showGeneration);
                 }
@@ -336,6 +338,23 @@ namespace NEA_testing
         public int getRandom(int maxNum)
         {
             return r.Next(maxNum + 1);
+        }
+        public int getEndPoint()
+        {
+            return endPoint;
+        }
+        public void makeEndPoint()
+        {
+            bool validEndPoint = false;
+            endPoint = 0;
+            while (!validEndPoint)
+            {
+                endPoint = getRandom(Xsize * Ysize);
+                if (getXcoordinate(endPoint) + getYcoordinate(endPoint) > (Xsize + Ysize) / 2)
+                {
+                    validEndPoint = true;
+                }
+            }
         }
     }
 }

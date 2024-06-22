@@ -8,7 +8,7 @@ namespace NEA
 {
     internal class Program
     {
-        private readonly static int size = 10;
+        private readonly static int size = 25;
         private readonly static Maze maze = new Maze(size);
         static void playGame(bool showGeneration)
         {
@@ -17,25 +17,14 @@ namespace NEA
             int newPos = 0;
             int oldPos;
             bool hasWon = false;
-            // Makes sure that the end point isn't too close to the user
-            bool validEndPoint = false;
-            int endPoint = 0;
-            while (!validEndPoint)
-            {
-                endPoint = maze.getRandom(maze.getXsize() * maze.getYsize());
-                if (maze.getXcoordinate(endPoint) + maze.getYcoordinate(endPoint) > (maze.getXsize() + maze.getYsize()) / 2)
-                {
-                    validEndPoint = true;
-                }
-            }
             // Keeps taking a move and re-displaying the board until the user reaches the end
             Console.SetCursorPosition(0, 0);
-            maze.displayGraph(newPos, endPoint);
+            maze.displayGraph(newPos);
             while (!hasWon)
             {
                 oldPos = newPos;
                 newPos = takeTurn(oldPos);
-                if (newPos == endPoint)
+                if (newPos == maze.getEndPoint())
                 {
                     hasWon = true;
                 }
@@ -46,7 +35,7 @@ namespace NEA
                 else if (!maze.getAdjList()[oldPos].Contains(newPos))
                 {
                     Console.SetCursorPosition(0, 0);
-                    maze.displayGraph(newPos, endPoint);
+                    maze.displayGraph(newPos);
                 }
                 else
                 {
