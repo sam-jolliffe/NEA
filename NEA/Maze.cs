@@ -61,9 +61,7 @@ namespace NEA_testing
                     }
                     else
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.Write("  ");
-                        Console.ForegroundColor = ConsoleColor.Gray;
                     }
                     // To the right of the node
                     if (x != Xsize - 1)
@@ -192,7 +190,7 @@ namespace NEA_testing
                     removeEdge(notEdges[0], node);
                 }
             }
-            makeEndPoint();
+            makeEndPoint(startNode);
             return;
         }
         public void recursiveBacktracking(int startNode, ref List<bool> visited, bool showGeneration)
@@ -346,14 +344,15 @@ namespace NEA_testing
         {
             return endPoint;
         }
-        public void makeEndPoint()
+        public void makeEndPoint(int startPoint)
         {
             bool validEndPoint = false;
             endPoint = 0;
             while (!validEndPoint)
             {
                 endPoint = getRandom(Xsize * Ysize);
-                if (getXcoordinate(endPoint) + getYcoordinate(endPoint) > (Xsize + Ysize) / 2)
+                // Checks if the x and y coordinate separatley are at least a third of the grid away from the start point
+                if (Math.Abs(getXcoordinate(endPoint) - getXcoordinate(startPoint)) >= Xsize / 3 && Math.Abs(getYcoordinate(endPoint) - getYcoordinate(startPoint)) >= Ysize / 3)
                 {
                     validEndPoint = true;
                 }

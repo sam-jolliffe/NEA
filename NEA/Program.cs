@@ -8,13 +8,13 @@ namespace NEA
 {
     internal class Program
     {
-        private readonly static int size = 5;
+        private readonly static int size = 25;
         private readonly static Maze maze = new Maze(size);
         static void playGame(bool showGeneration)
         {
             maze.createGraph();
-            maze.generateMaze(0, showGeneration);
-            int newPos = 0;
+            int newPos = maze.getRandom(maze.getXsize() * maze.getYsize() - 1);
+            maze.generateMaze(newPos, showGeneration);
             int oldPos;
             bool hasWon = false;
             // Keeps taking a move and re-displaying the board until the user reaches the end
@@ -67,6 +67,7 @@ __   __                                        _
         static int takeTurn(int pos)
         {
             Console.SetCursorPosition(0, 0);
+            Console.CursorVisible = false;
             ConsoleKeyInfo key = Console.ReadKey(true);
             if (key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow)
             {
@@ -124,7 +125,9 @@ __   __                                        _
         }
         static void Main(string[] args)
         {
+            Console.CursorVisible = false;
             bool showAlgorithm = getChoice();
+            Console.CursorVisible = false;
             while (true)
             {
                 Console.Clear();
