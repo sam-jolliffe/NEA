@@ -13,8 +13,8 @@ namespace NEA
             int size = 10;
             Maze maze = new Maze(size);
             maze.createGraph();
-            maze.recursiveBacktracking(0);
-            maze.displayGraph();
+            maze.recursiveBacktrackingConstructor(0);
+            maze.displayGraph(0);
             Console.ReadKey();
             // Console.WriteLine($"");
         }

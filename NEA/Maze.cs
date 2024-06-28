@@ -12,6 +12,7 @@ namespace NEA
 {
     internal class Maze
     {
+        private Random r = new Random();
         private int Xsize;
         private int Ysize;
         Dictionary<int, List<int>> adjList = new Dictionary<int, List<int>>();
@@ -25,10 +26,10 @@ namespace NEA
             Xsize = XSize;
             Ysize = YSize;
         }
-        public void displayGraph()
+        public void displayGraph(int currentNode)
         {
             // Top of the border
-            for (int i = 0; i < Xsize * 2 + 2; i++)
+            for (int i = 0; i < Xsize * 2 + 1; i++)
             {
                 Console.Write("██");
             }
@@ -39,21 +40,38 @@ namespace NEA
                 for (int x = 0; x < Xsize; x++)
                 {
                     int nodeNum = y * Xsize + x;
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    if (adjList[nodeNum].Count == 0)
+                    // Writing node
+                    if (nodeNum == currentNode)
                     {
+                        Console.ForegroundColor = ConsoleColor.Blue;
                         Console.Write("██");
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
+                    else if (adjList[nodeNum].Count == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("  ");
+                        Console.ForegroundColor = ConsoleColor.Gray;
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.Write("  ");
+                        Console.ForegroundColor = ConsoleColor.Gray;
                     }
+                    // To the right of the node
                     Console.ForegroundColor = ConsoleColor.Gray;
-                    if (adjList[nodeNum].Contains(nodeNum + 1))
+                    if (x != Xsize - 1)
                     {
-                        Console.Write("  ");
+                        if (adjList[nodeNum].Contains(nodeNum + 1))
+                        {
+                            Console.Write("██");
+                        }
+                        else
+                        {
+                            Console.Write("  ");
+                        }
                     }
-                    else Console.Write("██");
                 }
                 Console.Write("██\n██");
                 // If it's the last line, it writes the bottom of the border
@@ -74,11 +92,11 @@ namespace NEA
                         // If this node shares an edge with the node below it, a bar is added.
                         if (adjList[nodeNum].Contains(nodeNum + Xsize))
                         {
-                            Console.Write("  ");
+                            Console.Write("██");
                         }
                         else
                         {
-                            Console.Write("██");
+                            Console.Write("  ");
                         }
                         // For the space diagonally between nodes, to have an open space:
                         // The top left node and bottom left node must share an edge AND
@@ -86,19 +104,25 @@ namespace NEA
                         // The top left node and the top right node share an edge AND
                         // The bottom left node and the bottom right node share an edge
                         // If not true, a corner wall is placed there.
-                        if ((adjList[nodeNum].Contains(nodeNum + Xsize) && adjList[nodeNum + 1].Contains(nodeNum + Xsize + 1)) || (adjList[nodeNum].Contains(nodeNum + 1) && adjList[nodeNum + Xsize].Contains(nodeNum + Xsize + 1)))
+                        if (x != Xsize - 1)
                         {
-                            Console.Write("  ");
+                            if ((!adjList[nodeNum].Contains(nodeNum + Xsize) && !adjList[nodeNum + 1].Contains(nodeNum + Xsize + 1)) || (!adjList[nodeNum].Contains(nodeNum + 1) && !adjList[nodeNum + Xsize].Contains(nodeNum + Xsize + 1)))
+                            {
+                                Console.Write("██");
+                            }
+                            else
+                            {
+                                // Console.ForegroundColor = ConsoleColor.Red;
+                                Console.Write("██");
+                                // Console.ForegroundColor = ConsoleColor.Gray;
+                            }
                         }
                         else
                         {
-                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.Write("██");
-                            Console.ForegroundColor = ConsoleColor.Gray;
                         }
                     }
                 }
-                Console.Write("██");
             }
         }
         public Dictionary<int, List<int>> createGraph()
@@ -136,60 +160,33 @@ namespace NEA
             }
             return adjList;
         }
-        public Dictionary<int, List<int>> recursiveBacktracking(int startNode)
+        public void recursiveBacktrackingConstructor(int startNode)
         {
             Console.WriteLine("Generating maze, please wait...");
-            // The stack will hold the integer number of each node
-            Stack<int> stack = new Stack<int>();
-            // Parralel stack which will hold the edge that that node shares that wants removing
-            List<int> nodeEdges = adjList[startNode];
-            // Visited will hold the boolean status of whether each node has been visited by the node's status in it's corresponing index.
-            // For example, to see if node number 43 has been visited, look at visited[43]
             List<bool> visited = new List<bool>();
-            // Filling visited with all false
             for (int i = 0; i < adjList.Count(); i++)
-            {
                 visited.Add(false);
-            }
+            recursiveBacktracking(startNode, visited);
+            return;
+        }
+        public List<bool> recursiveBacktracking(int startNode, List<bool> visited)
+        {
+            List<int> nodeEdge = adjList[startNode];
+            List<int> nodeEdges = randomize(nodeEdge);
+
             visited[startNode] = true;
-            // Randomising nodeEdges and adding all items to the stack
-            nodeEdges = randomize(nodeEdges);
-            foreach (int nodeNum in nodeEdges)
+
+            Console.SetCursorPosition(0, 0);
+            foreach (int i in nodeEdges.ToList())
             {
-                stack.Push(nodeNum);
-            }
-            // Actual recursive backtracking loop
-            while (stack.Count() > 0)
-            {
-                // Takes the current node and it's connection from the top of the stack
-                int currentNode = stack.Pop();
-                // int connectedNode = connectedNodes.Pop();
-                // Retrieves and randomizes all connected nodes
-                nodeEdges = adjList[currentNode];
-                nodeEdges = randomize(nodeEdges);
-                // For each edge, check if that node has already been visited.
-                // If not, add it and the current node (it's connection) to the stack.
-                List<int> choices = new List<int>();
-                foreach (int nodeNum in nodeEdges)
+                if (!visited[i])
                 {
-                    if (!visited[nodeNum])
-                    {
-                        choices.Add(nodeNum);
-                        stack.Push(nodeNum);
-                        visited[nodeNum] = true;
-                    }
-                }
-                // Remove the edge between the current node and the last node.
-                // Console.Clear();
-                // displayGraph();
-                Thread.Sleep(1);
-                if (choices.Count() > 0)
-                {
-                    removeEdge(currentNode, choices[0]);
+                    removeEdge(startNode, i);
+                    displayGraph(startNode);
+                    visited = recursiveBacktracking(i, visited);
                 }
             }
-            // Console.Clear();
-            return adjList;
+            return visited;
         }
         public bool removeEdge(int node1, int node2)
         {
@@ -217,7 +214,7 @@ namespace NEA
                 return false;
             }
             return true;
-            
+
         }
         public bool addEdge(int node1, int node2)
         {
@@ -245,8 +242,7 @@ namespace NEA
         public List<int> randomize(List<int> ints)
         {
             // Based on the Fisher-Yates Shuffling algorithm. Article cited in references.
-            Random r = new Random();
-            for (int i = ints.Count - 1; i > 1; i--)
+            for (int i = ints.Count - 1; i > 0; i--)
             {
                 // i = size of list left
                 int ran = r.Next(0, i + 1);
