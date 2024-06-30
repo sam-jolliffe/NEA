@@ -13,39 +13,49 @@ namespace NEA
         readonly static Maze maze = new Maze(size);
         static void playGame(bool showGeneration)
         {
-            List<IVisible> Visibles = new List<IVisible>();
+            List<IVisible> objects = new List<IVisible>();
+            // Adding enemies
             for (int i = 0; i < 5; i++)
             {
-                Visibles.Add(new BaseEnemy(maze));
+                objects.Add(new BaseEnemy(maze));
             }
+            // Adding power-ups
+            for (int i = 0; i < 5; i++)
+            {
+                objects.Add(new Stun(maze));
+            }
+            Console.WriteLine(objects.Count());
+            // Adding the player
+            Player player = new Player();
+            objects.Add(player);
             maze.createGraph();
-            int newPos = maze.getRandom(maze.getXsize() * maze.getYsize() - 1);
-            maze.generateMaze(newPos, showGeneration);
+            int newPos = player.getPosition();
+            maze.generateMaze(newPos, showGeneration, objects);
             int oldPos;
             bool hasWon = false;
             // Keeps taking a move and re-displaying the board until the user reaches the end
             Console.SetCursorPosition(0, 0);
-            maze.displayGraph(newPos);
+            maze.displayGraph(newPos, objects);
             while (!hasWon)
             {
-                oldPos = newPos;
-                newPos = takeTurn(oldPos);
-                if (newPos == -1)
+                oldPos = player.getPosition();
+                player.setPosition(takeTurn(oldPos));
+                if (player.getPosition() == -1)
                 {
-                    newPos = oldPos;
+                    player.setPosition(oldPos);
                 }
-                else if (!maze.getAdjList()[oldPos].Contains(newPos))
+                else if (!maze.getAdjList()[oldPos].Contains(player.getPosition()))
                 {
                     Console.SetCursorPosition(0, 0);
-                    maze.displayGraph(newPos);
-                    if (newPos == maze.getEndPoint())
+                    maze.displayGraph(player.getPosition(), objects);
+                    if (player.getPosition() == maze.getEndPoint())
                     {
                         hasWon = true;
-                    }
+                    } 
                 }
                 else
                 {
-                    newPos = oldPos;
+                    player.setPosition(oldPos);
                 }
             }
             Console.BackgroundColor = ConsoleColor.Black;

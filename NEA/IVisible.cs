@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace NEA
 {
-    internal interface IVisible
+    public interface IVisible
     {
         int getPosition();
         int getYpos();
         int getXpos();
         bool spawn(Maze maze);
+        string getType();
     }
 }

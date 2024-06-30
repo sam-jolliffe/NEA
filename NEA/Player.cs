@@ -6,19 +6,24 @@ using System.Threading.Tasks;
 
 namespace NEA
 {
-    public abstract class Enemy : IVisible
+    public class Player : IVisible
     {
         private static Random r = new Random();
         private int Position;
         private int Xpos;
         private int Ypos;
-        public Enemy(Maze maze)
-        {
-            spawn(maze);
-        }
         public int getPosition()
         {
             return Position;
+        }
+        public void setPosition(int newPos)
+        {
+            Position = newPos;
+        }
+
+        public string getType()
+        {
+            return "Player";
         }
 
         public int getXpos()
@@ -37,10 +42,6 @@ namespace NEA
             Xpos = maze.getXcoordinate(Position);
             Ypos = maze.getYcoordinate(Position);
             return true;
-        }
-        public string getType()
-        {
-            return "Enemy";
         }
     }
 }

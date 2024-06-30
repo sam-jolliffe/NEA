@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace NEA
 {
-    public class BaseEnemy : Enemy
+    internal class Stun : Power_Up
     {
-        public BaseEnemy(Maze maze) : base(maze)
+        public Stun(Maze maze) : base(maze)
         {
         }
     }

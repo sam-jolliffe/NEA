@@ -25,7 +25,7 @@ namespace NEA
             Xsize = XSize;
             Ysize = YSize;
         }
-        public void displayGraph(int currentNode)
+        public void displayGraph(int currentNode, List<IVisible> objects)
         {
             ConsoleColor borderColour = ConsoleColor.Black;
             ConsoleColor wallColour = ConsoleColor.Black;
@@ -47,15 +47,35 @@ namespace NEA
                 {
                     int nodeNum = y * Xsize + x;
                     // Writing node
-                    if (nodeNum == currentNode)
+                    bool isObject = false;
+                    foreach (IVisible obj in objects)
                     {
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.Write("██");
-                        Console.ForegroundColor = wallColour;
+                        if (obj.getPosition() == nodeNum)
+                        {
+                            if (obj.getType() == "Player")
+                            {
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                isObject = true;
+                            }
+                            else if (obj.getType() == "Enemy")
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                isObject = true;
+                            }
+                            else if (obj.getType() == "Power-up")
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                isObject = true;
+                            }
+                        }
                     }
-                    else if (nodeNum == endPoint)
+                    if (nodeNum == endPoint)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        isObject = true;
+                    }
+                    if (isObject)
+                    {
                         Console.Write("██");
                         Console.ForegroundColor = wallColour;
                     }
@@ -150,21 +170,21 @@ namespace NEA
             }
             return adjList;
         }
-        public void generateMaze(int startNode, bool showGeneration)
+        public void generateMaze(int startNode, bool showGeneration, List<IVisible> objects)
         {
             // Creating and filling up visited with falses
             List<bool> visited = new List<bool>();
             for (int i = 0; i < adjList.Count(); i++)
                 visited.Add(false);
             // Running recursive backtracking
-            recursiveBacktracking(startNode, ref visited, showGeneration);
+            recursiveBacktracking(startNode, ref visited, showGeneration, objects);
             // Adding random pathways about the maze
             for (int i = 0; i < Xsize * Ysize / 10; i++)
             {
                 if (showGeneration)
                 {
                     Console.SetCursorPosition(0, 0);
-                    displayGraph(startNode);
+                    displayGraph(startNode, objects);
                 }
                 int node = getRandom(Xsize * Ysize - 1);
                 List<int> notEdges = new List<int>();
@@ -193,7 +213,7 @@ namespace NEA
             makeEndPoint(startNode);
             return;
         }
-        public void recursiveBacktracking(int startNode, ref List<bool> visited, bool showGeneration)
+        public void recursiveBacktracking(int startNode, ref List<bool> visited, bool showGeneration, List<IVisible> objects)
         {
             List<int> nodeEdges = randomize(adjList[startNode]);
             visited[startNode] = true;
@@ -208,9 +228,9 @@ namespace NEA
                     removeEdge(startNode, i);
                     if (showGeneration)
                     {
-                        displayGraph(startNode);
+                        displayGraph(startNode, objects);
                     }
-                    recursiveBacktracking(i, ref visited, showGeneration);
+                    recursiveBacktracking(i, ref visited, showGeneration, objects);
                 }
             }
             return;

@@ -8,29 +8,36 @@ namespace NEA
 {
     public abstract class Power_Up : IVisible
     {
+        private static Random r = new Random();
+        private int Position;
+        private int Xpos;
+        private int Ypos;
+        public Power_Up(Maze maze)
+        {
+            spawn(maze);
+        }
+        public string getType()
+        {
+            return "Power-up";
+        }
         public int getPosition()
         {
-            throw new NotImplementedException();
+            return Position;
         }
-
         public int getXpos()
         {
-            throw new NotImplementedException();
+            return Xpos;
         }
-
         public int getYpos()
         {
-            throw new NotImplementedException();
+            return Ypos;
         }
-
-        public bool spawn()
-        {
-            throw new NotImplementedException();
-        }
-
         public bool spawn(Maze maze)
         {
-            throw new NotImplementedException();
+            Position = r.Next(0, maze.getXsize() * maze.getYsize() - 1);
+            Xpos = maze.getXcoordinate(Position);
+            Ypos = maze.getYcoordinate(Position);
+            return true;
         }
     }
 }
