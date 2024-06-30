@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NEA_testing
+namespace NEA
 {
     public class Maze
     {

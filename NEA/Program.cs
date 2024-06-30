@@ -1,17 +1,23 @@
-﻿using NEA_testing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
+
 namespace NEA
 {
     internal class Program
     {
-        private readonly static int size = 25;
-        private readonly static Maze maze = new Maze(size);
+        readonly static int size = 25;
+        readonly static Maze maze = new Maze(size);
         static void playGame(bool showGeneration)
         {
+            List<IVisible> Visibles = new List<IVisible>();
+            for (int i = 0; i < 5; i++)
+            {
+                Visibles.Add(new BaseEnemy(maze));
+            }
             maze.createGraph();
             int newPos = maze.getRandom(maze.getXsize() * maze.getYsize() - 1);
             maze.generateMaze(newPos, showGeneration);
@@ -24,11 +30,7 @@ namespace NEA
             {
                 oldPos = newPos;
                 newPos = takeTurn(oldPos);
-                if (newPos == maze.getEndPoint())
-                {
-                    hasWon = true;
-                }
-                else if (newPos == -1)
+                if (newPos == -1)
                 {
                     newPos = oldPos;
                 }
@@ -36,6 +38,10 @@ namespace NEA
                 {
                     Console.SetCursorPosition(0, 0);
                     maze.displayGraph(newPos);
+                    if (newPos == maze.getEndPoint())
+                    {
+                        hasWon = true;
+                    }
                 }
                 else
                 {
