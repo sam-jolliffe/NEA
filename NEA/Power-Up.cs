@@ -8,12 +8,13 @@ namespace NEA
 {
     public abstract class Power_Up : IVisible
     {
-        private static Random r = new Random();
+        private static Random r;
         private int Position;
         private int Xpos;
         private int Ypos;
-        public Power_Up(Maze maze)
+        public Power_Up(Maze maze, Random ran)
         {
+            r = ran;
             spawn(maze);
         }
         public string getType()

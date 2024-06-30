@@ -8,12 +8,13 @@ namespace NEA
 {
     public abstract class Enemy : IVisible
     {
-        private static Random r = new Random();
+        private static Random r;
         private int Position;
         private int Xpos;
         private int Ypos;
-        public Enemy(Maze maze)
+        public Enemy(Maze maze, Random ran)
         {
+            r = ran;
             spawn(maze);
         }
         public int getPosition()

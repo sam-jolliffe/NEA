@@ -10,13 +10,14 @@ namespace NEA
 {
     public class Maze
     {
-        private static readonly Random r = new Random();
+        private static Random r;
         private readonly int Xsize;
         private readonly int Ysize;
         private int endPoint = -1;
         private readonly Dictionary<int, List<int>> adjList = new Dictionary<int, List<int>>();
-        public Maze(int sizeIn)
+        public Maze(int sizeIn, Random ran)
         {
+            r = ran;
             Xsize = sizeIn * 2;
             Ysize = sizeIn;
         }

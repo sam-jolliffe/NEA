@@ -9,33 +9,33 @@ namespace NEA
 {
     internal class Program
     {
+        static Random random = new Random();
         readonly static int size = 25;
-        readonly static Maze maze = new Maze(size);
+        readonly static Maze maze = new Maze(size, random);
         static void playGame(bool showGeneration)
         {
             List<IVisible> objects = new List<IVisible>();
             // Adding enemies
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 15; i++)
             {
-                objects.Add(new BaseEnemy(maze));
+                objects.Add(new BaseEnemy(maze, random));
             }
             // Adding power-ups
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 15; i++)
             {
-                objects.Add(new Stun(maze));
+                objects.Add(new Stun(maze, random));
             }
             Console.WriteLine(objects.Count());
             // Adding the player
-            Player player = new Player();
+            Player player = new Player(maze, random);
             objects.Add(player);
             maze.createGraph();
-            int newPos = player.getPosition();
-            maze.generateMaze(newPos, showGeneration, objects);
+            maze.generateMaze(player.getPosition(), showGeneration, objects);
             int oldPos;
             bool hasWon = false;
             // Keeps taking a move and re-displaying the board until the user reaches the end
             Console.SetCursorPosition(0, 0);
-            maze.displayGraph(newPos, objects);
+            maze.displayGraph(player.getPosition(), objects);
             while (!hasWon)
             {
                 oldPos = player.getPosition();

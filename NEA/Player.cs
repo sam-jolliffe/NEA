@@ -8,10 +8,15 @@ namespace NEA
 {
     public class Player : IVisible
     {
-        private static Random r = new Random();
+        private static Random r;
         private int Position;
         private int Xpos;
         private int Ypos;
+        public Player(Maze maze, Random ran)
+        {
+            r = ran;
+            spawn(maze);
+        }
         public int getPosition()
         {
             return Position;
