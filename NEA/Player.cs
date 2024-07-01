@@ -9,6 +9,7 @@ namespace NEA
     public class Player : IVisible
     {
         private static Random r;
+        private List<Power_Up> Inventory;
         private int Position;
         private int Xpos;
         private int Ypos;
@@ -16,6 +17,7 @@ namespace NEA
         {
             r = ran;
             spawn(maze);
+            Inventory = new List<Power_Up>();
         }
         public int getPosition()
         {
@@ -25,7 +27,24 @@ namespace NEA
         {
             Position = newPos;
         }
-
+        public List<Power_Up> getInventory()
+        {
+            return Inventory;
+        }
+        public void showInventory()
+        {
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Clear();
+            Console.WriteLine("You have: \n\n");
+            foreach (Power_Up powerup in Inventory)
+            {
+                Console.WriteLine($@"{powerup.getName()}:
+{powerup.getDescription()}");
+            }
+            Console.BackgroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Black;
+        }
         public string getType()
         {
             return "Player";

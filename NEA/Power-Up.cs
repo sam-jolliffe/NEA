@@ -21,6 +21,10 @@ namespace NEA
         {
             return "Power-up";
         }
+        public virtual string getName()
+        {
+            return "Base powerup";
+        }
         public int getPosition()
         {
             return Position;
@@ -32,6 +36,10 @@ namespace NEA
         public int getYpos()
         {
             return Ypos;
+        }
+        public virtual string getDescription()
+        {
+            return "Base Powerup";
         }
         public bool spawn(Maze maze)
         {

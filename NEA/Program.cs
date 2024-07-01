@@ -10,8 +10,9 @@ namespace NEA
     internal class Program
     {
         static Random random = new Random();
-        readonly static int size = 5;
+        readonly static int size = 25;
         readonly static Maze maze = new Maze(size, random);
+        static Player player = new Player(maze, random);
         static void playGame(bool showGeneration)
         {
             List<IVisible> objects = new List<IVisible>();
@@ -27,7 +28,6 @@ namespace NEA
             }
             Console.WriteLine(objects.Count());
             // Adding the player
-            Player player = new Player(maze, random);
             objects.Add(player);
             maze.createGraph();
             maze.generateMaze(player.getPosition(), showGeneration, objects);
@@ -147,18 +147,24 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             {
                 pos = maze.getUp(pos);
             }
-            if (key.Key == ConsoleKey.A || key.Key == ConsoleKey.LeftArrow)
+            else if (key.Key == ConsoleKey.A || key.Key == ConsoleKey.LeftArrow)
             {
                 pos = maze.getLeft(pos);
             }
-            if (key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow)
+            else if (key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow)
             {
                 pos = maze.getDown(pos);
             }
-            if (key.Key == ConsoleKey.D || key.Key == ConsoleKey.RightArrow)
+            else if (key.Key == ConsoleKey.D || key.Key == ConsoleKey.RightArrow)
             {
                 pos = maze.getRight(pos);
             }
+            else if (key.Key == ConsoleKey.E)
+            {
+                player.showInventory();
+                pos = -1;
+            }
+
             return pos;
         }
         static bool getChoice()

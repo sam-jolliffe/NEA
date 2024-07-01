@@ -11,5 +11,13 @@ namespace NEA
         public Stun(Maze maze, Random ran) : base(maze, ran)
         {
         }
+        public override string getDescription()
+        {
+            return "A stun ability which will temporarily make all enemies pause where they are for one move.";
+        }
+        public override string getName()
+        {
+            return "Stun";
+        }
     }
 }
