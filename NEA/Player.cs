@@ -45,6 +45,14 @@ namespace NEA
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
         }
+        public void addToInventory(Power_Up powerup)
+        {
+            Inventory.Add(powerup);
+        }
+        public void removeFromInventory(Power_Up powerup)
+        {
+            Inventory.Remove(powerup);
+        }
         public string getType()
         {
             return "Player";

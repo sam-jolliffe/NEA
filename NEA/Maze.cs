@@ -21,7 +21,7 @@ namespace NEA
             Xsize = sizeIn * 2;
             Ysize = sizeIn;
         }
-        public void displayGraph(int currentNode, List<IVisible> objects)
+        public void displayGraph(List<IVisible> objects)
         {
             ConsoleColor borderColour = ConsoleColor.Black;
             ConsoleColor wallColour = ConsoleColor.Black;
@@ -180,7 +180,7 @@ namespace NEA
                 if (showGeneration)
                 {
                     Console.SetCursorPosition(0, 0);
-                    displayGraph(startNode, objects);
+                    displayGraph(objects);
                 }
                 int node = getRandom(Xsize * Ysize - 1);
                 List<int> notEdges = new List<int>();
@@ -224,7 +224,7 @@ namespace NEA
                     removeEdge(startNode, i);
                     if (showGeneration)
                     {
-                        displayGraph(startNode, objects);
+                        displayGraph(objects);
                     }
                     recursiveBacktracking(i, ref visited, showGeneration, objects);
                 }

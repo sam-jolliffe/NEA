@@ -36,7 +36,7 @@ namespace NEA
             bool hasLost = false;
             // Keeps taking a move and re-displaying the board until the user reaches the end
             Console.SetCursorPosition(0, 0);
-            maze.displayGraph(player.getPosition(), objects);
+            maze.displayGraph(objects);
             while (!hasWon && !hasLost)
             {
                 oldPos = player.getPosition();
@@ -48,7 +48,7 @@ namespace NEA
                 else if (!maze.getAdjList()[oldPos].Contains(player.getPosition()))
                 {
                     Console.SetCursorPosition(0, 0);
-                    maze.displayGraph(player.getPosition(), objects);
+                    maze.displayGraph(objects);
                     if (player.getPosition() == maze.getEndPoint())
                     {
                         hasWon = true;
@@ -56,20 +56,35 @@ namespace NEA
                     // Making a list of the positions of all enemies and power-ups
                     List<int> enemyPositions = new List<int>();
                     List<int> powerupPositions = new List<int>();
+                    List<Enemy> enemies = new List<Enemy>();
+                    List<Power_Up> powerUps = new List<Power_Up>();
                     foreach (IVisible obj in objects)
                     {
                         if (obj.getType() == "Enemy")
                         {
                             enemyPositions.Add(obj.getPosition());
+                            enemies.Add((Enemy)obj);
                         }
                         else if (obj.getType() == "Power-up")
                         {
                             powerupPositions.Add(obj.getPosition());
+                            powerUps.Add((Power_Up)obj);
                         }
                     }
                     if (enemyPositions.Contains(player.getPosition()))
                     {
                         hasLost = true;
+                    }
+                    if (powerupPositions.Contains(player.getPosition()))
+                    {
+                        foreach (Power_Up powerUp in powerUps)
+                        {
+                            if (powerUp.getPosition() == player.getPosition())
+                            {
+                                player.addToInventory(powerUp);
+                                objects.Remove(powerUp);
+                            }
+                        }
                     }
                 }
                 else
@@ -85,22 +100,22 @@ namespace NEA
                 Console.WriteLine(@"
                                                                                                                                                 
                                                                                                                                                 
-YYYYYYY       YYYYYYY                                        WWWWWWWW                           WWWWWWWW                                    !!! 
-Y:::::Y       Y:::::Y                                        W::::::W                           W::::::W                                   !!:!!
-Y:::::Y       Y:::::Y                                        W::::::W                           W::::::W                                   !:::!
-Y::::::Y     Y::::::Y                                        W::::::W                           W::::::W                                   !:::!
-YYY:::::Y   Y:::::YYY   ooooooooooo   uuuuuu    uuuuuu        W:::::W           WWWWW           W:::::W    ooooooooooo   nnnn  nnnnnnnn    !:::!
-   Y:::::Y Y:::::Y    oo:::::::::::oo u::::u    u::::u         W:::::W         W:::::W         W:::::W   oo:::::::::::oo n:::nn::::::::nn  !:::!
-    Y:::::Y:::::Y    o:::::::::::::::ou::::u    u::::u          W:::::W       W:::::::W       W:::::W   o:::::::::::::::on::::::::::::::nn !:::!
-     Y:::::::::Y     o:::::ooooo:::::ou::::u    u::::u           W:::::W     W:::::::::W     W:::::W    o:::::ooooo:::::onn:::::::::::::::n!:::!
-      Y:::::::Y      o::::o     o::::ou::::u    u::::u            W:::::W   W:::::W:::::W   W:::::W     o::::o     o::::o  n:::::nnnn:::::n!:::!
-       Y:::::Y       o::::o     o::::ou::::u    u::::u             W:::::W W:::::W W:::::W W:::::W      o::::o     o::::o  n::::n    n::::n!:::!
-       Y:::::Y       o::::o     o::::ou::::u    u::::u              W:::::W:::::W   W:::::W:::::W       o::::o     o::::o  n::::n    n::::n!!:!!
-       Y:::::Y       o::::o     o::::ou:::::uuuu:::::u               W:::::::::W     W:::::::::W        o::::o     o::::o  n::::n    n::::n !!! 
-       Y:::::Y       o:::::ooooo:::::ou:::::::::::::::uu              W:::::::W       W:::::::W         o:::::ooooo:::::o  n::::n    n::::n     
-    YYYY:::::YYYY    o:::::::::::::::o u:::::::::::::::u               W:::::W         W:::::W          o:::::::::::::::o  n::::n    n::::n !!! 
-    Y:::::::::::Y     oo:::::::::::oo   uu::::::::uu:::u                W:::W           W:::W            oo:::::::::::oo   n::::n    n::::n!!:!!
-    YYYYYYYYYYYYY       ooooooooooo       uuuuuuuu  uuuu                 WWW             WWW               ooooooooooo     nnnnnn    nnnnnn !!! 
+YYYYYYY       YYYYYYY                                          WWWWWWWW                           WWWWWWWW                                        !!! 
+Y:::::Y       Y:::::Y                                          W::::::W                           W::::::W                                       !!:!!
+Y:::::Y       Y:::::Y                                          W::::::W                           W::::::W                                       !:::!
+Y::::::Y     Y::::::Y                                          W::::::W                           W::::::W                                       !:::!
+YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu        W:::::W           WWWWW           W:::::W    ooooooooooo     nnnn  nnnnnnnn      !:::!
+   Y:::::Y Y:::::Y    oo:::::::::::oo   u::::u    u::::u         W:::::W         W:::::W         W:::::W   oo:::::::::::oo   n:::nn::::::::nn    !:::!
+    Y:::::Y:::::Y    o:::::::::::::::o  u::::u    u::::u          W:::::W       W:::::::W       W:::::W   o:::::::::::::::o  n::::::::::::::nn   !:::!
+     Y:::::::::Y     o:::::ooooo:::::o  u::::u    u::::u           W:::::W     W:::::::::W     W:::::W    o:::::ooooo:::::o  nn:::::::::::::::n  !:::!
+      Y:::::::Y      o::::o     o::::o  u::::u    u::::u            W:::::W   W:::::W:::::W   W:::::W     o::::o     o::::o    n:::::nnnn:::::n  !:::!
+       Y:::::Y       o::::o     o::::o  u::::u    u::::u             W:::::W W:::::W W:::::W W:::::W      o::::o     o::::o    n::::n    n::::n  !:::!
+       Y:::::Y       o::::o     o::::o  u::::u    u::::u              W:::::W:::::W   W:::::W:::::W       o::::o     o::::o    n::::n    n::::n  !!:!!
+       Y:::::Y       o::::o     o::::o  u:::::uuuu:::::u               W:::::::::W     W:::::::::W        o::::o     o::::o    n::::n    n::::n   !!! 
+       Y:::::Y       o:::::ooooo:::::o  u:::::::::::::::uu              W:::::::W       W:::::::W         o:::::ooooo:::::o    n::::n    n::::n     
+    YYYY:::::YYYY    o:::::::::::::::o   u:::::::::::::::u               W:::::W         W:::::W          o:::::::::::::::o    n::::n    n::::n   !!! 
+    Y:::::::::::Y     oo:::::::::::oo     uu::::::::uu:::u                W:::W           W:::W            oo:::::::::::oo     n::::n    n::::n  !!:!!
+    YYYYYYYYYYYYY       ooooooooooo         uuuuuuuu  uuuu                 WWW             WWW               ooooooooooo       nnnnnn    nnnnnn   !!! 
                                                                                                                                                 
                                                                                                                                                 
                                                                                                                                                 
