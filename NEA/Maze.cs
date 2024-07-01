@@ -21,11 +21,6 @@ namespace NEA
             Xsize = sizeIn * 2;
             Ysize = sizeIn;
         }
-        public Maze(int XSize, int YSize)
-        {
-            Xsize = XSize;
-            Ysize = YSize;
-        }
         public void displayGraph(int currentNode, List<IVisible> objects)
         {
             ConsoleColor borderColour = ConsoleColor.Black;
