@@ -127,7 +127,6 @@ __   __                                        _
         {
             Console.CursorVisible = false;
             bool showAlgorithm = getChoice();
-            Console.CursorVisible = false;
             while (true)
             {
                 Console.Clear();
