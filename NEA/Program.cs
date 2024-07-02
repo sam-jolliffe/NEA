@@ -1,68 +1,157 @@
-﻿using NEA_testing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
+
 namespace NEA
 {
     internal class Program
     {
-        private readonly static int size = 25;
-        private readonly static Maze maze = new Maze(size);
+        static Random random = new Random();
+        readonly static int size = 25;
+        readonly static Maze maze = new Maze(size, random);
+        static Player player = new Player(maze, random);
         static void playGame(bool showGeneration)
         {
+            List<IVisible> objects = new List<IVisible>();
+            // Adding enemies
+            for (int i = 0; i < 1; i++)
+            {
+                objects.Add(new BaseEnemy(maze, random));
+            }
+            // Adding power-ups
+            for (int i = 0; i < 5; i++)
+            {
+                objects.Add(new Stun(maze, random));
+            }
+            Console.WriteLine(objects.Count());
+            // Adding the player
+            objects.Add(player);
             maze.createGraph();
-            int newPos = maze.getRandom(maze.getXsize() * maze.getYsize() - 1);
-            maze.generateMaze(newPos, showGeneration);
+            maze.generateMaze(player.getPosition(), showGeneration, objects);
             int oldPos;
             bool hasWon = false;
+            bool hasLost = false;
             // Keeps taking a move and re-displaying the board until the user reaches the end
             Console.SetCursorPosition(0, 0);
-            maze.displayGraph(newPos);
-            while (!hasWon)
+            maze.displayGraph(objects);
+            while (!hasWon && !hasLost)
             {
-                oldPos = newPos;
-                newPos = takeTurn(oldPos);
-                if (newPos == maze.getEndPoint())
+                oldPos = player.getPosition();
+                player.setPosition(takeTurn(oldPos));
+                if (player.getPosition() == -1)
                 {
-                    hasWon = true;
+                    player.setPosition(oldPos);
                 }
-                else if (newPos == -1)
-                {
-                    newPos = oldPos;
-                }
-                else if (!maze.getAdjList()[oldPos].Contains(newPos))
+                else if (!maze.getAdjList()[oldPos].Contains(player.getPosition()))
                 {
                     Console.SetCursorPosition(0, 0);
-                    maze.displayGraph(newPos);
+                    maze.displayGraph(objects);
+                    if (player.getPosition() == maze.getEndPoint())
+                    {
+                        hasWon = true;
+                    }
+                    // Making a list of the positions of all enemies and power-ups
+                    List<int> enemyPositions = new List<int>();
+                    List<int> powerupPositions = new List<int>();
+                    List<Enemy> enemies = new List<Enemy>();
+                    List<Power_Up> powerUps = new List<Power_Up>();
+                    foreach (IVisible obj in objects)
+                    {
+                        if (obj.getType() == "Enemy")
+                        {
+                            enemyPositions.Add(obj.getPosition());
+                            enemies.Add((Enemy)obj);
+                        }
+                        else if (obj.getType() == "Power-up")
+                        {
+                            powerupPositions.Add(obj.getPosition());
+                            powerUps.Add((Power_Up)obj);
+                        }
+                    }
+                    if (enemyPositions.Contains(player.getPosition()))
+                    {
+                        hasLost = true;
+                    }
+                    if (powerupPositions.Contains(player.getPosition()))
+                    {
+                        foreach (Power_Up powerUp in powerUps)
+                        {
+                            if (powerUp.getPosition() == player.getPosition())
+                            {
+                                player.addToInventory(powerUp);
+                                objects.Remove(powerUp);
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    newPos = oldPos;
+                    player.setPosition(oldPos);
                 }
             }
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Clear();
-            Console.WriteLine(@"
-__   __                                        _                                             
-\ \ / /                                       | |                                            
- \ V /   ___   _   _  __      __  ___   _ __  | |                                            
-  \ /   / _ \ | | | | \ \ /\ / / / _ \ | '_ \ | |                                            
-  | |  | (_) || |_| |  \ V  V / | (_) || | | ||_|                                            
-  \_/   \___/  \__,_|   \_/\_/   \___/ |_| |_|(_)                                            
-                                                                                             
-                                                                                             
- _____                                    _           _         _    _                     _ 
-/  __ \                                  | |         | |       | |  (_)                   | |
-| /  \/  ___   _ __    __ _  _ __   __ _ | |_  _   _ | |  __ _ | |_  _   ___   _ __   ___ | |
-| |     / _ \ | '_ \  / _` || '__| / _` || __|| | | || | / _` || __|| | / _ \ | '_ \ / __|| |
-| \__/\| (_) || | | || (_| || |   | (_| || |_ | |_| || || (_| || |_ | || (_) || | | |\__ \|_|
- \____/ \___/ |_| |_| \__, ||_|    \__,_| \__| \__,_||_| \__,_| \__||_| \___/ |_| |_||___/(_)
-                       __/ |                                                                 
-                      |___/                                                                  
+            if (hasWon)
+            {
+                Console.WriteLine(@"
+                                                                                                                                                
+                                                                                                                                                
+YYYYYYY       YYYYYYY                                          WWWWWWWW                           WWWWWWWW                                        !!! 
+Y:::::Y       Y:::::Y                                          W::::::W                           W::::::W                                       !!:!!
+Y:::::Y       Y:::::Y                                          W::::::W                           W::::::W                                       !:::!
+Y::::::Y     Y::::::Y                                          W::::::W                           W::::::W                                       !:::!
+YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu        W:::::W           WWWWW           W:::::W    ooooooooooo     nnnn  nnnnnnnn      !:::!
+   Y:::::Y Y:::::Y    oo:::::::::::oo   u::::u    u::::u         W:::::W         W:::::W         W:::::W   oo:::::::::::oo   n:::nn::::::::nn    !:::!
+    Y:::::Y:::::Y    o:::::::::::::::o  u::::u    u::::u          W:::::W       W:::::::W       W:::::W   o:::::::::::::::o  n::::::::::::::nn   !:::!
+     Y:::::::::Y     o:::::ooooo:::::o  u::::u    u::::u           W:::::W     W:::::::::W     W:::::W    o:::::ooooo:::::o  nn:::::::::::::::n  !:::!
+      Y:::::::Y      o::::o     o::::o  u::::u    u::::u            W:::::W   W:::::W:::::W   W:::::W     o::::o     o::::o    n:::::nnnn:::::n  !:::!
+       Y:::::Y       o::::o     o::::o  u::::u    u::::u             W:::::W W:::::W W:::::W W:::::W      o::::o     o::::o    n::::n    n::::n  !:::!
+       Y:::::Y       o::::o     o::::o  u::::u    u::::u              W:::::W:::::W   W:::::W:::::W       o::::o     o::::o    n::::n    n::::n  !!:!!
+       Y:::::Y       o::::o     o::::o  u:::::uuuu:::::u               W:::::::::W     W:::::::::W        o::::o     o::::o    n::::n    n::::n   !!! 
+       Y:::::Y       o:::::ooooo:::::o  u:::::::::::::::uu              W:::::::W       W:::::::W         o:::::ooooo:::::o    n::::n    n::::n     
+    YYYY:::::YYYY    o:::::::::::::::o   u:::::::::::::::u               W:::::W         W:::::W          o:::::::::::::::o    n::::n    n::::n   !!! 
+    Y:::::::::::Y     oo:::::::::::oo     uu::::::::uu:::u                W:::W           W:::W            oo:::::::::::oo     n::::n    n::::n  !!:!!
+    YYYYYYYYYYYYY       ooooooooooo         uuuuuuuu  uuuu                 WWW             WWW               ooooooooooo       nnnnnn    nnnnnn   !!! 
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
 ");
+            }
+            else if (hasLost)
+            {
+                Console.WriteLine(@"
+                                                                                                                                                   
+                                                                                                                                                     
+YYYYYYY       YYYYYYY                                          LLLLLLLLLLL                                                            tttt             !!! 
+Y:::::Y       Y:::::Y                                          L:::::::::L                                                         ttt:::t            !!:!!
+Y:::::Y       Y:::::Y                                          L:::::::::L                                                         t:::::t            !:::!
+Y::::::Y     Y::::::Y                                          LL:::::::LL                                                         t:::::t            !:::!
+YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L                    ooooooooooo         ssssssssss   ttttttt:::::ttttttt      !:::!
+   Y:::::Y Y:::::Y    oo:::::::::::oo   u::::u    u::::u         L:::::L                  oo:::::::::::oo     ss::::::::::s  t:::::::::::::::::t      !:::!
+    Y:::::Y:::::Y    o:::::::::::::::o  u::::u    u::::u         L:::::L                 o:::::::::::::::o  ss:::::::::::::s t:::::::::::::::::t      !:::!
+     Y:::::::::Y     o:::::ooooo:::::o  u::::u    u::::u         L:::::L                 o:::::ooooo:::::o  s::::::ssss:::::stttttt:::::::tttttt      !:::!
+      Y:::::::Y      o::::o     o::::o  u::::u    u::::u         L:::::L                 o::::o     o::::o   s:::::s  ssssss       t:::::t            !:::!
+       Y:::::Y       o::::o     o::::o  u::::u    u::::u         L:::::L                 o::::o     o::::o     s::::::s            t:::::t            !:::!
+       Y:::::Y       o::::o     o::::o  u::::u    u::::u         L:::::L                 o::::o     o::::o        s::::::s         t:::::t            !!:!!
+       Y:::::Y       o::::o     o::::o  u:::::uuuu:::::u         L:::::L         LLLLLL  o::::o     o::::o  ssssss   s:::::s       t:::::t    tttttt   !!! 
+       Y:::::Y       o:::::ooooo:::::o  u:::::::::::::::uu     LL:::::::LLLLLLLLL:::::L  o:::::ooooo:::::o  s:::::ssss::::::s      t::::::tttt:::::t     
+    YYYY:::::YYYY    o:::::::::::::::o   u:::::::::::::::u     L::::::::::::::::::::::L  o:::::::::::::::o  s::::::::::::::s       tt::::::::::::::t   !!! 
+    Y:::::::::::Y     oo:::::::::::oo     uu::::::::uu:::u     L::::::::::::::::::::::L   oo:::::::::::oo    s:::::::::::ss          tt:::::::::::tt  !!:!!
+    YYYYYYYYYYYYY       ooooooooooo         uuuuuuuu  uuuu     LLLLLLLLLLLLLLLLLLLLLLLL     ooooooooooo       sssssssssss              ttttttttttt     !!! 
+                                                                                                                                                   
+                                                                                                                                                   
+                                                                                                                                                   
+                                    
+");
+            }
         }
         static int takeTurn(int pos)
         {
@@ -73,18 +162,24 @@ __   __                                        _
             {
                 pos = maze.getUp(pos);
             }
-            if (key.Key == ConsoleKey.A || key.Key == ConsoleKey.LeftArrow)
+            else if (key.Key == ConsoleKey.A || key.Key == ConsoleKey.LeftArrow)
             {
                 pos = maze.getLeft(pos);
             }
-            if (key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow)
+            else if (key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow)
             {
                 pos = maze.getDown(pos);
             }
-            if (key.Key == ConsoleKey.D || key.Key == ConsoleKey.RightArrow)
+            else if (key.Key == ConsoleKey.D || key.Key == ConsoleKey.RightArrow)
             {
                 pos = maze.getRight(pos);
             }
+            else if (key.Key == ConsoleKey.E)
+            {
+                player.showInventory();
+                pos = -1;
+            }
+
             return pos;
         }
         static bool getChoice()
