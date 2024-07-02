@@ -10,19 +10,19 @@ namespace NEA
     internal class Program
     {
         static Random random = new Random();
-        readonly static int size = 25;
+        readonly static int size = 10;
         readonly static Maze maze = new Maze(size, random);
         static Player player = new Player(maze, random);
         static void playGame(bool showGeneration)
         {
             List<IVisible> objects = new List<IVisible>();
             // Adding enemies
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 10; i++)
             {
                 objects.Add(new BaseEnemy(maze, random));
             }
             // Adding power-ups
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 10; i++)
             {
                 objects.Add(new Stun(maze, random));
             }
@@ -220,8 +220,8 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
         }
         static void Main(string[] args)
         {
-            Console.CursorVisible = false;
             bool showAlgorithm = getChoice();
+            Console.CursorVisible = false;
             while (true)
             {
                 Console.Clear();
