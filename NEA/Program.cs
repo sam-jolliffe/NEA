@@ -100,12 +100,12 @@ namespace NEA
                 }
             }
             stopwatch.Stop();
-            AddToLeaderboard((int)stopwatch.Elapsed.TotalSeconds);
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Clear();
             if (hasWon)
             {
+                AddToLeaderboard((int)stopwatch.Elapsed.TotalSeconds);
                 Console.WriteLine(@"
                                                                                                                                                 
                                                                                                                                                 
