@@ -364,10 +364,11 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
         }
         static void Main(string[] args)
         {
-            bool showAlgorithm = getChoice();
-            Console.CursorVisible = false;
-            while (true)
+            bool exit = false;
+            while (!exit)
             {
+                Console.CursorVisible = false;
+                int choice = MainMenu();
                 Console.Clear();
                 if (choice == 1) playGame();
                 else if (choice == 2) DisplayLeaderBoard();
