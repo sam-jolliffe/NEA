@@ -40,7 +40,8 @@ namespace NEA
             foreach (Power_Up powerup in Inventory)
             {
                 Console.WriteLine($@"{powerup.getName()}:
-{powerup.getDescription()}");
+{powerup.getDescription()}
+ ");
             }
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;

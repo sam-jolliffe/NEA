@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 
@@ -13,8 +16,10 @@ namespace NEA
         readonly static int size = 10;
         readonly static Maze maze = new Maze(size, random);
         static Player player = new Player(maze, random);
-        static void playGame(bool showGeneration)
+        static void playGame()
         {
+            Console.BackgroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Black;
             List<IVisible> objects = new List<IVisible>();
             // Adding enemies
             for (int i = 0; i < 10; i++)
@@ -30,13 +35,15 @@ namespace NEA
             // Adding the player
             objects.Add(player);
             maze.createGraph();
-            maze.generateMaze(player.getPosition(), showGeneration, objects);
+            maze.generateMaze(player.getPosition(), objects);
             int oldPos;
             bool hasWon = false;
             bool hasLost = false;
             // Keeps taking a move and re-displaying the board until the user reaches the end
             Console.SetCursorPosition(0, 0);
             maze.displayGraph(objects);
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
             while (!hasWon && !hasLost)
             {
                 oldPos = player.getPosition();
@@ -92,6 +99,8 @@ namespace NEA
                     player.setPosition(oldPos);
                 }
             }
+            stopwatch.Stop();
+            AddToLeaderboard((int)stopwatch.Elapsed.TotalSeconds);
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Clear();
@@ -152,6 +161,8 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                                     
 ");
             }
+            Console.WriteLine("\n\n\n\n Press any key to play again");
+            Console.ReadKey(true);
         }
         static int takeTurn(int pos)
         {
@@ -182,13 +193,15 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
 
             return pos;
         }
-        static bool getChoice()
+        static int MainMenu()
         {
             int yPos = 1;
             Console.Clear();
-            Console.WriteLine(@"Would you like to see the maze generate?
-  Yes
-  No");
+            Console.WriteLine(@"Would you like to: 
+  Start Game
+  View Leaderboard
+  How To Play?
+  Exit");
             ConsoleKeyInfo key;
             while (true)
             {
@@ -201,22 +214,153 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 {
                     if (yPos == 1)
                     {
-                        return true;
+                        return 1;
                     }
                     else if (yPos == 2)
                     {
-                        return false;
+                        return 2;
+                    }
+                    else if (yPos == 3)
+                    {
+                        return 3;
+                    }
+                    else if (yPos == 4)
+                    {
+                        return 4;
                     }
                 }
                 else if ((key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow) && yPos > 1)
                 {
                     yPos--;
                 }
-                else if ((key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow) && yPos < 2)
+                else if ((key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow) && yPos < 4)
                 {
                     yPos++;
                 }
             }
+        }
+        static void DisplayLeaderBoard()
+        {
+            const string fileName = "Leaderboard.txt";
+            List<string> names = new List<string>();
+            List<int> times = new List<int>();
+            using (StreamReader sr = new StreamReader(fileName))
+            {
+                string[] temps = new string[2];
+                while (!sr.EndOfStream)
+                {
+                    temps = sr.ReadLine().Split(' ');
+                    names.Add(temps[0]);
+                    times.Add(int.Parse(temps[1]));
+                }
+            }
+            for (int i = 0; i < names.Count(); i++)
+            {
+                Console.WriteLine($"{names[i]}: {formatTime(times[i])}");
+            }
+            Console.ReadKey();
+        }
+        static void AddToLeaderboard(int seconds)
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Clear();
+            Console.WriteLine("Enter your name:");
+            string name = Console.ReadLine();
+            const string fileName = "Leaderboard.txt";
+            List<string> lines = new List<string>();
+            using (StreamReader streamReader = new StreamReader(fileName))
+            {
+                while (!streamReader.EndOfStream)
+                {
+                    lines.Add(streamReader.ReadLine());
+                }
+            }
+            lines = InsertionSort(name, seconds, lines);
+            using (StreamWriter streamWriter = new StreamWriter(fileName))
+            {
+                foreach (string line in lines)
+                {
+                    streamWriter.WriteLine(line);
+                }
+            }
+        }
+        static void HowToPlay()
+        {
+            Console.WriteLine("Just play the game dumbass");
+            Console.ReadKey();
+        }
+        public static string formatTime(int seconds)
+        {
+            int[] times = new int[5];
+            times[0] = seconds / 31536000; // Hours
+            times[1] = (seconds - (times[0] * 31536000)) / 86400; // Days
+            times[2] = (seconds - (times[0] * 31536000) - (times[1] * 86400)) / 3600; // Hours
+            times[3] = (seconds - (times[0] * 31536000) - (times[1] * 86400) - (times[2] * 3600)) / 60; // Minutes
+            times[4] = seconds - (times[0] * 31536000) - (times[1] * 86400) - (times[2] * 3600) - (times[3] * 60); // Seconds
+            string[] isPlural = new string[5];
+            bool[] exists = new bool[5];
+            string[] names = { "year", "day", "hour", "minute", "second" };
+            for (int i = 0; i < 5; i++) isPlural[i] = "";
+            for (int i = 0; i < 5; i++)
+            {
+                if (times[i] != 1) isPlural[i] = "s"; 
+                if (times[i] == 0) exists[i] = false; 
+                else exists[i] = true;
+            }
+            int lastIndex = 0;
+            for (int i = 0; i < 5; i++)
+            {
+                if (exists[i]) lastIndex = i;
+            }
+            int secondLastIndex = 0;
+            for (int i = 0; i < lastIndex; i++)
+            {
+                if (exists[i]) secondLastIndex = i;
+            }
+            int count = -1;
+            string returnString = "";
+            foreach (bool b in exists)
+            {
+                count++;
+                if (b)
+                {
+                    if (count == lastIndex) returnString += $"{times[count]} {names[count]}{isPlural[count]}";
+                    else if (count == secondLastIndex) returnString += $"{times[count]} {names[count]}{isPlural[count]} and ";
+                    else returnString += $"{times[count]} {names[count]}{isPlural[count]}, ";
+                }
+            }
+            return returnString;
+        }
+        static List<string> InsertionSort(string name, int time, List<string> list)
+        {
+            List<int> times = new List<int>();
+            List<string> returnList = new List<string>();
+            // Isolates the integers from the list
+            foreach (string s in list)
+            {
+                string[] tempArr = s.Split(' ');
+                times.Add(int.Parse(tempArr[1]));
+            }
+            // Inserts value
+            bool done = false;
+            int index = 0;
+            while (!done)
+            {
+                if (time <= times[index])
+                {
+                    done = true;
+                    returnList.Add($"{name} {time}");
+                }
+                returnList.Add(list[index]);
+                index++;
+            }
+            while (index < list.Count)
+            {
+                returnList.Add(list[index]);
+                index++;
+            }
+            return returnList;
         }
         static void Main(string[] args)
         {
@@ -225,11 +369,10 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             while (true)
             {
                 Console.Clear();
-                Console.BackgroundColor = ConsoleColor.White;
-                Console.ForegroundColor = ConsoleColor.Black;
-                playGame(showAlgorithm);
-                Console.WriteLine("\n\n\n\n Press any key to play again");
-                Console.ReadKey(true);
+                if (choice == 1) playGame();
+                else if (choice == 2) DisplayLeaderBoard();
+                else if (choice == 3) HowToPlay();
+                else exit = true;
             }
         }
     }

@@ -166,22 +166,17 @@ namespace NEA
             }
             return adjList;
         }
-        public void generateMaze(int startNode, bool showGeneration, List<IVisible> objects)
+        public void generateMaze(int startNode, List<IVisible> objects)
         {
             // Creating and filling up visited with falses
             List<bool> visited = new List<bool>();
             for (int i = 0; i < adjList.Count(); i++)
                 visited.Add(false);
             // Running recursive backtracking
-            recursiveBacktracking(startNode, ref visited, showGeneration, objects);
+            recursiveBacktracking(startNode, ref visited, objects);
             // Adding random pathways about the maze
             for (int i = 0; i < Xsize * Ysize / 10; i++)
             {
-                if (showGeneration)
-                {
-                    Console.SetCursorPosition(0, 0);
-                    displayGraph(objects);
-                }
                 int node = getRandom(Xsize * Ysize - 1);
                 List<int> notEdges = new List<int>();
                 if (adjList[node].Contains(getLeft(node)) && getLeft(node) != -1)
@@ -209,24 +204,16 @@ namespace NEA
             makeEndPoint(startNode);
             return;
         }
-        public void recursiveBacktracking(int startNode, ref List<bool> visited, bool showGeneration, List<IVisible> objects)
+        public void recursiveBacktracking(int startNode, ref List<bool> visited, List<IVisible> objects)
         {
             List<int> nodeEdges = randomize(adjList[startNode]);
             visited[startNode] = true;
-            if (showGeneration)
-            {
-                Console.SetCursorPosition(0, 0);
-            }
             foreach (int i in nodeEdges.ToList())
             {
                 if (!visited[i])
                 {
                     removeEdge(startNode, i);
-                    if (showGeneration)
-                    {
-                        displayGraph(objects);
-                    }
-                    recursiveBacktracking(i, ref visited, showGeneration, objects);
+                    recursiveBacktracking(i, ref visited, objects);
                 }
             }
             return;
