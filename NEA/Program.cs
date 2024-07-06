@@ -13,7 +13,7 @@ namespace NEA
     internal class Program
     {
         static Random random = new Random();
-        readonly static int size = 10;
+        readonly static int size = 5;
         readonly static Maze maze = new Maze(size, random);
         static Player player = new Player(maze, random);
         static void playGame()
@@ -22,7 +22,7 @@ namespace NEA
             Console.ForegroundColor = ConsoleColor.Black;
             List<IVisible> objects = new List<IVisible>();
             // Adding enemies
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 2; i++)
             {
                 objects.Add(new BaseEnemy(maze, random));
             }
@@ -269,8 +269,14 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
-            Console.WriteLine("Enter your name:");
-            string name = Console.ReadLine();
+            string name = "";
+            bool validName = false;
+            while (!validName)
+            {
+                Console.WriteLine("Enter your name:");
+                name = Console.ReadLine();
+                if (name.Length > 0) validName = true;
+            }
             const string fileName = "Leaderboard.txt";
             List<string> lines = new List<string>();
             using (StreamReader streamReader = new StreamReader(fileName))

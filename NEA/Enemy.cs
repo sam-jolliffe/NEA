@@ -54,7 +54,7 @@ namespace NEA
                 if (direction == 0) tempPos = maze.getUp(tempPos);
                 else if (direction == 1) tempPos = maze.getRight(tempPos);
                 else if (direction == 2) tempPos = maze.getDown(tempPos);
-                else if (direction == 3) tempPos = maze.getLeft(tempPos);
+                else tempPos = maze.getLeft(tempPos);
                 if (tempPos != -1 && !maze.getEdges(tempPos).Contains(Position))
                 {
                     Position = tempPos;

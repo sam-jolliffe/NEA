@@ -309,35 +309,19 @@ namespace NEA
         }
         public int getLeft(int node)
         {
-            if (getXcoordinate(node) != 0)
-            {
-                return node - 1;
-            }
-            return -1;
+            return getXcoordinate(node) != 0 ? node - 1 : -1;
         }
         public int getRight(int node)
         {
-            if (getXcoordinate(node) < Xsize - 1)
-            {
-                return node + 1;
-            }
-            return -1;
+            return getXcoordinate(node) < Xsize - 1 ? node + 1 : -1;
         }
         public int getUp(int node)
         {
-            if (getYcoordinate(node) != 0)
-            {
-                return node - Xsize;
-            }
-            return -1;
+            return getYcoordinate(node) != 0 ? node - Xsize : -1;
         }
         public int getDown(int node)
         {
-            if (getYcoordinate(node) != Ysize - 1)
-            {
-                return node + Xsize;
-            }
-            return -1;
+            return getYcoordinate(node) != Ysize - 1 ? node + Xsize : -1;
         }
         public int getRandom(int maxNum)
         {
