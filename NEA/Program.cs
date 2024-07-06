@@ -78,6 +78,10 @@ namespace NEA
                             powerUps.Add((Power_Up)obj);
                         }
                     }
+                    foreach (Enemy enemy in enemies)
+                    {
+                        enemy.move(maze);
+                    }
                     if (enemyPositions.Contains(player.getPosition()))
                     {
                         hasLost = true;
