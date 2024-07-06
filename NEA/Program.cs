@@ -292,24 +292,20 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
         }
         public static string formatTime(int seconds)
         {
-            int[] times = new int[5];
-            times[0] = seconds / 31536000; // Hours
-            times[1] = (seconds - (times[0] * 31536000)) / 86400; // Days
-            times[2] = (seconds - (times[0] * 31536000) - (times[1] * 86400)) / 3600; // Hours
-            times[3] = (seconds - (times[0] * 31536000) - (times[1] * 86400) - (times[2] * 3600)) / 60; // Minutes
-            times[4] = seconds - (times[0] * 31536000) - (times[1] * 86400) - (times[2] * 3600) - (times[3] * 60); // Seconds
-            string[] isPlural = new string[5];
+            int[] times = new int[3];
+            times[0] = seconds / 3600; // Hours
+            times[1] = (seconds - (times[0] * 3600)) / 60; // Minutes
+            times[2] = seconds - (times[0] * 3600) - (times[1] * 60); // Seconds
+            string[] isPlural = new string[3];
             bool[] exists = new bool[5];
-            string[] names = { "year", "day", "hour", "minute", "second" };
-            for (int i = 0; i < 5; i++) isPlural[i] = "";
-            for (int i = 0; i < 5; i++)
+            string[] names = { "hour", "minute", "second" };
+            for (int i = 0; i < 3; i++)
             {
-                if (times[i] != 1) isPlural[i] = "s"; 
-                if (times[i] == 0) exists[i] = false; 
-                else exists[i] = true;
+                isPlural[i] = times[i] != 1 ? "s" : "";
+                exists[i] = times[i] == 0 ? false : true; 
             }
             int lastIndex = 0;
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 3; i++)
             {
                 if (exists[i]) lastIndex = i;
             }
@@ -318,16 +314,14 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             {
                 if (exists[i]) secondLastIndex = i;
             }
-            int count = -1;
             string returnString = "";
-            foreach (bool b in exists)
+            for (int i = 0; i < exists.Length; i++)
             {
-                count++;
-                if (b)
+                if (exists[i])
                 {
-                    if (count == lastIndex) returnString += $"{times[count]} {names[count]}{isPlural[count]}";
-                    else if (count == secondLastIndex) returnString += $"{times[count]} {names[count]}{isPlural[count]} and ";
-                    else returnString += $"{times[count]} {names[count]}{isPlural[count]}, ";
+                    if (i == lastIndex) returnString += $"{times[i]} {names[i]}{isPlural[i]}";
+                    else if (i == secondLastIndex) returnString += $"{times[i]} {names[i]}{isPlural[i]} and ";
+                    else returnString += $"{times[i]} {names[i]}{isPlural[i]}, ";
                 }
             }
             return returnString;
