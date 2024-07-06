@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Documents;
 
 namespace NEA
 {
@@ -312,7 +308,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             for (int i = 0; i < 3; i++)
             {
                 isPlural[i] = times[i] != 1 ? "s" : "";
-                exists[i] = times[i] == 0 ? false : true; 
+                exists[i] = times[i] == 0 ? false : true;
             }
             int lastIndex = 0;
             for (int i = 0; i < 3; i++)
