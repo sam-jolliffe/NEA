@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="BaseEnemy.cs" />
     <Compile Include="Enemy.cs" />
+    <Compile Include="Exceptions.cs" />
     <Compile Include="IVisible.cs" />
     <Compile Include="Maze.cs" />
     <Compile Include="Player.cs" />

@@ -6,10 +6,12 @@ using System.Linq;
 
 namespace NEA
 {
+    public enum Dir {up, right, down, left}
     internal class Program
     {
+
         static Random random = new Random();
-        readonly static int size = 5;
+        readonly static int size = 25;
         readonly static Maze maze = new Maze(size, random);
         static Player player = new Player(maze, random);
         static void playGame()
@@ -43,12 +45,17 @@ namespace NEA
             while (!hasWon && !hasLost)
             {
                 oldPos = player.getPosition();
-                player.setPosition(takeTurn(oldPos));
-                if (player.getPosition() == -1)
+                bool invalidTurn = false;
+                try
+                {
+                    player.setPosition(takeTurn(oldPos));
+                }
+                catch (NotInListException)
                 {
                     player.setPosition(oldPos);
+                    invalidTurn = true;
                 }
-                else if (!maze.getAdjList()[oldPos].Contains(player.getPosition()))
+                if (!maze.getAdjList()[oldPos].Contains(player.getPosition()) && !invalidTurn)
                 {
                     Console.SetCursorPosition(0, 0);
                     maze.displayGraph(objects);
@@ -65,7 +72,6 @@ namespace NEA
                     {
                         if (obj.getType() == "Enemy")
                         {
-                            enemyPositions.Add(obj.getPosition());
                             enemies.Add((Enemy)obj);
                         }
                         else if (obj.getType() == "Power-up")
@@ -77,6 +83,7 @@ namespace NEA
                     foreach (Enemy enemy in enemies)
                     {
                         enemy.move(maze);
+                        enemyPositions.Add(enemy.getPosition());
                     }
                     if (enemyPositions.Contains(player.getPosition()))
                     {
@@ -169,21 +176,22 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.SetCursorPosition(0, 0);
             Console.CursorVisible = false;
             ConsoleKeyInfo key = Console.ReadKey(true);
+
             if (key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow)
             {
-                pos = maze.getUp(pos);
+                pos = maze.getDirection(pos, Dir.up);
             }
             else if (key.Key == ConsoleKey.A || key.Key == ConsoleKey.LeftArrow)
             {
-                pos = maze.getLeft(pos);
+                pos = maze.getDirection(pos, Dir.left);
             }
             else if (key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow)
             {
-                pos = maze.getDown(pos);
+                pos = maze.getDirection(pos, Dir.down);
             }
             else if (key.Key == ConsoleKey.D || key.Key == ConsoleKey.RightArrow)
             {
-                pos = maze.getRight(pos);
+                pos = maze.getDirection(pos, Dir.right);
             }
             else if (key.Key == ConsoleKey.E)
             {

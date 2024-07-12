@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NEA
 {
@@ -46,20 +42,26 @@ namespace NEA
         }
         public void move(Maze maze)
         {
-            bool moved = false;
-            while (!moved)
+            Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
+            List<int> randomDirections = maze.randomize(new List<int> { 0, 1, 2, 3 });
+            List<int> possibleDirections = new List<int>();
+            bool isValidDirection = false;
+            foreach (int i in randomDirections)
             {
-                int direction = r.Next(0, 4);
-                int tempPos = Position;
-                if (direction == 0) tempPos = maze.getUp(tempPos);
-                else if (direction == 1) tempPos = maze.getRight(tempPos);
-                else if (direction == 2) tempPos = maze.getDown(tempPos);
-                else tempPos = maze.getLeft(tempPos);
-                if (tempPos != -1 && !maze.getEdges(tempPos).Contains(Position))
+                try
                 {
-                    Position = tempPos;
-                    moved = true;
+                    int tempPos = maze.getDirection(Position, directions[i]);
+                    if (!maze.getEdges(tempPos).Contains(Position))
+                    {
+                        possibleDirections.Add(tempPos);
+                    }
+                    isValidDirection = true;
                 }
+                catch (NotInListException) { }
+            }
+            if (isValidDirection)
+            {
+                Position = possibleDirections[0];
             }
         }
     }

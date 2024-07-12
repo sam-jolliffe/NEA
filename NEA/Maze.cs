@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace NEA
 {
@@ -14,6 +10,7 @@ namespace NEA
         private readonly int Xsize;
         private readonly int Ysize;
         private int endPoint = -1;
+        Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
         private readonly Dictionary<int, List<int>> adjList = new Dictionary<int, List<int>>();
         public Maze(int sizeIn, Random ran)
         {
@@ -50,7 +47,7 @@ namespace NEA
                         {
                             if (obj.getType() == "Player")
                             {
-                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                Console.ForegroundColor = ConsoleColor.DarkBlue;
                                 isObject = true;
                             }
                             else if (obj.getType() == "Enemy")
@@ -143,25 +140,13 @@ namespace NEA
             // Adds connections with all adjacent nodes
             for (int nodeNum = 0; nodeNum < Xsize * Ysize; nodeNum++)
             {
-                // Checks if it can place an edge to the left
-                if (getLeft(nodeNum) != -1)
+                foreach (Dir d in directions)
                 {
-                    adjList[nodeNum].Add(getLeft(nodeNum));
-                }
-                // Checks if it can place an edge above
-                if (getYcoordinate(nodeNum) > 0)
-                {
-                    adjList[nodeNum].Add(getUp(nodeNum));
-                }
-                // Checks if it can place an edge to the right
-                if (getRight(nodeNum) != -1)
-                {
-                    adjList[nodeNum].Add(getRight(nodeNum));
-                }
-                // Checks if it can place an edge below
-                if (getYcoordinate(nodeNum) < Ysize - 1)
-                {
-                    adjList[nodeNum].Add(getDown(nodeNum));
+                    try
+                    {
+                        adjList[nodeNum].Add(getDirection(nodeNum, d));
+                    }
+                    catch (NotInListException) { }
                 }
             }
             return adjList;
@@ -174,31 +159,28 @@ namespace NEA
                 visited.Add(false);
             // Running recursive backtracking
             recursiveBacktracking(startNode, ref visited, objects);
-            // Adding random pathways about the maze
-            for (int i = 0; i < Xsize * Ysize / 10; i++)
+            for (int i = 0; i < Xsize * Ysize; i++)
             {
-                int node = getRandom(Xsize * Ysize - 1);
-                List<int> notEdges = new List<int>();
-                if (adjList[node].Contains(getLeft(node)) && getLeft(node) != -1)
+                // Checks for dead ends, breaks the ends.
+
+                // Use this one to have some dead ends still
+                // int node = getRandom(Xsize * Ysize - 1);
+
+                // Use this one for all dead ends to be removed
+                int node = i;
+                if (adjList[node].Count() == 3)
                 {
-                    notEdges.Add(getLeft(node));
-                }
-                if (adjList[node].Contains(getRight(node)) && getRight(node) != -1)
-                {
-                    notEdges.Add(getRight(node));
-                }
-                if (adjList[node].Contains(getUp(node)) && getUp(node) != -1)
-                {
-                    notEdges.Add(getUp(node));
-                }
-                if (adjList[node].Contains(getUp(node)) && getUp(node) != -1)
-                {
-                    notEdges.Add(getUp(node));
-                }
-                notEdges = randomize(notEdges);
-                if (notEdges.Count > 0)
-                {
-                    removeEdge(notEdges[0], node);
+                    foreach (Dir d in directions)
+                    {
+                        try
+                        {
+                            if (!adjList[node].Contains(getDirection(node, d)))
+                            {
+                                removeEdge(node, getDirection(node, directions[((int)d + 2) % 4]));
+                            }
+                        }
+                        catch (NotInListException) { }
+                    }
                 }
             }
             makeEndPoint(startNode);
@@ -222,7 +204,7 @@ namespace NEA
         {
             if (!adjList.ContainsKey(node1) || !adjList.ContainsKey(node2))
             {
-                Console.WriteLine($"NotInDict");
+                // Console.WriteLine($"NotInDict");
                 return false;
             }
             if (adjList[node1].Contains(node2))
@@ -231,7 +213,7 @@ namespace NEA
             }
             else
             {
-                Console.WriteLine($"NotInList. {node1}, {node2}");
+                // Console.WriteLine($"NotInList. {node1}, {node2}");
                 return false;
             }
             if (adjList[node2].Contains(node1))
@@ -240,7 +222,7 @@ namespace NEA
             }
             else
             {
-                Console.WriteLine($"NotInList. {node1}, {node2}");
+                // Console.WriteLine($"NotInList. {node1}, {node2}");
                 return false;
             }
             return true;
@@ -307,21 +289,20 @@ namespace NEA
         {
             return node / Xsize;
         }
-        public int getLeft(int node)
+        public int getDirection(int node, Dir d)
         {
-            return getXcoordinate(node) != 0 ? node - 1 : -1;
-        }
-        public int getRight(int node)
-        {
-            return getXcoordinate(node) < Xsize - 1 ? node + 1 : -1;
-        }
-        public int getUp(int node)
-        {
-            return getYcoordinate(node) != 0 ? node - Xsize : -1;
-        }
-        public int getDown(int node)
-        {
-            return getYcoordinate(node) != Ysize - 1 ? node + Xsize : -1;
+            switch (d)
+            {
+                case Dir.left:
+                    return getXcoordinate(node) != 0 ? node - 1 : throw new NotInListException();
+                case Dir.right:
+                    return getXcoordinate(node) < Xsize - 1 ? node + 1 : throw new NotInListException();
+                case Dir.up:
+                    return getYcoordinate(node) != 0 ? node - Xsize : throw new NotInListException();
+                case Dir.down:
+                    return getYcoordinate(node) != Ysize - 1 ? node + Xsize : throw new NotInListException();
+            }
+            throw new NotInListException();
         }
         public int getRandom(int maxNum)
         {
