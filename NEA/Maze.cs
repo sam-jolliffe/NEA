@@ -20,6 +20,15 @@ namespace NEA
         }
         public void displayGraph(List<IVisible> objects)
         {
+            int playerPos = 0;
+            foreach (IVisible obj in objects)
+            {
+                if (obj.getType() == "Player")
+                {
+                    playerPos = obj.getPosition();
+                }
+            }
+            List<int> visibleNodes = depthFirst(playerPos, 0, new List<int>());
             ConsoleColor borderColour = ConsoleColor.Black;
             ConsoleColor wallColour = ConsoleColor.Black;
             // Top of the border
@@ -47,6 +56,7 @@ namespace NEA
                         {
                             if (obj.getType() == "Player")
                             {
+                                playerPos = obj.getPosition();
                                 Console.ForegroundColor = ConsoleColor.DarkBlue;
                                 isObject = true;
                             }
@@ -67,6 +77,11 @@ namespace NEA
                         Console.ForegroundColor = ConsoleColor.DarkYellow;
                         isObject = true;
                     }
+                    if (!visibleNodes.Contains(nodeNum))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                    }
                     if (isObject)
                     {
                         Console.Write("██");
@@ -76,9 +91,14 @@ namespace NEA
                     {
                         Console.Write("  ");
                     }
+                    Console.BackgroundColor = ConsoleColor.White;
                     // To the right of the node
                     if (x != Xsize - 1)
                     {
+                        if (!visibleNodes.Contains(nodeNum) || !visibleNodes.Contains(nodeNum + 1))
+                        {
+                            Console.BackgroundColor = ConsoleColor.Black;
+                        }
                         if (adjList[nodeNum].Contains(nodeNum + 1))
                         {
                             Console.Write("██");
@@ -87,6 +107,7 @@ namespace NEA
                         {
                             Console.Write("  ");
                         }
+                        Console.BackgroundColor = ConsoleColor.White;
                     }
                 }
                 Console.ForegroundColor = borderColour;
@@ -110,6 +131,10 @@ namespace NEA
                         // Makes itself the node above where it will place the bar
                         int nodeNum = y * Xsize + x;
                         // If this node shares an edge with the node below it, a bar is added.
+                        if (!visibleNodes.Contains(nodeNum) && !visibleNodes.Contains(nodeNum + Xsize))
+                        {
+                            Console.BackgroundColor = ConsoleColor.Black;
+                        }
                         if (adjList[nodeNum].Contains(nodeNum + Xsize))
                         {
                             Console.Write("██");
@@ -118,6 +143,7 @@ namespace NEA
                         {
                             Console.Write("  ");
                         }
+                        Console.BackgroundColor = ConsoleColor.White;
                         // The right hand border of the maze
                         if (x == Xsize - 1)
                         {
@@ -129,7 +155,7 @@ namespace NEA
                     }
                 }
             }
-        }
+        }  
         public Dictionary<int, List<int>> createGraph()
         {
             // Fills the dictionary so that each node has an associated adjacency list;
@@ -325,6 +351,32 @@ namespace NEA
                     validEndPoint = true;
                 }
             }
+        }
+        public List<int> depthFirst(int node, int count, List<int> visited)
+        {
+            count++;
+            if (count >= 10)
+            {
+                return visited;
+            }
+            List<int> adjacents = new List<int>();
+            foreach (Dir d in directions)
+            {
+                try
+                {
+                    adjacents.Add(getDirection(node, d));
+                }
+                catch (NotInListException) { }
+            }
+            foreach (int i in adjacents)
+            {
+                if (!visited.Contains(i) && !adjList[node].Contains(i))
+                {
+                    visited.Add(i);
+                    visited = depthFirst(i, count, visited);
+                }
+            }
+            return visited;
         }
     }
 }

@@ -18,17 +18,14 @@ namespace NEA
         {
             return Position;
         }
-
         public int getXpos()
         {
             return Xpos;
         }
-
         public int getYpos()
         {
             return Ypos;
         }
-
         public bool spawn(Maze maze)
         {
             Position = r.Next(0, maze.getXsize() * maze.getYsize() - 1);
