@@ -20,8 +20,8 @@ namespace NEA
         }
         public void displayGraph(List<IVisible> objects)
         {
-            // ██ signifies a coridoor
-            // '  ' signifies a wall
+            // ██ signifies a wall
+            // '  ' signifies a coridoor
             int playerPos = 0;
             foreach (IVisible obj in objects)
             {
@@ -30,7 +30,8 @@ namespace NEA
                     playerPos = obj.getPosition();
                 }
             }
-            List<int> visibleNodes = depthFirst(playerPos, 0, new List<int>());
+            List<int> visibleNodes = new List<int> { playerPos};
+            visibleNodes = depthFirst(playerPos, 0, visibleNodes);
             ConsoleColor borderColour = ConsoleColor.Black;
             ConsoleColor wallColour = ConsoleColor.Black;
             // Top of the border
@@ -349,10 +350,8 @@ namespace NEA
         public List<int> depthFirst(int node, int count, List<int> visited)
         {
             count++;
-            if (count >= 16)
-            {
-                return visited;
-            }
+            if (count >= 15) return visited;
+            visited.Add(node);
             List<int> adjacents = new List<int>();
             foreach (Dir d in directions)
             {
@@ -364,9 +363,8 @@ namespace NEA
             }
             foreach (int i in adjacents)
             {
-                if (!visited.Contains(i) && !adjList[node].Contains(i))
+                if (!adjList[node].Contains(i))
                 {
-                    visited.Add(i);
                     visited = depthFirst(i, count, visited);
                 }
             }
