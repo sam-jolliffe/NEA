@@ -198,6 +198,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             {
                 player.showInventory();
                 pos = -1;
+                throw new NotInListException();
             }
 
             return pos;

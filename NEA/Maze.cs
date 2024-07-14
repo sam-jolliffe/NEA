@@ -20,6 +20,8 @@ namespace NEA
         }
         public void displayGraph(List<IVisible> objects)
         {
+            // ██ signifies a coridoor
+            // '  ' signifies a wall
             int playerPos = 0;
             foreach (IVisible obj in objects)
             {
@@ -44,7 +46,7 @@ namespace NEA
                 Console.ForegroundColor = borderColour;
                 Console.Write("\n██");
                 Console.ForegroundColor = wallColour;
-                // Writes each node and then a blank space if there is an edge with the node to the right of it
+                // Writes each node 
                 for (int x = 0; x < Xsize; x++)
                 {
                     int nodeNum = y * Xsize + x;
@@ -110,6 +112,7 @@ namespace NEA
                         Console.BackgroundColor = ConsoleColor.White;
                     }
                 }
+                // Writes the right then left hand of the border
                 Console.ForegroundColor = borderColour;
                 Console.Write("██\n██");
                 Console.ForegroundColor = wallColour;
@@ -125,30 +128,21 @@ namespace NEA
                 }
                 else
                 {
-                    // Writes the vertical layer between nodes, has a dash if the nodes above and below it share a conection.
+                    // Writes the vertical layer between nodes, has a coridoor if the nodes above and below it share a conection.
                     for (int x = 0; x < Xsize; x++)
                     {
-                        // Makes itself the node above where it will place the bar
+                        // Makes itself the node above where it will write the piece
                         int nodeNum = y * Xsize + x;
-                        // If this node shares an edge with the node below it, a bar is added.
-                        if (!visibleNodes.Contains(nodeNum) && !visibleNodes.Contains(nodeNum + Xsize))
-                        {
-                            Console.BackgroundColor = ConsoleColor.Black;
-                        }
-                        if (adjList[nodeNum].Contains(nodeNum + Xsize))
-                        {
-                            Console.Write("██");
-                        }
-                        else
+                        // If this node shares an edge with the node below it, a coridoor is added.
+                        if (!adjList[nodeNum].Contains(nodeNum + Xsize) && visibleNodes.Contains(nodeNum) && visibleNodes.Contains(nodeNum + Xsize))
                         {
                             Console.Write("  ");
                         }
-                        Console.BackgroundColor = ConsoleColor.White;
-                        // The right hand border of the maze
-                        if (x == Xsize - 1)
+                        else
                         {
-                            Console.ForegroundColor = borderColour;
+                            Console.Write("██");
                         }
+                        Console.BackgroundColor = ConsoleColor.White;
                         // The wall diagonally between nodes
                         Console.Write("██");
                         Console.ForegroundColor = wallColour;
@@ -355,7 +349,7 @@ namespace NEA
         public List<int> depthFirst(int node, int count, List<int> visited)
         {
             count++;
-            if (count >= 10)
+            if (count >= 16)
             {
                 return visited;
             }
