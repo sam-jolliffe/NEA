@@ -6,6 +6,7 @@ namespace NEA
 {
     public class Maze
     {
+        private readonly bool testing = true;
         private static Random r;
         private readonly int Xsize;
         private readonly int Ysize;
@@ -31,7 +32,17 @@ namespace NEA
                 }
             }
             List<int> visibleNodes = new List<int> { playerPos};
-            visibleNodes = depthFirst(playerPos, 0, visibleNodes);
+            if (!testing)
+            {
+                visibleNodes = depthFirst(playerPos, 0, visibleNodes);
+            }
+            else
+            {
+                for (int i = 0; i < Xsize * Ysize; i++)
+                {
+                    visibleNodes.Add(i);
+                }
+            }
             ConsoleColor borderColour = ConsoleColor.Black;
             ConsoleColor wallColour = ConsoleColor.Black;
             // Top of the border
@@ -350,7 +361,7 @@ namespace NEA
         public List<int> depthFirst(int node, int count, List<int> visited)
         {
             count++;
-            if (count >= 15) return visited;
+            if (count >= 20) return visited;
             visited.Add(node);
             List<int> adjacents = new List<int>();
             foreach (Dir d in directions)

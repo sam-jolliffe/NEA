@@ -10,9 +10,8 @@ namespace NEA
     public enum Dir {up, right, down, left}
     internal class Program
     {
-
         static Random random = new Random();
-        readonly static int size = 25;
+        readonly static int size = 5;
         readonly static Maze maze = new Maze(size, random);
         static Player player = new Player(maze, random);
         static void playGame()
@@ -83,7 +82,7 @@ namespace NEA
                     }
                     foreach (Enemy enemy in enemies)
                     {
-                        enemy.move(maze);
+                        enemy.move(maze, player.getPosition());
                         enemyPositions.Add(enemy.getPosition());
                     }
                     if (enemyPositions.Contains(player.getPosition()))
