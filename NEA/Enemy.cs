@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Xml.Linq;
 
 namespace NEA
 {
@@ -40,51 +41,64 @@ namespace NEA
         }
         public void move(Maze maze, int playerPos)
         {
-            List<int> distances = new List<int>();
-            List<int> previous = new List<int>();
+            int[] distances = new int[maze.getXsize() * maze.getYsize()];
+            int[] previous = new int[maze.getXsize() * maze.getYsize()];
             List<int> unvisitedNodes = new List<int>();
             for (int i = 0; i < maze.getXsize() * maze.getYsize(); i++)
             {
-                distances.Add(1000);
-                previous.Add(-1);
+                distances[i] = 1000;
+                previous[i] = -1;
                 unvisitedNodes.Add(i);
             }
             distances[Position] = 0;
-
+            unvisitedNodes.Remove(0);
             while (unvisitedNodes.Count > 0)
             {
                 // Getting node with shortest distance:
                 // Has to be in unvisitedNodes, have lowest corresponding distance
                 int nodeVal = 1001;
+                int node = -1;
                 foreach (int i in unvisitedNodes)
                 {
                     if (distances[i] < nodeVal)
                     {
                         nodeVal = distances[i];
+                        node = i;
                     }
                 }
-                int node = distances.IndexOf(nodeVal);
                 unvisitedNodes.Remove(node);
-                Console.Write(node + ", ");
+                Console.Write($"node: {node} value: {nodeVal} ");
                 // Creates a list of all the possible moves the enemy could do
                 List<int> possibleMoves = new List<int>();
-                foreach (int i in maze.getAdjList()[node])
+                Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
+                List<int> possibleDirections = new List<int>();
+                foreach (Dir d in directions)
                 {
-                    if (unvisitedNodes.Contains(i))
+                    try
+                    {
+                        possibleDirections.Add(maze.getDirection(node, d));
+                    }
+                    catch (NotInListException) { }
+                }
+                foreach (int i in possibleDirections)
+                {
+                    if (unvisitedNodes.Contains(i) && !maze.getAdjList()[node].Contains(i))
                     {
                         possibleMoves.Add(i);
                     }
                 }
 
                 // Temp is the same for each one as the distance is the same each time.
-                int thisPath = distances[node] + 1;
+
                 foreach (int i in possibleMoves)
                 {
+                    int thisPath = distances[node] + 1;
                     if (thisPath < distances[i])
                     {
                         distances[i] = thisPath;
                         // 'i' is the node that it's talking about, the actual value is the node prior to it.
                         previous[i] = node;
+                        Console.Write($"previous {i}: {previous[i]} ");
                     }
                 }
             }
@@ -99,7 +113,9 @@ namespace NEA
                     Position = temp;
                     isFound = true;
                 }
+                temp = previous[temp];
             }
+            
 
             /*List<int> randomDirections = maze.randomize(new List<int> { 0, 1, 2, 3 });
             List<int> possibleDirections = new List<int>();
