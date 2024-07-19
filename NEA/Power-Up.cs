@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,10 +13,18 @@ namespace NEA
         private int Position;
         private int Xpos;
         private int Ypos;
-        public Power_Up(Maze maze, Random ran)
+        private readonly Maze maze;
+        public Power_Up(Maze mazeIn, Random ran)
         {
             r = ran;
-            spawn(maze);
+            maze = mazeIn;
+            spawn();
+        }
+        public Power_Up(Maze mazeIn, Random ran, int position)
+        {
+            r = ran;
+            maze = mazeIn;
+            spawn(position);
         }
         public string getType()
         {
@@ -41,12 +50,17 @@ namespace NEA
         {
             return "Base Powerup";
         }
-        public bool spawn(Maze maze)
+        public void spawn()
         {
             Position = r.Next(0, maze.getXsize() * maze.getYsize() - 1);
             Xpos = maze.getXcoordinate(Position);
             Ypos = maze.getYcoordinate(Position);
-            return true;
+        }
+        public void spawn(int position)
+        {
+            Position = position;
+            Xpos = maze.getXcoordinate(Position);
+            Ypos = maze.getYcoordinate(Position);
         }
     }
 }

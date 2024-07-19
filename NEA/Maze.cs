@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Configuration;
 
 namespace NEA
 {
@@ -11,7 +12,8 @@ namespace NEA
         private readonly int Xsize;
         private readonly int Ysize;
         private int endPoint = -1;
-        Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
+        private readonly List<int> roomsNodes = new List<int>();
+        private readonly Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
         private readonly Dictionary<int, List<int>> adjList = new Dictionary<int, List<int>>();
         public Maze(int sizeIn, Random ran)
         {
@@ -68,20 +70,20 @@ namespace NEA
                     {
                         if (obj.getPosition() == nodeNum)
                         {
-                            if (obj.getType() == "Player")
+                            if (obj.getType() == "Power-up")
                             {
-                                playerPos = obj.getPosition();
-                                Console.ForegroundColor = ConsoleColor.DarkBlue;
+                                Console.ForegroundColor = ConsoleColor.Green;
                                 isObject = true;
                             }
-                            else if (obj.getType() == "Enemy")
+                            if (obj.getType() == "Enemy")
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
                                 isObject = true;
                             }
-                            else if (obj.getType() == "Power-up")
+                            if (obj.getType() == "Player")
                             {
-                                Console.ForegroundColor = ConsoleColor.Green;
+                                playerPos = obj.getPosition();
+                                Console.ForegroundColor = ConsoleColor.DarkBlue;
                                 isObject = true;
                             }
                         }
@@ -156,7 +158,11 @@ namespace NEA
                         }
                         Console.BackgroundColor = ConsoleColor.White;
                         // The wall diagonally between nodes
-                        Console.Write("██");
+                        if (roomsNodes.Contains(nodeNum) && roomsNodes.Contains(getDirection(nodeNum, Dir.right)) && roomsNodes.Contains(getDirection(nodeNum, Dir.down)) && roomsNodes.Contains(getDirection(getDirection(nodeNum, Dir.right), Dir.down)))
+                        {
+                            Console.Write("  ");
+                        }
+                        else Console.Write("██");
                         Console.ForegroundColor = wallColour;
                     }
                 }
@@ -190,7 +196,7 @@ namespace NEA
             for (int i = 0; i < adjList.Count(); i++)
                 visited.Add(false);
             // Running recursive backtracking
-            recursiveBacktracking(startNode, ref visited, objects);
+            recursiveBacktracking(startNode, ref visited);
             for (int i = 0; i < Xsize * Ysize; i++)
             {
                 // Checks for dead ends, breaks the ends.
@@ -200,6 +206,7 @@ namespace NEA
 
                 // Use this one for all dead ends to be removed
                 int node = i;
+
                 if (adjList[node].Count() == 3)
                 {
                     foreach (Dir d in directions)
@@ -215,10 +222,11 @@ namespace NEA
                     }
                 }
             }
+            makeRooms();
             makeEndPoint(startNode);
-            return;
+
         }
-        public void recursiveBacktracking(int startNode, ref List<bool> visited, List<IVisible> objects)
+        public void recursiveBacktracking(int startNode, ref List<bool> visited)
         {
             List<int> nodeEdges = randomize(adjList[startNode]);
             visited[startNode] = true;
@@ -227,10 +235,9 @@ namespace NEA
                 if (!visited[i])
                 {
                     removeEdge(startNode, i);
-                    recursiveBacktracking(i, ref visited, objects);
+                    recursiveBacktracking(i, ref visited);
                 }
             }
-            return;
         }
         public bool removeEdge(int node1, int node2)
         {
@@ -361,7 +368,7 @@ namespace NEA
         public List<int> depthFirst(int node, int count, List<int> visited)
         {
             count++;
-            if (count >= 20) return visited;
+            if (count >= 15) return visited;
             visited.Add(node);
             List<int> adjacents = new List<int>();
             foreach (Dir d in directions)
@@ -381,5 +388,43 @@ namespace NEA
             }
             return visited;
         }
+        public void makeRooms()
+        {
+            // Treasure room:
+            int Node = 0;
+            bool isValid = false;
+            // Node cannot be on one of the borders, as i'm going to dig out a 3x3 around it.
+            while (!isValid)
+            {
+                Node = r.Next(0, Xsize * Ysize);
+                //      Top row                               Bottom row                        Left column                       Right column
+                if (!(getYcoordinate(Node) == 0 || getYcoordinate(Node) == Ysize - 1 || getXcoordinate(Node) == 0 || getXcoordinate(Node) == Xsize - 1))
+                {
+                    isValid = true;
+                }
+            }
+            removeEdge(getDirection(getDirection(Node, Dir.left), Dir.up), getDirection(Node, Dir.up)); // Top left, top middle
+            removeEdge(getDirection(Node, Dir.up), getDirection(getDirection(Node, Dir.right), Dir.up)); // Top middle, top right
+            removeEdge(getDirection(getDirection(Node, Dir.left), Dir.up), getDirection(Node, Dir.left)); // Top left, middle left
+            removeEdge(getDirection(Node, Dir.up), Node); // Top middle, middle
+            removeEdge(getDirection(getDirection(Node, Dir.right), Dir.up), getDirection(Node, Dir.right)); // Top right, middle right
+            removeEdge(getDirection(Node, Dir.left), Node); // Middle left, middle
+            removeEdge(Node, getDirection(Node, Dir.right)); // Middle, middle right
+            removeEdge(getDirection(Node, Dir.left), getDirection(getDirection(Node, Dir.left), Dir.down)); // Middle left, bottom left
+            removeEdge(Node, getDirection(Node, Dir.down)); // Middle, bottom middle
+            removeEdge(getDirection(Node, Dir.right), getDirection(getDirection(Node, Dir.right), Dir.down)); // Middle right, bottom right
+            removeEdge(getDirection(getDirection(Node, Dir.left), Dir.down), getDirection(Node, Dir.down)); // Bottom left, bottom middle
+            removeEdge(getDirection(Node, Dir.down), getDirection(getDirection(Node, Dir.right), Dir.down)); // Bottom middle, bottom right
+            roomsNodes.Add(Node);
+            roomsNodes.Add(getDirection(getDirection(Node, Dir.up), Dir.left));
+            roomsNodes.Add(getDirection(Node, Dir.up));
+            roomsNodes.Add(getDirection(getDirection(Node, Dir.right), Dir.up));
+            roomsNodes.Add(getDirection(Node, Dir.left));
+            roomsNodes.Add(getDirection(Node, Dir.right));
+            roomsNodes.Add(getDirection(getDirection(Node, Dir.left), Dir.down));
+            roomsNodes.Add(getDirection(Node, Dir.down));
+            roomsNodes.Add(getDirection(getDirection(Node, Dir.right), Dir.down));
+        }
+        public List<int> getRoomsNodes() { return roomsNodes; }
     }
 }

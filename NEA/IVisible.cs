@@ -11,7 +11,7 @@ namespace NEA
         int getPosition();
         int getYpos();
         int getXpos();
-        bool spawn(Maze maze);
+        void spawn();
         string getType();
     }
 }

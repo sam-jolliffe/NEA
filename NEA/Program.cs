@@ -10,17 +10,17 @@ namespace NEA
     public enum Dir {up, right, down, left}
     internal class Program
     {
-        static Random random = new Random();
-        readonly static int size = 5;
+        static readonly Random random = new Random();
+        readonly static int size = 15;
         readonly static Maze maze = new Maze(size, random);
-        static Player player = new Player(maze, random);
+        static readonly Player player = new Player(maze, random);
         static void playGame()
         {
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
             List<IVisible> objects = new List<IVisible>();
             // Adding enemies
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 0; i++)
             {
                 objects.Add(new BaseEnemy(maze, random));
             }
@@ -30,10 +30,14 @@ namespace NEA
                 objects.Add(new Stun(maze, random));
             }
             Console.WriteLine(objects.Count());
-            // Adding the player
-            objects.Add(player);
             maze.createGraph();
             maze.generateMaze(player.getPosition(), objects);
+            List<int> roomsNodes = maze.getRoomsNodes();
+            foreach (int roomNode in roomsNodes)
+            {
+                objects.Add(new Stun(maze, random, roomNode));
+            }
+            objects.Add(player);
             int oldPos;
             bool hasWon = false;
             bool hasLost = false;
@@ -73,17 +77,21 @@ namespace NEA
                         if (obj.getType() == "Enemy")
                         {
                             enemies.Add((Enemy)obj);
+                            try
+                            {
+                                ((Enemy)obj).move(maze, player.getPosition());
+                            }
+                            catch
+                            {
+                                hasLost = true;
+                            }
+                            enemyPositions.Add(obj.getPosition());
                         }
                         else if (obj.getType() == "Power-up")
                         {
                             powerupPositions.Add(obj.getPosition());
                             powerUps.Add((Power_Up)obj);
                         }
-                    }
-                    foreach (Enemy enemy in enemies)
-                    {
-                        enemy.move(maze, player.getPosition());
-                        enemyPositions.Add(enemy.getPosition());
                     }
                     if (enemyPositions.Contains(player.getPosition()))
                     {
@@ -196,7 +204,6 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             else if (key.Key == ConsoleKey.E)
             {
                 player.showInventory();
-                pos = -1;
                 throw new NotInListException();
             }
 
@@ -317,7 +324,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             for (int i = 0; i < 3; i++)
             {
                 isPlural[i] = times[i] != 1 ? "s" : "";
-                exists[i] = times[i] == 0 ? false : true;
+                exists[i] = times[i] != 0;
             }
             int lastIndex = 0;
             for (int i = 0; i < 3; i++)

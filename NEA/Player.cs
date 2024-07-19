@@ -9,14 +9,16 @@ namespace NEA
     public class Player : IVisible
     {
         private static Random r;
-        private List<Power_Up> Inventory;
+        private readonly List<Power_Up> Inventory;
         private int Position;
         private int Xpos;
         private int Ypos;
+        private readonly Maze Maze;
         public Player(Maze maze, Random ran)
         {
             r = ran;
-            spawn(maze);
+            Maze = maze;
+            spawn();
             Inventory = new List<Power_Up>();
         }
         public int getPosition()
@@ -36,12 +38,19 @@ namespace NEA
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Clear();
-            Console.WriteLine("You have: \n\n");
-            foreach (Power_Up powerup in Inventory)
+            if (Inventory.Count > 0)
             {
-                Console.WriteLine($@"{powerup.getName()}:
+                Console.WriteLine("You have: \n\n");
+                foreach (Power_Up powerup in Inventory)
+                {
+                    Console.WriteLine($@"{powerup.getName()}:
 {powerup.getDescription()}
  ");
+                }
+            }
+            else
+            {
+                Console.WriteLine("You have nothing in your inventory");
             }
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
@@ -69,12 +78,11 @@ namespace NEA
             return Ypos;
         }
 
-        public bool spawn(Maze maze)
+        public void spawn()
         {
-            Position = r.Next(0, maze.getXsize() * maze.getYsize() - 1);
-            Xpos = maze.getXcoordinate(Position);
-            Ypos = maze.getYcoordinate(Position);
-            return true;
+            Position = r.Next(0, Maze.getXsize() * Maze.getYsize() - 1);
+            Xpos = Maze.getXcoordinate(Position);
+            Ypos = Maze.getYcoordinate(Position);
         }
     }
 }

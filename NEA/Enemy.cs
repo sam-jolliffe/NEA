@@ -11,10 +11,12 @@ namespace NEA
         private int Position;
         private int Xpos;
         private int Ypos;
+        private readonly Maze Maze;
         public Enemy(Maze maze, Random ran)
         {
             r = ran;
-            spawn(maze);
+            Maze = maze;
+            spawn();
         }
         public int getPosition()
         {
@@ -28,12 +30,11 @@ namespace NEA
         {
             return Ypos;
         }
-        public bool spawn(Maze maze)
+        public void spawn()
         {
-            Position = r.Next(0, maze.getXsize() * maze.getYsize() - 1);
-            Xpos = maze.getXcoordinate(Position);
-            Ypos = maze.getYcoordinate(Position);
-            return true;
+            Position = r.Next(0, Maze.getXsize() * Maze.getYsize() - 1);
+            Xpos = Maze.getXcoordinate(Position);
+            Ypos = Maze.getYcoordinate(Position);
         }
         public string getType()
         {
@@ -67,7 +68,7 @@ namespace NEA
                     }
                 }
                 unvisitedNodes.Remove(node);
-                Console.Write($"node: {node} value: {nodeVal} ");
+                // Console.Write($"node: {node} value: {nodeVal} ");
                 // Creates a list of all the possible moves the enemy could do
                 List<int> possibleMoves = new List<int>();
                 Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
@@ -98,7 +99,7 @@ namespace NEA
                         distances[i] = thisPath;
                         // 'i' is the node that it's talking about, the actual value is the node prior to it.
                         previous[i] = node;
-                        Console.Write($"previous {i}: {previous[i]} ");
+                        // Console.Write($"previous {i}: {previous[i]} ");
                     }
                 }
             }
