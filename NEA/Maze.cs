@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Configuration;
 
 namespace NEA
 {
@@ -12,7 +11,8 @@ namespace NEA
         private readonly int Xsize;
         private readonly int Ysize;
         private int endPoint = -1;
-        private readonly List<int> roomsNodes = new List<int>();
+        private List<int> treasureRoomNodes = new List<int>();
+        private List<int> allRoomsNodes = new List<int>();
         private readonly Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
         private readonly Dictionary<int, List<int>> adjList = new Dictionary<int, List<int>>();
         public Maze(int sizeIn, Random ran)
@@ -33,7 +33,7 @@ namespace NEA
                     playerPos = obj.getPosition();
                 }
             }
-            List<int> visibleNodes = new List<int> { playerPos};
+            List<int> visibleNodes = new List<int> { playerPos };
             if (!testing)
             {
                 visibleNodes = depthFirst(playerPos, 0, visibleNodes);
@@ -158,7 +158,7 @@ namespace NEA
                         }
                         Console.BackgroundColor = ConsoleColor.White;
                         // The wall diagonally between nodes
-                        if (roomsNodes.Contains(nodeNum) && roomsNodes.Contains(getDirection(nodeNum, Dir.right)) && roomsNodes.Contains(getDirection(nodeNum, Dir.down)) && roomsNodes.Contains(getDirection(getDirection(nodeNum, Dir.right), Dir.down)))
+                        if (allRoomsNodes.Contains(nodeNum) && allRoomsNodes.Contains(getDirection(nodeNum, Dir.right)) && allRoomsNodes.Contains(getDirection(nodeNum, Dir.down)) && allRoomsNodes.Contains(getDirection(getDirection(nodeNum, Dir.right), Dir.down)))
                         {
                             Console.Write("  ");
                         }
@@ -167,7 +167,7 @@ namespace NEA
                     }
                 }
             }
-        }  
+        }
         public Dictionary<int, List<int>> createGraph()
         {
             // Fills the dictionary so that each node has an associated adjacency list;
@@ -222,7 +222,7 @@ namespace NEA
                     }
                 }
             }
-            makeRooms();
+            makeRooms(ref objects);
             makeEndPoint(startNode);
 
         }
@@ -388,7 +388,7 @@ namespace NEA
             }
             return visited;
         }
-        public void makeRooms()
+        public void makeRooms(ref List<IVisible> objects)
         {
             // Treasure room:
             int Node = 0;
@@ -415,16 +415,63 @@ namespace NEA
             removeEdge(getDirection(Node, Dir.right), getDirection(getDirection(Node, Dir.right), Dir.down)); // Middle right, bottom right
             removeEdge(getDirection(getDirection(Node, Dir.left), Dir.down), getDirection(Node, Dir.down)); // Bottom left, bottom middle
             removeEdge(getDirection(Node, Dir.down), getDirection(getDirection(Node, Dir.right), Dir.down)); // Bottom middle, bottom right
-            roomsNodes.Add(Node);
-            roomsNodes.Add(getDirection(getDirection(Node, Dir.up), Dir.left));
-            roomsNodes.Add(getDirection(Node, Dir.up));
-            roomsNodes.Add(getDirection(getDirection(Node, Dir.right), Dir.up));
-            roomsNodes.Add(getDirection(Node, Dir.left));
-            roomsNodes.Add(getDirection(Node, Dir.right));
-            roomsNodes.Add(getDirection(getDirection(Node, Dir.left), Dir.down));
-            roomsNodes.Add(getDirection(Node, Dir.down));
-            roomsNodes.Add(getDirection(getDirection(Node, Dir.right), Dir.down));
+            treasureRoomNodes = new List<int>
+            {
+                Node,
+                getDirection(getDirection(Node, Dir.up), Dir.left),
+                getDirection(Node, Dir.up),
+                getDirection(getDirection(Node, Dir.right), Dir.up),
+                getDirection(Node, Dir.left),
+                getDirection(Node, Dir.right),
+                getDirection(getDirection(Node, Dir.left), Dir.down),
+                getDirection(Node, Dir.down),
+                getDirection(getDirection(Node, Dir.right), Dir.down)
+            };
+            allRoomsNodes = new List<int>(treasureRoomNodes);
+
+            // Key room:
+            isValid = false;
+            while (!isValid)
+            {
+                Node = r.Next(0, Xsize * Ysize);
+                //      Top row                               Bottom row                        Left column                       Right column
+                if (!((getYcoordinate(Node) == 0 || getYcoordinate(Node) == Ysize - 1 || getXcoordinate(Node) == 0 || getXcoordinate(Node) == Xsize - 1) && allRoomsNodes.Contains(Node)))
+                {
+                    isValid = true;
+                }
+            }
+            removeEdge(getDirection(getDirection(Node, Dir.left), Dir.up), getDirection(Node, Dir.up)); // Top left, top middle
+            removeEdge(getDirection(Node, Dir.up), getDirection(getDirection(Node, Dir.right), Dir.up)); // Top middle, top right
+            removeEdge(getDirection(getDirection(Node, Dir.left), Dir.up), getDirection(Node, Dir.left)); // Top left, middle left
+            removeEdge(getDirection(Node, Dir.up), Node); // Top middle, middle
+            removeEdge(getDirection(getDirection(Node, Dir.right), Dir.up), getDirection(Node, Dir.right)); // Top right, middle right
+            removeEdge(getDirection(Node, Dir.left), Node); // Middle left, middle
+            removeEdge(Node, getDirection(Node, Dir.right)); // Middle, middle right
+            removeEdge(getDirection(Node, Dir.left), getDirection(getDirection(Node, Dir.left), Dir.down)); // Middle left, bottom left
+            removeEdge(Node, getDirection(Node, Dir.down)); // Middle, bottom middle
+            removeEdge(getDirection(Node, Dir.right), getDirection(getDirection(Node, Dir.right), Dir.down)); // Middle right, bottom right
+            removeEdge(getDirection(getDirection(Node, Dir.left), Dir.down), getDirection(Node, Dir.down)); // Bottom left, bottom middle
+            removeEdge(getDirection(Node, Dir.down), getDirection(getDirection(Node, Dir.right), Dir.down)); // Bottom middle, bottom right
+            allRoomsNodes.AddRange(new List<int>
+            {
+                Node,
+                getDirection(getDirection(Node, Dir.up), Dir.left),
+                getDirection(Node, Dir.up),
+                getDirection(getDirection(Node, Dir.right), Dir.up),
+                getDirection(Node, Dir.left),
+                getDirection(Node, Dir.right),
+                getDirection(getDirection(Node, Dir.left), Dir.down),
+                getDirection(Node, Dir.down),
+                getDirection(getDirection(Node, Dir.right), Dir.down)
+            });
         }
-        public List<int> getRoomsNodes() { return roomsNodes; }
+        public List<int> getTreasureRoomNodes()
+        {
+            return treasureRoomNodes;
+        }
+        public List<int> getAllRoomsNodes()
+        {
+            return allRoomsNodes;
+        }
     }
 }

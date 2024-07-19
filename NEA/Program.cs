@@ -20,20 +20,20 @@ namespace NEA
             Console.ForegroundColor = ConsoleColor.Black;
             List<IVisible> objects = new List<IVisible>();
             // Adding enemies
-            for (int i = 0; i < 0; i++)
+            for (int i = 0; i < 5; i++)
             {
                 objects.Add(new BaseEnemy(maze, random));
             }
             // Adding power-ups
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 5; i++)
             {
                 objects.Add(new Stun(maze, random));
             }
             Console.WriteLine(objects.Count());
             maze.createGraph();
             maze.generateMaze(player.getPosition(), objects);
-            List<int> roomsNodes = maze.getRoomsNodes();
-            foreach (int roomNode in roomsNodes)
+            List<int> roomNodes = maze.getTreasureRoomNodes();
+            foreach (int roomNode in roomNodes)
             {
                 objects.Add(new Stun(maze, random, roomNode));
             }
