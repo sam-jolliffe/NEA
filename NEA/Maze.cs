@@ -24,7 +24,7 @@ namespace NEA
         }
         public void displayGraph(List<IVisible> objects)
         {
-            // ██ signifies a wall
+            // ██ signifies a wall or an object
             // '  ' signifies a coridoor
             int playerPos = 0;
             foreach (IVisible obj in objects)
@@ -116,24 +116,23 @@ namespace NEA
                     }
                     else
                     {
-                        Console.BackgroundColor = ConsoleColor.Black;
-                        Console.Write("  ");
+                        Console.Write("██");
                     }
                     Console.BackgroundColor = ConsoleColor.White;
+                    Console.ForegroundColor = ConsoleColor.Black;
                     // To the right of the node
                     if (x != Xsize - 1)
                     {
                         if (!visibleNodes.Contains(nodeNum) || !visibleNodes.Contains(nodeNum + 1))
                         {
-                            Console.BackgroundColor = ConsoleColor.Black;
                         }
-                        if (adjList[nodeNum].Contains(nodeNum + 1))
+                        if (!adjList[nodeNum].Contains(nodeNum + 1) && visibleNodes.Contains(nodeNum) && visibleNodes.Contains(nodeNum + 1))
                         {
-                            Console.Write("██");
+                            Console.Write("  ");
                         }
                         else
                         {
-                            Console.Write("  ");
+                            Console.Write("██");
                         }
                         Console.BackgroundColor = ConsoleColor.White;
                     }
