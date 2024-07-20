@@ -68,50 +68,55 @@ namespace NEA
                     int nodeNum = y * Xsize + x;
                     // Writing node
                     bool isObject = false;
-                    foreach (IVisible obj in objects)
+                    if (visibleNodes.Contains(nodeNum))
                     {
-                        if (obj.getPosition() == nodeNum)
+                        foreach (IVisible obj in objects)
                         {
-                            if (obj.getType() == "Power-up")
+                            if (obj.getPosition() == nodeNum)
                             {
-                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.BackgroundColor = ConsoleColor.White;
                                 isObject = true;
-                            }
-                            else if (obj.getType() == "Enemy")
-                            {
-                                Console.ForegroundColor = ConsoleColor.Red;
-                                isObject = true;
-                            }
-                            else if (obj.getType() == "Key")
-                            {
-                                Console.ForegroundColor = ConsoleColor.Magenta;
-                                isObject = true;
-                            }
-                            else if (obj.getType() == "Player")
-                            {
-                                playerPos = obj.getPosition();
-                                Console.ForegroundColor = ConsoleColor.DarkBlue;
-                                isObject = true;
+                                switch (obj.getType())
+                                {
+                                    case "Power-up":
+                                        Console.ForegroundColor = ConsoleColor.Green;
+                                        Console.Write("°°");
+                                        break;
+                                    case "Enemy":
+                                        Console.ForegroundColor = ConsoleColor.Red;
+                                        Console.Write("╬╬");
+                                        break;
+                                    case "Key":
+                                        Console.ForegroundColor = ConsoleColor.Magenta;
+                                        Console.Write("██");
+                                        break;
+                                    case "Player":
+                                        playerPos = obj.getPosition();
+                                        Console.ForegroundColor = ConsoleColor.DarkBlue;
+                                        Console.Write("██");
+                                        break;
+                                }
                             }
                         }
-                    }
-                    if (nodeNum == endPoint)
-                    {
-                        Console.ForegroundColor = ConsoleColor.DarkYellow;
-                        isObject = true;
-                    }
-                    if (!visibleNodes.Contains(nodeNum))
-                    {
-                        Console.ForegroundColor = ConsoleColor.Black;
-                        Console.BackgroundColor = ConsoleColor.Black;
-                    }
-                    if (isObject)
-                    {
-                        Console.Write("██");
-                        Console.ForegroundColor = wallColour;
+                        if (nodeNum == endPoint)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.Write("██");
+                            isObject = true;
+                        }
+                        if (isObject)
+                        {
+                            Console.ForegroundColor = wallColour;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.Write("██");
+                        }
                     }
                     else
                     {
+                        Console.BackgroundColor = ConsoleColor.Black;
                         Console.Write("  ");
                     }
                     Console.BackgroundColor = ConsoleColor.White;
