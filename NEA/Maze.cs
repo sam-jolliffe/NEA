@@ -11,6 +11,7 @@ namespace NEA
         private readonly int Xsize;
         private readonly int Ysize;
         private int endPoint = -1;
+        private int keyPosition;
         private List<int> treasureRoomNodes = new List<int>();
         private List<int> allRoomsNodes = new List<int>();
         private readonly Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
@@ -75,12 +76,17 @@ namespace NEA
                                 Console.ForegroundColor = ConsoleColor.Green;
                                 isObject = true;
                             }
-                            if (obj.getType() == "Enemy")
+                            else if (obj.getType() == "Enemy")
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
                                 isObject = true;
                             }
-                            if (obj.getType() == "Player")
+                            else if (obj.getType() == "Key")
+                            {
+                                Console.ForegroundColor = ConsoleColor.Magenta;
+                                isObject = true;
+                            }
+                            else if (obj.getType() == "Player")
                             {
                                 playerPos = obj.getPosition();
                                 Console.ForegroundColor = ConsoleColor.DarkBlue;
@@ -398,7 +404,7 @@ namespace NEA
             {
                 Node = r.Next(0, Xsize * Ysize);
                 //      Top row                               Bottom row                        Left column                       Right column
-                if (!(getYcoordinate(Node) == 0 || getYcoordinate(Node) == Ysize - 1 || getXcoordinate(Node) == 0 || getXcoordinate(Node) == Xsize - 1))
+                if (!(getYcoordinate(Node) <= 1 || getYcoordinate(Node) >= Ysize - 2 || getXcoordinate(Node) <= 1 || getXcoordinate(Node) >= Xsize - 2))
                 {
                     isValid = true;
                 }
@@ -435,7 +441,7 @@ namespace NEA
             {
                 Node = r.Next(0, Xsize * Ysize);
                 //      Top row                               Bottom row                        Left column                       Right column
-                if (!((getYcoordinate(Node) == 0 || getYcoordinate(Node) == Ysize - 1 || getXcoordinate(Node) == 0 || getXcoordinate(Node) == Xsize - 1) && allRoomsNodes.Contains(Node)))
+                if (!(getYcoordinate(Node) <= 1 || getYcoordinate(Node) >= Ysize - 2 || getXcoordinate(Node) <= 1 || getXcoordinate(Node) >= Xsize - 2) && !allRoomsNodes.Contains(Node))
                 {
                     isValid = true;
                 }
@@ -464,6 +470,7 @@ namespace NEA
                 getDirection(Node, Dir.down),
                 getDirection(getDirection(Node, Dir.right), Dir.down)
             });
+            keyPosition = Node;
         }
         public List<int> getTreasureRoomNodes()
         {
@@ -472,6 +479,10 @@ namespace NEA
         public List<int> getAllRoomsNodes()
         {
             return allRoomsNodes;
+        }
+        public int getKeyPosition()
+        {
+            return keyPosition;
         }
     }
 }

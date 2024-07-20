@@ -11,7 +11,7 @@ namespace NEA
     internal class Program
     {
         static readonly Random random = new Random();
-        readonly static int size = 15;
+        readonly static int size = 10;
         readonly static Maze maze = new Maze(size, random);
         static readonly Player player = new Player(maze, random);
         static void playGame()
@@ -20,7 +20,7 @@ namespace NEA
             Console.ForegroundColor = ConsoleColor.Black;
             List<IVisible> objects = new List<IVisible>();
             // Adding enemies
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 1; i++)
             {
                 objects.Add(new BaseEnemy(maze, random));
             }
@@ -32,11 +32,12 @@ namespace NEA
             Console.WriteLine(objects.Count());
             maze.createGraph();
             maze.generateMaze(player.getPosition(), objects);
-            List<int> roomNodes = maze.getTreasureRoomNodes();
-            foreach (int roomNode in roomNodes)
+            List<int> treasureRoomNodes = maze.getTreasureRoomNodes();
+            foreach (int roomNode in treasureRoomNodes)
             {
                 objects.Add(new Stun(maze, random, roomNode));
             }
+            objects.Add(new Key(maze.getKeyPosition(), maze));
             objects.Add(player);
             int oldPos;
             bool hasWon = false;
@@ -63,7 +64,7 @@ namespace NEA
                 {
                     Console.SetCursorPosition(0, 0);
                     maze.displayGraph(objects);
-                    if (player.getPosition() == maze.getEndPoint())
+                    if (player.getPosition() == maze.getEndPoint() && player.getHasKey() == true)
                     {
                         hasWon = true;
                     }
@@ -72,6 +73,7 @@ namespace NEA
                     List<int> powerupPositions = new List<int>();
                     List<Enemy> enemies = new List<Enemy>();
                     List<Power_Up> powerUps = new List<Power_Up>();
+                    int keyPos = -1;
                     foreach (IVisible obj in objects)
                     {
                         if (obj.getType() == "Enemy")
@@ -92,12 +94,16 @@ namespace NEA
                             powerupPositions.Add(obj.getPosition());
                             powerUps.Add((Power_Up)obj);
                         }
+                        else if (obj.getType() == "Key")
+                        {
+                            keyPos = obj.getPosition();
+                        }
                     }
                     if (enemyPositions.Contains(player.getPosition()))
                     {
                         hasLost = true;
                     }
-                    if (powerupPositions.Contains(player.getPosition()))
+                    else if (powerupPositions.Contains(player.getPosition()))
                     {
                         foreach (Power_Up powerUp in powerUps)
                         {
@@ -107,6 +113,19 @@ namespace NEA
                                 objects.Remove(powerUp);
                             }
                         }
+                    }
+                    else if (keyPos == player.getPosition())
+                    {
+                        player.gotKey();
+                        Key tempKey = new Key(-1, maze);
+                        foreach (IVisible obj in objects)
+                        {
+                            if (obj.getType() == "Key")
+                            {
+                                tempKey = (Key)obj;
+                            }
+                        }
+                        objects.Remove(tempKey);
                     }
                 }
                 else

@@ -14,12 +14,14 @@ namespace NEA
         private int Xpos;
         private int Ypos;
         private readonly Maze Maze;
+        private bool hasKey;
         public Player(Maze maze, Random ran)
         {
             r = ran;
             Maze = maze;
             spawn();
             Inventory = new List<Power_Up>();
+            hasKey = false;
         }
         public int getPosition()
         {
@@ -77,7 +79,14 @@ namespace NEA
         {
             return Ypos;
         }
-
+        public bool getHasKey()
+        {
+            return hasKey;
+        }
+        public void gotKey()
+        {
+            hasKey = true;
+        }
         public void spawn()
         {
             Position = r.Next(0, Maze.getXsize() * Maze.getYsize() - 1);
