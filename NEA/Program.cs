@@ -11,7 +11,7 @@ namespace NEA
     internal class Program
     {
         static readonly Random random = new Random();
-        readonly static int size = 10;
+        readonly static int size = 25;
         readonly static Maze maze = new Maze(size, random);
         static readonly Player player = new Player(maze, random);
         static void playGame()

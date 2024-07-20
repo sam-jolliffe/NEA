@@ -6,7 +6,7 @@ namespace NEA
 {
     public class Maze
     {
-        private readonly bool testing = true;
+        private readonly bool testing = false;
         private static Random r;
         private readonly int Xsize;
         private readonly int Ysize;
@@ -37,7 +37,8 @@ namespace NEA
             List<int> visibleNodes = new List<int> { playerPos };
             if (!testing)
             {
-                visibleNodes = depthFirst(playerPos, 0, visibleNodes);
+                // visibleNodes = depthFirst(playerPos, 0, visibleNodes);
+                visibleNodes = getVisibleNodes(playerPos);
             }
             else
             {
@@ -483,6 +484,19 @@ namespace NEA
         public int getKeyPosition()
         {
             return keyPosition;
+        }
+        public List<int> getVisibleNodes(int Node)
+        {
+            int radius = 10;
+            List<int> nodes = new List<int>();
+            for (int i = 0; i < Xsize * Ysize; i++)
+            {
+                if (Math.Pow(Math.Abs(getXcoordinate(Node) - getXcoordinate(i)), 2) + Math.Pow(Math.Abs(getYcoordinate(Node) - getYcoordinate(i)), 2) <= Math.Pow(radius, 2))
+                {
+                    nodes.Add(i);
+                }
+            }
+            return nodes;
         }
     }
 }
