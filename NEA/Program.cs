@@ -11,7 +11,7 @@ namespace NEA
     internal class Program
     {
         static readonly Random random = new Random();
-        readonly static int size = 25;
+        readonly static int size = 15;
         readonly static Maze maze = new Maze(size, random);
         static readonly Player player = new Player(maze, random);
         static void playGame()
@@ -20,7 +20,7 @@ namespace NEA
             Console.ForegroundColor = ConsoleColor.Black;
             List<IVisible> objects = new List<IVisible>();
             // Adding enemies
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 0; i++)
             {
                 objects.Add(new BaseEnemy(maze, random));
             }
@@ -51,6 +51,8 @@ namespace NEA
             {
                 oldPos = player.getPosition();
                 bool invalidTurn = false;
+                Console.SetCursorPosition(0, 0);
+                maze.displayGraph(objects);
                 try
                 {
                     player.setPosition(takeTurn(oldPos));
@@ -62,8 +64,6 @@ namespace NEA
                 }
                 if (!maze.getAdjList()[oldPos].Contains(player.getPosition()) && !invalidTurn)
                 {
-                    Console.SetCursorPosition(0, 0);
-                    maze.displayGraph(objects);
                     if (player.getPosition() == maze.getEndPoint() && player.getHasKey() == true)
                     {
                         hasWon = true;
@@ -247,21 +247,12 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 key = Console.ReadKey(true);
                 if (key.Key == ConsoleKey.Enter)
                 {
-                    if (yPos == 1)
+                    switch (yPos)
                     {
-                        return 1;
-                    }
-                    else if (yPos == 2)
-                    {
-                        return 2;
-                    }
-                    else if (yPos == 3)
-                    {
-                        return 3;
-                    }
-                    else if (yPos == 4)
-                    {
-                        return 4;
+                        case 1: return 1;
+                        case 2: return 2;
+                        case 3: return 3;
+                        case 4: return 4;
                     }
                 }
                 else if ((key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow) && yPos > 1)
@@ -360,9 +351,9 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             {
                 if (exists[i])
                 {
-                    if (i == lastIndex) returnString += $"{times[i]} {names[i]}{isPlural[i]}";
-                    else if (i == secondLastIndex) returnString += $"{times[i]} {names[i]}{isPlural[i]} and ";
-                    else returnString += $"{times[i]} {names[i]}{isPlural[i]}, ";
+                    returnString += $"{times[i]} {names[i]}{isPlural[i]}";
+                    if (i == secondLastIndex) returnString += " and ";
+                    else if (i != lastIndex) returnString += ", ";
                 }
             }
             return returnString;

@@ -50,6 +50,10 @@ namespace NEA
         {
             return "Base Powerup";
         }
+        public virtual void use()
+        {
+
+        }
         public void spawn()
         {
             Position = r.Next(0, maze.getXsize() * maze.getYsize() - 1);

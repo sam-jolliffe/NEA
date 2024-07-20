@@ -165,7 +165,7 @@ namespace NEA
                         }
                         Console.BackgroundColor = ConsoleColor.White;
                         // The wall diagonally between nodes
-                        if (allRoomsNodes.Contains(nodeNum) && allRoomsNodes.Contains(getDirection(nodeNum, Dir.right)) && allRoomsNodes.Contains(getDirection(nodeNum, Dir.down)) && allRoomsNodes.Contains(getDirection(getDirection(nodeNum, Dir.right), Dir.down)))
+                        if (allRoomsNodes.Contains(nodeNum) && allRoomsNodes.Contains(getDirection(nodeNum, Dir.right)) && allRoomsNodes.Contains(getDirection(nodeNum, Dir.down)) && allRoomsNodes.Contains(getDirection(getDirection(nodeNum, Dir.right), Dir.down)) && visibleNodes.Contains(nodeNum))
                         {
                             Console.Write("  ");
                         }

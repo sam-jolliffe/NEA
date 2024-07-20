@@ -15,6 +15,10 @@ namespace NEA
         {
 
         }
+        public override void use()
+        {
+            Console.WriteLine("Pretend this does something");
+        }
         public override string getDescription()
         {
             return "A stun ability which will temporarily make all enemies pause where they are for one move.";

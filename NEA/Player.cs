@@ -37,25 +37,45 @@ namespace NEA
         }
         public void showInventory()
         {
+            int yPos = 3;
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Clear();
-            if (Inventory.Count > 0)
+            Console.WriteLine("You have: \n\n");
+            foreach (Power_Up powerup in Inventory)
             {
-                Console.WriteLine("You have: \n\n");
-                foreach (Power_Up powerup in Inventory)
+                Console.WriteLine($@"   {powerup.getName()}:
+   {powerup.getDescription()}
+");
+            }
+                ConsoleKeyInfo key;
+            while (true)
+            {
+                Console.CursorLeft = 0;
+                Console.Write(" ");
+                Console.SetCursorPosition(0, yPos);
+                Console.Write(">");
+                key = Console.ReadKey(true);
+                if (key.Key == ConsoleKey.Enter)
                 {
-                    Console.WriteLine($@"{powerup.getName()}:
-{powerup.getDescription()}
- ");
+                    // If the user presses enter, it uses that power-up
+                    Inventory[yPos / 3 - 3].use();
+                    return;
+                }
+                else if (key.Key == ConsoleKey.Escape)
+                {
+                    Console.Clear();
+                    return;
+                }
+                else if ((key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow) && yPos > 3)
+                {
+                    yPos -= 3;
+                }
+                else if ((key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow) && yPos < Inventory.Count() * 3)
+                {
+                    yPos += 3;
                 }
             }
-            else
-            {
-                Console.WriteLine("You have nothing in your inventory");
-            }
-            Console.BackgroundColor = ConsoleColor.White;
-            Console.ForegroundColor = ConsoleColor.Black;
         }
         public void addToInventory(Power_Up powerup)
         {
@@ -69,12 +89,10 @@ namespace NEA
         {
             return "Player";
         }
-
         public int getXpos()
         {
             return Xpos;
         }
-
         public int getYpos()
         {
             return Ypos;
