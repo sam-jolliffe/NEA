@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Xml.Linq;
 
 namespace NEA
@@ -42,18 +43,28 @@ namespace NEA
         }
         public void move(Maze maze, int playerPos)
         {
-            int[] distances = new int[maze.getXsize() * maze.getYsize()];
+            Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
+            // H distances will be the manhattan distance between the player position and the given node
+            int[] Hdistances = new int[maze.getXsize() * maze.getYsize()];
+            // G distances will be the current shortest path discovered to get to that node
+            int[] Gdistances = new int[maze.getXsize() * maze.getYsize()];
+            // F distances will be the sum of the P and H distances for that node. 
+            // This makes it so that the algorithm will try to search in the vague direction of the end point (the player)
+            int[] Fdistances = new int[maze.getXsize() * maze.getYsize()];
             int[] previous = new int[maze.getXsize() * maze.getYsize()];
             List<int> unvisitedNodes = new List<int>();
             for (int i = 0; i < maze.getXsize() * maze.getYsize(); i++)
             {
-                distances[i] = 1000;
+                Hdistances[i] = Math.Abs(maze.getXcoordinate(playerPos) - maze.getXcoordinate(i)) + Math.Abs(maze.getYcoordinate(playerPos) - maze.getYcoordinate(i));
+                Gdistances[i] = 1000;
+                Fdistances[i] = 1000;
                 previous[i] = -1;
                 unvisitedNodes.Add(i);
             }
-            distances[Position] = 0;
+            Gdistances[Position] = 0;
+            Fdistances[Position] = Hdistances[Position];
             unvisitedNodes.Remove(0);
-            while (unvisitedNodes.Count > 0)
+            while (unvisitedNodes.Count > 0 && unvisitedNodes.Contains(playerPos))
             {
                 // Getting node with shortest distance:
                 // Has to be in unvisitedNodes, have lowest corresponding distance
@@ -61,45 +72,39 @@ namespace NEA
                 int node = -1;
                 foreach (int i in unvisitedNodes)
                 {
-                    if (distances[i] < nodeVal)
+                    if (Fdistances[i] < nodeVal)
                     {
-                        nodeVal = distances[i];
+                        nodeVal = Fdistances[i];
                         node = i;
                     }
                 }
                 unvisitedNodes.Remove(node);
-                // Console.Write($"node: {node} value: {nodeVal} ");
                 // Creates a list of all the possible moves the enemy could do
                 List<int> possibleMoves = new List<int>();
-                Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
-                List<int> possibleDirections = new List<int>();
                 foreach (Dir d in directions)
                 {
                     try
                     {
-                        possibleDirections.Add(maze.getDirection(node, d));
+                        int Temp = maze.getDirection(node, d);
+                        if (unvisitedNodes.Contains(Temp) && !maze.getAdjList()[node].Contains(Temp))
+                        {
+                            possibleMoves.Add(Temp);
+                        }
                     }
                     catch (NotInListException) { }
                 }
-                foreach (int i in possibleDirections)
-                {
-                    if (unvisitedNodes.Contains(i) && !maze.getAdjList()[node].Contains(i))
-                    {
-                        possibleMoves.Add(i);
-                    }
-                }
 
-                // Temp is the same for each one as the distance is the same each time.
+                // thisPath is the same for each one as the distance is the same each time.
 
+                int thisPath = Gdistances[node] + 1;
                 foreach (int i in possibleMoves)
                 {
-                    int thisPath = distances[node] + 1;
-                    if (thisPath < distances[i])
+                    if (thisPath < Gdistances[i])
                     {
-                        distances[i] = thisPath;
+                        Gdistances[i] = thisPath;
+                        Fdistances[i] = Hdistances[i] + thisPath;
                         // 'i' is the node that it's talking about, the actual value is the node prior to it.
                         previous[i] = node;
-                        // Console.Write($"previous {i}: {previous[i]} ");
                     }
                 }
             }
@@ -116,28 +121,6 @@ namespace NEA
                 }
                 temp = previous[temp];
             }
-            
-
-            /*List<int> randomDirections = maze.randomize(new List<int> { 0, 1, 2, 3 });
-            List<int> possibleDirections = new List<int>();
-            bool isValidDirection = false;
-            foreach (int i in randomDirections)
-            {
-                try
-                {
-                    int tempPos = maze.getDirection(Position, directions[i]);
-                    if (!maze.getEdges(tempPos).Contains(Position))
-                    {
-                        possibleDirections.Add(tempPos);
-                    }
-                    isValidDirection = true;
-                }
-                catch (NotInListException) { }
-            }
-            if (isValidDirection)
-            {
-                Position = possibleDirections[0];
-            }*/
         }
     }
 }
