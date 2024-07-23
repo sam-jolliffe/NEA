@@ -22,7 +22,7 @@ namespace NEA
             Xsize = sizeIn * 2;
             Ysize = sizeIn;
         }
-        public void displayGraph(List<IVisible> objects)
+        public void displayGraph(List<IVisible> objects, int FOV)
         {
             // ██ signifies a wall or an object
             // '  ' signifies a coridoor
@@ -38,7 +38,7 @@ namespace NEA
             if (!testing)
             {
                 // visibleNodes = depthFirst(playerPos, 0, visibleNodes);
-                visibleNodes = getVisibleNodes(playerPos);
+                visibleNodes = getVisibleNodes(playerPos, FOV);
             }
             else
             {
@@ -70,9 +70,10 @@ namespace NEA
                     bool isObject = false;
                     if (visibleNodes.Contains(nodeNum))
                     {
+                        bool hasWritten = false;
                         foreach (IVisible obj in objects)
                         {
-                            if (obj.getPosition() == nodeNum)
+                            if (obj.getPosition() == nodeNum && !hasWritten)
                             {
                                 Console.BackgroundColor = ConsoleColor.White;
                                 isObject = true;
@@ -84,7 +85,7 @@ namespace NEA
                                         break;
                                     case "Enemy":
                                         Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.Write("╬╬");
+                                        Console.Write("()");
                                         break;
                                     case "Key":
                                         Console.ForegroundColor = ConsoleColor.Magenta;
@@ -96,6 +97,7 @@ namespace NEA
                                         Console.Write("██");
                                         break;
                                 }
+                                hasWritten = true;
                             }
                         }
                         if (nodeNum == endPoint)
@@ -489,13 +491,12 @@ namespace NEA
         {
             return keyPosition;
         }
-        public List<int> getVisibleNodes(int Node)
+        public List<int> getVisibleNodes(int Node, int FOV)
         {
-            int radius = 10;
             List<int> nodes = new List<int>();
             for (int i = 0; i < Xsize * Ysize; i++)
             {
-                if (Math.Pow(Math.Abs(getXcoordinate(Node) - getXcoordinate(i)), 2) + Math.Pow(Math.Abs(getYcoordinate(Node) - getYcoordinate(i)), 2) <= Math.Pow(radius, 2))
+                if (Math.Pow(Math.Abs(getXcoordinate(Node) - getXcoordinate(i)), 2) + Math.Pow(Math.Abs(getYcoordinate(Node) - getYcoordinate(i)), 2) <= Math.Pow(FOV, 2))
                 {
                     nodes.Add(i);
                 }

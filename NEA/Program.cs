@@ -10,26 +10,29 @@ namespace NEA
     public enum Dir {up, right, down, left}
     internal class Program
     {
+        static int size;
         static readonly Random random = new Random();
-        readonly static int size = 15;
-        readonly static Maze maze = new Maze(size, random);
-        static readonly Player player = new Player(maze, random);
+        static Maze maze;// = new Maze(size, random);
+        static Player player;// = new Player(maze, random);
+        static int numEnemies;
+        static int numPowerups;
+        static int FOV;
         static void playGame()
         {
+            setDifficulty();
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
             List<IVisible> objects = new List<IVisible>();
             // Adding enemies
-            for (int i = 0; i < 0; i++)
+            for (int i = 0; i < numEnemies; i++)
             {
                 objects.Add(new BaseEnemy(maze, random));
             }
             // Adding power-ups
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < numPowerups; i++)
             {
                 objects.Add(new Stun(maze, random));
             }
-            Console.WriteLine(objects.Count());
             maze.createGraph();
             maze.generateMaze(player.getPosition(), objects);
             List<int> treasureRoomNodes = maze.getTreasureRoomNodes();
@@ -44,7 +47,7 @@ namespace NEA
             bool hasLost = false;
             // Keeps taking a move and re-displaying the board until the user reaches the end
             Console.SetCursorPosition(0, 0);
-            maze.displayGraph(objects);
+            maze.displayGraph(objects, FOV);
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             while (!hasWon && !hasLost)
@@ -52,7 +55,7 @@ namespace NEA
                 oldPos = player.getPosition();
                 bool invalidTurn = false;
                 Console.SetCursorPosition(0, 0);
-                maze.displayGraph(objects);
+                maze.displayGraph(objects, FOV);
                 try
                 {
                     player.setPosition(takeTurn(oldPos));
@@ -254,6 +257,66 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                         case 3: return 3;
                         case 4: return 4;
                     }
+                }
+                else if ((key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow) && yPos > 1)
+                {
+                    yPos--;
+                }
+                else if ((key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow) && yPos < 4)
+                {
+                    yPos++;
+                }
+            }
+        }
+        static void setDifficulty()
+        {
+            int yPos = 1;
+            Console.Clear();
+            Console.WriteLine(@"Select a difficulty: 
+  Easy
+  Meduim
+  Hard
+  Insane");
+            ConsoleKeyInfo key;
+            while (true)
+            {
+                Console.CursorLeft = 0;
+                Console.Write(" ");
+                Console.SetCursorPosition(0, yPos);
+                Console.Write(">");
+                key = Console.ReadKey(true);
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    switch (yPos)
+                    {
+                        case 1:
+                            size = 15;
+                            numEnemies = 1;
+                            numPowerups = 10;
+                            FOV = 10;
+                            break;
+                        case 2:
+                            size = 20;
+                            numEnemies = 1;
+                            numPowerups = 5;
+                            FOV = 10;
+                            break;
+                        case 3:
+                            size = 25;
+                            numEnemies = 3;
+                            numPowerups = 5;
+                            FOV = 8;
+                            break;
+                        case 4:
+                            size = 25;
+                            numEnemies = 5;
+                            numPowerups = 3;
+                            FOV = 5;
+                            break;
+                    }
+                    maze = new Maze(size, random);
+                    player = new Player(maze, random);
+                    return;
                 }
                 else if ((key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow) && yPos > 1)
                 {
