@@ -12,8 +12,8 @@ namespace NEA
     {
         static int size;
         static readonly Random random = new Random();
-        static Maze maze;// = new Maze(size, random);
-        static Player player;// = new Player(maze, random);
+        static Maze maze;
+        static Player player;
         static int numEnemies;
         static int numPowerups;
         static int FOV;
@@ -273,6 +273,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             int yPos = 1;
             Console.Clear();
             Console.WriteLine(@"Select a difficulty: 
+  Practice
   Easy
   Meduim
   Hard
@@ -290,24 +291,30 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                     switch (yPos)
                     {
                         case 1:
+                            size = 25;
+                            numEnemies = 0;
+                            numPowerups = 10;
+                            FOV = 15;
+                            break;
+                        case 2:
                             size = 15;
                             numEnemies = 1;
                             numPowerups = 10;
                             FOV = 10;
                             break;
-                        case 2:
+                        case 3:
                             size = 20;
                             numEnemies = 1;
                             numPowerups = 5;
                             FOV = 10;
                             break;
-                        case 3:
+                        case 4:
                             size = 25;
                             numEnemies = 3;
                             numPowerups = 5;
                             FOV = 8;
                             break;
-                        case 4:
+                        case 5:
                             size = 25;
                             numEnemies = 5;
                             numPowerups = 3;
@@ -322,7 +329,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 {
                     yPos--;
                 }
-                else if ((key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow) && yPos < 4)
+                else if ((key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow) && yPos < 5)
                 {
                     yPos++;
                 }
@@ -356,11 +363,16 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.Clear();
             string name = "";
             bool validName = false;
+            Console.WriteLine("Enter your name:");
             while (!validName)
             {
-                Console.WriteLine("Enter your name:");
                 name = Console.ReadLine();
-                if (name.Length > 0) validName = true;
+                if (name.Length > 0 && !name.Contains(' ')) validName = true;
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Please enter another name. Your name must have at least 1 character, and not include any spaces.");
+                }
             }
             const string fileName = "Leaderboard.txt";
             List<string> lines = new List<string>();
