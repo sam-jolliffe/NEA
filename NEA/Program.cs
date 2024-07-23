@@ -3,23 +3,22 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace NEA
 {
-    public enum Dir {up, right, down, left}
+    public enum Dir { up, right, down, left }
     internal class Program
     {
-        static int size;
         static readonly Random random = new Random();
         static Maze maze;
         static Player player;
+        static int size;
         static int numEnemies;
         static int numPowerups;
         static int FOV;
         static void playGame()
         {
-            setDifficulty();
+            int difficulty = setDifficulty();
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
             List<IVisible> objects = new List<IVisible>();
@@ -142,8 +141,8 @@ namespace NEA
             Console.Clear();
             if (hasWon)
             {
-                AddToLeaderboard((int)stopwatch.Elapsed.TotalSeconds);
-                Console.WriteLine(@"
+                AddToLeaderboard((int)stopwatch.Elapsed.TotalSeconds, difficulty);
+                Console.WriteLine($@"
                                                                                                                                                 
                                                                                                                                                 
 YYYYYYY       YYYYYYY                                          WWWWWWWW                           WWWWWWWW                                        !!! 
@@ -162,13 +161,9 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu        W:::::W         
     YYYY:::::YYYY    o:::::::::::::::o   u:::::::::::::::u               W:::::W         W:::::W          o:::::::::::::::o    n::::n    n::::n   !!! 
     Y:::::::::::Y     oo:::::::::::oo     uu::::::::uu:::u                W:::W           W:::W            oo:::::::::::oo     n::::n    n::::n  !!:!!
     YYYYYYYYYYYYY       ooooooooooo         uuuuuuuu  uuuu                 WWW             WWW               ooooooooooo       nnnnnn    nnnnnn   !!! 
-                                                                                                                                                
-                                                                                                                                                
-                                                                                                                                                
-                                                                                                                                                
-                                                                                                                                                
-                                                                                                                                                
-                                                                                                                                                
+
+
+                                                               Your time was: {formatTime((int)stopwatch.Elapsed.TotalSeconds)}                                                                                                                                       
 ");
             }
             else if (hasLost)
@@ -268,7 +263,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 }
             }
         }
-        static void setDifficulty()
+        static int setDifficulty()
         {
             int yPos = 1;
             Console.Clear();
@@ -304,7 +299,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             break;
                         case 3:
                             size = 20;
-                            numEnemies = 1;
+                            numEnemies = 2;
                             numPowerups = 5;
                             FOV = 10;
                             break;
@@ -323,7 +318,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                     }
                     maze = new Maze(size, random);
                     player = new Player(maze, random);
-                    return;
+                    return yPos;
                 }
                 else if ((key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow) && yPos > 1)
                 {
@@ -340,6 +335,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             const string fileName = "Leaderboard.txt";
             List<string> names = new List<string>();
             List<int> times = new List<int>();
+            List<string> difficulties = new List<string>();
             using (StreamReader sr = new StreamReader(fileName))
             {
                 string[] temps = new string[2];
@@ -348,16 +344,109 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                     temps = sr.ReadLine().Split(' ');
                     names.Add(temps[0]);
                     times.Add(int.Parse(temps[1]));
+                    difficulties.Add(temps[2]);
                 }
             }
-            for (int i = 0; i < names.Count(); i++)
+            ConsoleKeyInfo key;
+            int yPos = 1;
+            while (true)
             {
-                Console.WriteLine($"{names[i]}: {formatTime(times[i])}");
+
+                Console.SetCursorPosition(0, 0);
+                Console.WriteLine($@"Would you like to see:
+  All times
+  Practice mode
+  Easy difficulty
+  Medium difficulty
+  Hard difficulty
+  Insane difficulty
+  Exit");
+                Console.CursorLeft = 0;
+                Console.Write(" ");
+                Console.SetCursorPosition(0, yPos);
+                Console.Write(">");
+                key = Console.ReadKey(true);
+                string thisDifficulty = "";
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    switch (yPos)
+                    {
+                        case 1:
+                            thisDifficulty = "All";
+                            break;
+                        case 2:
+                            thisDifficulty = "Practice";
+                            break;
+                        case 3:
+                            thisDifficulty = "Easy";
+                            break;
+                        case 4:
+                            thisDifficulty = "Medium";
+                            break;
+                        case 5:
+                            thisDifficulty = "Hard";
+                            break;
+                        case 6:
+                            thisDifficulty = "Insane";
+                            break;
+                        case 7:
+                            return;
+                    }
+                    List<string> theseNames = new List<string>();
+                    List<int> theseTimes = new List<int>();
+                    List<string> theseDifficulties = new List<string>();
+                    for (int i = 0; i < names.Count(); i++)
+                    {
+                        if (difficulties[i] == thisDifficulty || thisDifficulty == "All")
+                        {
+                            theseNames.Add(names[i]);
+                            theseTimes.Add(times[i]);
+                            theseDifficulties.Add(difficulties[i]);
+                        }
+                    }
+                    Console.Clear();
+                    for (int i = 0; i < theseNames.Count(); i++)
+                    {
+                        Console.SetCursorPosition(30, i);
+                        Console.WriteLine($"{theseNames[i]}: ");
+                        Console.SetCursorPosition(60, i);
+                        Console.WriteLine($"{formatTime(theseTimes[i])}");
+                        Console.SetCursorPosition(90, i);
+                        Console.WriteLine($"{theseDifficulties[i]} difficulty");
+                    }
+                }
+                else if ((key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow) && yPos > 1)
+                {
+                    yPos--;
+                }
+                else if ((key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow) && yPos < 7)
+                {
+                    yPos++;
+                }
             }
-            Console.ReadKey();
         }
-        static void AddToLeaderboard(int seconds)
+        static void AddToLeaderboard(int seconds, int difficulty)
         {
+            // Getting the difficulty as a string to add
+            string strDifficulty = "";
+            switch (difficulty)
+            {
+                case 1:
+                    strDifficulty = "Practice";
+                    break;
+                case 2:
+                    strDifficulty = "Easy";
+                    break;
+                case 3:
+                    strDifficulty = "Medium";
+                    break;
+                case 4:
+                    strDifficulty = "Hard";
+                    break;
+                case 5:
+                    strDifficulty = "Insane";
+                    break;
+            }
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
@@ -367,11 +456,11 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             while (!validName)
             {
                 name = Console.ReadLine();
-                if (name.Length > 0 && !name.Contains(' ')) validName = true;
+                if (name.Length > 0 && !name.Contains(' ') && name.Length <= 25) validName = true;
                 else
                 {
                     Console.Clear();
-                    Console.WriteLine("Please enter another name. Your name must have at least 1 character, and not include any spaces.");
+                    Console.WriteLine("Please enter another name. Your name must have at between 1 and 25 characters, and not include any spaces.");
                 }
             }
             const string fileName = "Leaderboard.txt";
@@ -383,7 +472,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                     lines.Add(streamReader.ReadLine());
                 }
             }
-            lines = InsertionSort(name, seconds, lines);
+            lines = InsertionSort(name, seconds, strDifficulty, lines);
             using (StreamWriter streamWriter = new StreamWriter(fileName))
             {
                 foreach (string line in lines)
@@ -433,7 +522,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             }
             return returnString;
         }
-        static List<string> InsertionSort(string name, int time, List<string> list)
+        static List<string> InsertionSort(string name, int time, string difficulty, List<string> list)
         {
             List<int> times = new List<int>();
             List<string> returnList = new List<string>();
@@ -451,7 +540,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 if (time <= times[index])
                 {
                     done = true;
-                    returnList.Add($"{name} {time}");
+                    returnList.Add($"{name} {time} {difficulty}");
                 }
                 returnList.Add(list[index]);
                 index++;
