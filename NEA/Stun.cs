@@ -8,7 +8,7 @@ namespace NEA
 {
     internal class Stun : Power_Up
     {
-        public Stun(Maze maze, Random ran) : base(maze, ran)
+        public Stun(Maze maze, Random ran, List<int> objectPositions) : base(maze, ran, objectPositions)
         {
         }
         public Stun(Maze maze, Random ran, int position) : base(maze, ran, position)

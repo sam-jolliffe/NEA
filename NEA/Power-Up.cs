@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Windows.Documents;
 
 namespace NEA
 {
@@ -9,11 +11,11 @@ namespace NEA
         private int Xpos;
         private int Ypos;
         private readonly Maze maze;
-        public Power_Up(Maze mazeIn, Random ran)
+        public Power_Up(Maze mazeIn, Random ran, List<int> objectPositions)
         {
             r = ran;
             maze = mazeIn;
-            spawn();
+            spawn(objectPositions);
         }
         public Power_Up(Maze mazeIn, Random ran, int position)
         {
@@ -49,9 +51,17 @@ namespace NEA
         {
 
         }
-        public void spawn()
+        public void spawn(List<int> objectPositions)
         {
-            Position = r.Next(0, maze.getXsize() * maze.getYsize() - 1);
+            bool valid = false;
+            while (!valid)
+            {
+                Position = r.Next(0, maze.getXsize() * maze.getYsize() - 1);
+                if (!objectPositions.Contains(Position))
+                {
+                    valid = true;
+                }
+            }
             Xpos = maze.getXcoordinate(Position);
             Ypos = maze.getYcoordinate(Position);
         }

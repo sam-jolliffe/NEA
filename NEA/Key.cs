@@ -38,7 +38,7 @@ namespace NEA
             return Ypos;
         }
 
-        public void spawn()
+        public void spawn(List<int> objectPositions)
         {
             Xpos = maze.getXcoordinate(Position);
             Ypos = maze.getYcoordinate(Position);

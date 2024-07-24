@@ -6,7 +6,7 @@ namespace NEA
 {
     public class Maze
     {
-        private readonly bool testing = false;
+        private readonly bool testing = true;
         private static Random r;
         private readonly int Xsize;
         private readonly int Ysize;
@@ -407,11 +407,16 @@ namespace NEA
             int Node = 0;
             bool isValid = false;
             // Node cannot be on one of the borders, as i'm going to dig out a 3x3 around it.
+            List<int> objectPositions = new List<int>();
+            foreach (IVisible obj in objects)
+            {
+                objectPositions.Add(obj.getPosition());
+            }
             while (!isValid)
             {
                 Node = r.Next(0, Xsize * Ysize);
                 //      Top row                               Bottom row                        Left column                       Right column
-                if (!(getYcoordinate(Node) <= 1 || getYcoordinate(Node) >= Ysize - 2 || getXcoordinate(Node) <= 1 || getXcoordinate(Node) >= Xsize - 2))
+                if (!(getYcoordinate(Node) <= 1 || getYcoordinate(Node) >= Ysize - 2 || getXcoordinate(Node) <= 1 || getXcoordinate(Node) >= Xsize - 2) && !objectPositions.Contains(Node))
                 {
                     isValid = true;
                 }
@@ -448,7 +453,7 @@ namespace NEA
             {
                 Node = r.Next(0, Xsize * Ysize);
                 //      Top row                               Bottom row                        Left column                       Right column
-                if (!(getYcoordinate(Node) <= 1 || getYcoordinate(Node) >= Ysize - 2 || getXcoordinate(Node) <= 1 || getXcoordinate(Node) >= Xsize - 2) && !allRoomsNodes.Contains(Node))
+                if (!(getYcoordinate(Node) <= 1 || getYcoordinate(Node) >= Ysize - 2 || getXcoordinate(Node) <= 1 || getXcoordinate(Node) >= Xsize - 2) && !allRoomsNodes.Contains(Node) && !objectPositions.Contains(Node))
                 {
                     isValid = true;
                 }

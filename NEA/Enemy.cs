@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NEA
 {
@@ -10,11 +11,11 @@ namespace NEA
         private int Xpos;
         private int Ypos;
         private readonly Maze Maze;
-        public Enemy(Maze maze, Random ran)
+        public Enemy(Maze maze, Random ran, List<int> objectPositions)
         {
             r = ran;
             Maze = maze;
-            spawn();
+            spawn(objectPositions);
         }
         public int getPosition()
         {
@@ -28,9 +29,17 @@ namespace NEA
         {
             return Ypos;
         }
-        public void spawn()
+        public void spawn(List<int> objectPositions)
         {
-            Position = r.Next(0, Maze.getXsize() * Maze.getYsize() - 1);
+            bool valid = false;
+            while (!valid)
+            {
+                Position = r.Next(0, Maze.getXsize() * Maze.getYsize() - 1);
+                if (!objectPositions.Contains(Position))
+                {
+                    valid = true;
+                }
+            }
             Xpos = Maze.getXcoordinate(Position);
             Ypos = Maze.getYcoordinate(Position);
         }
@@ -43,7 +52,7 @@ namespace NEA
             Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
             // H distances will be the manhattan distance between the player position and the given node
             int[] Hdistances = new int[maze.getXsize() * maze.getYsize()];
-            // G distances will be the current shortest path discovered to get to that node
+            // G distances will be the current shortest distance discovered to get to that node
             int[] Gdistances = new int[maze.getXsize() * maze.getYsize()];
             // F distances will be the sum of the P and H distances for that node. 
             // This makes it so that the algorithm will try to search in the vague direction of the end point (the player)

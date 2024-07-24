@@ -17,7 +17,7 @@ namespace NEA
         {
             r = ran;
             Maze = maze;
-            spawn();
+            spawn(new List<int>());
             Inventory = new List<Power_Up>();
             hasKey = false;
         }
@@ -104,8 +104,9 @@ namespace NEA
         {
             hasKey = true;
         }
-        public void spawn()
+        public void spawn(List<int> objectPositions)
         {
+            // ObjectPositions is justy a blank list, as the player is always the first objects created, so there is nowhere it can't spawn
             Position = r.Next(0, Maze.getXsize() * Maze.getYsize() - 1);
             Xpos = Maze.getXcoordinate(Position);
             Ypos = Maze.getYcoordinate(Position);

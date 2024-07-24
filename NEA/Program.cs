@@ -22,15 +22,18 @@ namespace NEA
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
             List<IVisible> objects = new List<IVisible>();
+            List<int> objectPositions = new List<int>(player.getPosition());
             // Adding enemies
             for (int i = 0; i < numEnemies; i++)
             {
-                objects.Add(new BaseEnemy(maze, random));
+                objects.Add(new BaseEnemy(maze, random, objectPositions));
+                objectPositions.Add(objects[i].getPosition());
             }
             // Adding power-ups
             for (int i = 0; i < numPowerups; i++)
             {
-                objects.Add(new Stun(maze, random));
+                objects.Add(new Stun(maze, random, objectPositions));
+                objectPositions.Add(objects[i + numEnemies].getPosition());
             }
             maze.createGraph();
             maze.generateMaze(player.getPosition(), objects);
@@ -49,6 +52,7 @@ namespace NEA
             maze.displayGraph(objects, FOV);
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
+            bool enemyMove = false;
             while (!hasWon && !hasLost)
             {
                 oldPos = player.getPosition();
@@ -78,7 +82,7 @@ namespace NEA
                     int keyPos = -1;
                     foreach (IVisible obj in objects)
                     {
-                        if (obj.getType() == "Enemy")
+                        if (obj.getType() == "Enemy" && enemyMove)
                         {
                             enemies.Add((Enemy)obj);
                             try
@@ -100,6 +104,7 @@ namespace NEA
                         {
                             keyPos = obj.getPosition();
                         }
+                        enemyMove = !enemyMove;
                     }
                     if (enemyPositions.Contains(player.getPosition()))
                     {
@@ -360,7 +365,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
   Medium difficulty
   Hard difficulty
   Insane difficulty
-  Exit");
+  Return to menu");
                 Console.CursorLeft = 0;
                 Console.Write(" ");
                 Console.SetCursorPosition(0, yPos);
