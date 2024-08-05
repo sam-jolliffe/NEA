@@ -7,18 +7,18 @@ namespace NEA
 {
     public abstract class Enemy : IVisible
     {
-        private static int numOfEnemies = 0;
-        private static int canMove = -1;
-        private static Random r;
-        private int Position;
-        private int Xpos;
-        private int Ypos;
-        private readonly Maze Maze;
-        public Enemy(Maze maze, Random ran, List<int> objectPositions, int playerPos)
+        protected static int numOfEnemies = 0;
+        protected static int canMove = -1;
+        protected static Random r;
+        protected int Position;
+        protected int Xpos;
+        protected int Ypos;
+        protected readonly Maze maze;
+        public Enemy(Maze mazeIn, Random ran, List<int> objectPositions, int playerPos)
         {
             numOfEnemies++;
             r = ran;
-            Maze = maze;
+            maze = mazeIn;
             spawn(objectPositions, playerPos);
         }
         public int getPosition()
@@ -38,20 +38,20 @@ namespace NEA
             bool valid = false;
             while (!valid)
             {
-                Position = r.Next(0, Maze.getXsize() * Maze.getYsize() - 1);
-                if (!objectPositions.Contains(Position) && Math.Abs(Maze.getXcoordinate(Position) - Maze.getXcoordinate(playerPos)) >= Maze.getXsize() / 4 && Math.Abs(Maze.getYcoordinate(Position) - Maze.getYcoordinate(playerPos)) >= Maze.getYsize() / 4)
+                Position = r.Next(0, maze.getXsize() * maze.getYsize() - 1);
+                if (!objectPositions.Contains(Position) && Math.Abs(maze.getXcoordinate(Position) - maze.getXcoordinate(playerPos)) >= maze.getXsize() / 4 && Math.Abs(maze.getYcoordinate(Position) - maze.getYcoordinate(playerPos)) >= maze.getYsize() / 4)
                 {
                     valid = true;
                 }
             }
-            Xpos = Maze.getXcoordinate(Position);
-            Ypos = Maze.getYcoordinate(Position);
+            Xpos = maze.getXcoordinate(Position);
+            Ypos = maze.getYcoordinate(Position);
         }
         public string getType()
         {
             return "Enemy";
         }
-        public void move(Maze maze, int playerPos)
+        public virtual void move(int playerPos)
         {
             // CanMove is static, so all of the enemies move every other time, but not all at once.
             canMove += r.Next(0, 2);

@@ -5,7 +5,7 @@ namespace NEA
 {
     public class BaseEnemy : Enemy
     {
-        public BaseEnemy(Maze maze, Random ran, List<int> objectPositions, int playerPos) : base(maze, ran, objectPositions, playerPos)
+        public BaseEnemy(Maze mazeIn, Random ran, List<int> objectPositions, int playerPos) : base(mazeIn, ran, objectPositions, playerPos)
         {
         }
     }

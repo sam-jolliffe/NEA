@@ -26,7 +26,7 @@ namespace NEA
             // Adding enemies
             for (int i = 0; i < numEnemies; i++)
             {
-                objects.Add(new BaseEnemy(maze, random, objectPositions, player.getPosition()));
+                objects.Add(new GhostEnemy(maze, random, objectPositions, player.getPosition()));
                 objectPositions.Add(objects[i].getPosition());
             }
             // Adding power-ups
@@ -86,7 +86,7 @@ namespace NEA
                             enemies.Add((Enemy)obj);
                             try
                             {
-                                ((Enemy)obj).move(maze, player.getPosition());
+                                ((Enemy)obj).move(player.getPosition());
                             }
                             catch
                             {
