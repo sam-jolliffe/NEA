@@ -26,7 +26,7 @@ namespace NEA
             // Adding enemies
             for (int i = 0; i < numEnemies; i++)
             {
-                objects.Add(new BaseEnemy(maze, random, objectPositions));
+                objects.Add(new BaseEnemy(maze, random, objectPositions, player.getPosition()));
                 objectPositions.Add(objects[i].getPosition());
             }
             // Adding power-ups
@@ -52,7 +52,6 @@ namespace NEA
             maze.displayGraph(objects, FOV);
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            bool enemyMove = false;
             while (!hasWon && !hasLost)
             {
                 oldPos = player.getPosition();
@@ -82,7 +81,7 @@ namespace NEA
                     int keyPos = -1;
                     foreach (IVisible obj in objects)
                     {
-                        if (obj.getType() == "Enemy" && enemyMove)
+                        if (obj.getType() == "Enemy")
                         {
                             enemies.Add((Enemy)obj);
                             try
@@ -104,7 +103,6 @@ namespace NEA
                         {
                             keyPos = obj.getPosition();
                         }
-                        enemyMove = !enemyMove;
                     }
                     if (enemyPositions.Contains(player.getPosition()))
                     {
@@ -298,25 +296,25 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             break;
                         case 2:
                             size = 15;
-                            numEnemies = 1;
+                            numEnemies = 2;
                             numPowerups = 10;
                             FOV = 10;
                             break;
                         case 3:
                             size = 20;
-                            numEnemies = 2;
+                            numEnemies = 4;
                             numPowerups = 5;
                             FOV = 10;
                             break;
                         case 4:
                             size = 25;
-                            numEnemies = 3;
+                            numEnemies = 6;
                             numPowerups = 5;
                             FOV = 8;
                             break;
                         case 5:
                             size = 25;
-                            numEnemies = 5;
+                            numEnemies = 10;
                             numPowerups = 3;
                             FOV = 5;
                             break;

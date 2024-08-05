@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace NEA
 {
     public abstract class Enemy : IVisible
     {
+        private static int numOfEnemies = 0;
+        private static int canMove = -1;
         private static Random r;
         private int Position;
         private int Xpos;
         private int Ypos;
         private readonly Maze Maze;
-        public Enemy(Maze maze, Random ran, List<int> objectPositions)
+        public Enemy(Maze maze, Random ran, List<int> objectPositions, int playerPos)
         {
+            numOfEnemies++;
             r = ran;
             Maze = maze;
-            spawn(objectPositions);
+            spawn(objectPositions, playerPos);
         }
         public int getPosition()
         {
@@ -29,13 +33,13 @@ namespace NEA
         {
             return Ypos;
         }
-        public void spawn(List<int> objectPositions)
+        public void spawn(List<int> objectPositions, int playerPos)
         {
             bool valid = false;
             while (!valid)
             {
                 Position = r.Next(0, Maze.getXsize() * Maze.getYsize() - 1);
-                if (!objectPositions.Contains(Position))
+                if (!objectPositions.Contains(Position) && Math.Abs(Maze.getXcoordinate(Position) - Maze.getXcoordinate(playerPos)) >= Maze.getXsize() / 4 && Math.Abs(Maze.getYcoordinate(Position) - Maze.getYcoordinate(playerPos)) >= Maze.getYsize() / 4)
                 {
                     valid = true;
                 }
@@ -49,6 +53,9 @@ namespace NEA
         }
         public void move(Maze maze, int playerPos)
         {
+            // CanMove is static, so all of the enemies move every other time, but not all at once.
+            canMove += r.Next(0, 2);
+            if (canMove % 2 == 0 || canMove < 0) return;
             Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
             // H distances will be the manhattan distance between the player position and the given node
             int[] Hdistances = new int[maze.getXsize() * maze.getYsize()];
@@ -127,6 +134,14 @@ namespace NEA
                 }
                 temp = previous[temp];
             }
+        }
+        public static void changeCanMove(int newVal)
+        {
+            canMove = newVal;
+        }
+        public static int getNumOfEnemies()
+        {
+            return numOfEnemies;
         }
     }
 }

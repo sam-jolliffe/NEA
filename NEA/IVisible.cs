@@ -7,7 +7,6 @@ namespace NEA
         int getPosition();
         int getYpos();
         int getXpos();
-        void spawn(List<int> objectPositions);
         string getType();
     }
 }

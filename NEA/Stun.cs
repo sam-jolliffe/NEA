@@ -17,7 +17,7 @@ namespace NEA
         }
         public override void use()
         {
-            Console.WriteLine("Pretend this does something");
+            Enemy.changeCanMove(-2 * Enemy.getNumOfEnemies());
         }
         public override string getDescription()
         {
