@@ -15,15 +15,15 @@ namespace NEA
         {
 
         }
-        public override void use()
+        public override void Use()
         {
-            Enemy.changeCanMove(-2 * Enemy.getNumOfEnemies());
+            Enemy.ChangeCanMove(-2 * Enemy.GetNumOfEnemies());
         }
-        public override string getDescription()
+        public override string GetDescription()
         {
             return "A stun ability which will temporarily make all enemies pause where they are for one move.";
         }
-        public override string getName()
+        public override string GetName()
         {
             return "Stun";
         }

@@ -15,61 +15,69 @@ namespace NEA
         {
             r = ran;
             maze = mazeIn;
-            spawn(objectPositions);
+            Spawn(objectPositions);
         }
         public Power_Up(Maze mazeIn, Random ran, int position)
         {
             r = ran;
             maze = mazeIn;
-            spawn(position);
+            Spawn(position);
         }
-        public string getType()
+        public string GetSprite()
+        {
+            return "°°";
+        }
+        public virtual ConsoleColor GetColour()
+        {
+            return ConsoleColor.Green;
+        }
+        new public string GetType()
         {
             return "Power-up";
         }
-        public virtual string getName()
+        public virtual string GetName()
         {
             return "Base powerup";
         }
-        public int getPosition()
+        public int GetPosition()
         {
             return Position;
         }
-        public int getXpos()
+        public int GetXpos()
         {
             return Xpos;
         }
-        public int getYpos()
+        public int GetYpos()
         {
             return Ypos;
         }
-        public virtual string getDescription()
+        public virtual string GetDescription()
         {
             return "Base Powerup";
         }
-        public virtual void use()
+        public virtual void Use()
         {
 
         }
-        public void spawn(List<int> objectPositions)
+        public void Spawn(List<int> objectPositions)
         {
             bool valid = false;
             while (!valid)
             {
-                Position = r.Next(0, maze.getXsize() * maze.getYsize() - 1);
+                Position = r.Next(0, maze.GetXsize() * maze.GetYsize() - 1);
                 if (!objectPositions.Contains(Position))
                 {
                     valid = true;
                 }
             }
-            Xpos = maze.getXcoordinate(Position);
-            Ypos = maze.getYcoordinate(Position);
+            Xpos = maze.GetXcoordinate(Position);
+            Ypos = maze.GetYcoordinate(Position);
         }
-        public void spawn(int position)
+        public void Spawn(int position)
         {
             Position = position;
-            Xpos = maze.getXcoordinate(Position);
-            Ypos = maze.getYcoordinate(Position);
+            Xpos = maze.GetXcoordinate(Position);
+            Ypos = maze.GetYcoordinate(Position);
         }
     }
 }

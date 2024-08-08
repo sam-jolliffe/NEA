@@ -13,63 +13,70 @@ namespace NEA
         static Maze maze;
         static Player player;
         static int size;
-        static int numEnemies;
-        static int numPowerups;
         static int FOV;
-        static void playGame()
+        static int BaseEnemies = 0;
+        static int Ghosts = 0;
+        static int Stuns = 0;
+        static void PlayGame()
         {
-            int difficulty = setDifficulty();
+            int difficulty = SetDifficulty();
+            int TotalEnemies = BaseEnemies + Ghosts;
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
             List<IVisible> objects = new List<IVisible>();
-            List<int> objectPositions = new List<int>(player.getPosition());
+            List<int> objectPositions = new List<int>(player.GetPosition());
             // Adding enemies
-            for (int i = 0; i < numEnemies; i++)
+            for (int i = 0; i < BaseEnemies; i++)
             {
-                objects.Add(new GhostEnemy(maze, random, objectPositions, player.getPosition()));
-                objectPositions.Add(objects[i].getPosition());
+                objects.Add(new BaseEnemy(maze, random, objectPositions, player.GetPosition()));
+                objectPositions.Add(objects[i].GetPosition());
+            }
+            for (int i = 0; i < Ghosts; i++)
+            {
+                objects.Add(new GhostEnemy(maze, random, objectPositions, player.GetPosition()));
+                objectPositions.Add(objects[i].GetPosition());
             }
             // Adding power-ups
-            for (int i = 0; i < numPowerups; i++)
+            for (int i = 0; i < Stuns; i++)
             {
                 objects.Add(new Stun(maze, random, objectPositions));
-                objectPositions.Add(objects[i + numEnemies].getPosition());
+                objectPositions.Add(objects[i + TotalEnemies].GetPosition());
             }
-            maze.createGraph();
-            maze.generateMaze(player.getPosition(), objects);
-            List<int> treasureRoomNodes = maze.getTreasureRoomNodes();
+            maze.CreateGraph();
+            maze.GenerateMaze(player.GetPosition(), objects);
+            List<int> treasureRoomNodes = maze.GetTreasureRoomNodes();
             foreach (int roomNode in treasureRoomNodes)
             {
                 objects.Add(new Stun(maze, random, roomNode));
             }
-            objects.Add(new Key(maze.getKeyPosition(), maze));
+            objects.Add(new Key(maze.GetKeyPosition(), maze));
             objects.Add(player);
             int oldPos;
             bool hasWon = false;
             bool hasLost = false;
             // Keeps taking a move and re-displaying the board until the user reaches the end
             Console.SetCursorPosition(0, 0);
-            maze.displayGraph(objects, FOV);
+            maze.DisplayGraph(objects, FOV);
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             while (!hasWon && !hasLost)
             {
-                oldPos = player.getPosition();
+                oldPos = player.GetPosition();
                 bool invalidTurn = false;
                 Console.SetCursorPosition(0, 0);
-                maze.displayGraph(objects, FOV);
+                maze.DisplayGraph(objects, FOV);
                 try
                 {
-                    player.setPosition(takeTurn(oldPos));
+                    player.SetPosition(TakeTurn(oldPos));
                 }
                 catch (NotInListException)
                 {
-                    player.setPosition(oldPos);
+                    player.SetPosition(oldPos);
                     invalidTurn = true;
                 }
-                if (!maze.getAdjList()[oldPos].Contains(player.getPosition()) && !invalidTurn)
+                if (!maze.GetAdjList()[oldPos].Contains(player.GetPosition()) && !invalidTurn)
                 {
-                    if (player.getPosition() == maze.getEndPoint() && player.getHasKey() == true)
+                    if (player.GetPosition() == maze.GetEndPoint() && player.GetHasKey() == true)
                     {
                         hasWon = true;
                     }
@@ -81,51 +88,51 @@ namespace NEA
                     int keyPos = -1;
                     foreach (IVisible obj in objects)
                     {
-                        if (obj.getType() == "Enemy")
+                        if (obj.GetType() == "Enemy")
                         {
                             enemies.Add((Enemy)obj);
                             try
                             {
-                                ((Enemy)obj).move(player.getPosition());
+                                ((Enemy)obj).Move(player.GetPosition());
                             }
                             catch
                             {
                                 hasLost = true;
                             }
-                            enemyPositions.Add(obj.getPosition());
+                            enemyPositions.Add(obj.GetPosition());
                         }
-                        else if (obj.getType() == "Power-up")
+                        else if (obj.GetType() == "Power-up")
                         {
-                            powerupPositions.Add(obj.getPosition());
+                            powerupPositions.Add(obj.GetPosition());
                             powerUps.Add((Power_Up)obj);
                         }
-                        else if (obj.getType() == "Key")
+                        else if (obj.GetType() == "Key")
                         {
-                            keyPos = obj.getPosition();
+                            keyPos = obj.GetPosition();
                         }
                     }
-                    if (enemyPositions.Contains(player.getPosition()))
+                    if (enemyPositions.Contains(player.GetPosition()))
                     {
                         hasLost = true;
                     }
-                    else if (powerupPositions.Contains(player.getPosition()))
+                    else if (powerupPositions.Contains(player.GetPosition()))
                     {
                         foreach (Power_Up powerUp in powerUps)
                         {
-                            if (powerUp.getPosition() == player.getPosition())
+                            if (powerUp.GetPosition() == player.GetPosition())
                             {
-                                player.addToInventory(powerUp);
+                                player.AddToInventory(powerUp);
                                 objects.Remove(powerUp);
                             }
                         }
                     }
-                    else if (keyPos == player.getPosition())
+                    else if (keyPos == player.GetPosition())
                     {
-                        player.gotKey();
+                        player.GotKey();
                         Key tempKey = new Key(-1, maze);
                         foreach (IVisible obj in objects)
                         {
-                            if (obj.getType() == "Key")
+                            if (obj.GetType() == "Key")
                             {
                                 tempKey = (Key)obj;
                             }
@@ -135,7 +142,7 @@ namespace NEA
                 }
                 else
                 {
-                    player.setPosition(oldPos);
+                    player.SetPosition(oldPos);
                 }
             }
             stopwatch.Stop();
@@ -166,7 +173,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu        W:::::W         
     YYYYYYYYYYYYY       ooooooooooo         uuuuuuuu  uuuu                 WWW             WWW               ooooooooooo       nnnnnn    nnnnnn   !!! 
 
 
-                                                               Your time was: {formatTime((int)stopwatch.Elapsed.TotalSeconds)}                                                                                                                                       
+                                                               Your time was: {FormatTime((int)stopwatch.Elapsed.TotalSeconds)}                                                                                                                                       
 ");
             }
             else if (hasLost)
@@ -199,7 +206,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.WriteLine("\n\n\n\n Press any key to play again");
             Console.ReadKey(true);
         }
-        static int takeTurn(int pos)
+        static int TakeTurn(int pos)
         {
             Console.SetCursorPosition(0, 0);
             Console.CursorVisible = false;
@@ -207,23 +214,23 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
 
             if (key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow)
             {
-                pos = maze.getDirection(pos, Dir.up);
+                pos = maze.GetDirection(pos, Dir.up);
             }
             else if (key.Key == ConsoleKey.A || key.Key == ConsoleKey.LeftArrow)
             {
-                pos = maze.getDirection(pos, Dir.left);
+                pos = maze.GetDirection(pos, Dir.left);
             }
             else if (key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow)
             {
-                pos = maze.getDirection(pos, Dir.down);
+                pos = maze.GetDirection(pos, Dir.down);
             }
             else if (key.Key == ConsoleKey.D || key.Key == ConsoleKey.RightArrow)
             {
-                pos = maze.getDirection(pos, Dir.right);
+                pos = maze.GetDirection(pos, Dir.right);
             }
             else if (key.Key == ConsoleKey.E)
             {
-                player.showInventory();
+                player.ShowInventory();
                 throw new NotInListException();
             }
 
@@ -266,7 +273,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 }
             }
         }
-        static int setDifficulty()
+        static int SetDifficulty()
         {
             int yPos = 1;
             Console.Clear();
@@ -290,32 +297,37 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                     {
                         case 1:
                             size = 25;
-                            numEnemies = 0;
-                            numPowerups = 10;
+                            BaseEnemies = 0;
+                            Ghosts = 0;
+                            Stuns = 10;
                             FOV = 15;
                             break;
                         case 2:
                             size = 15;
-                            numEnemies = 2;
-                            numPowerups = 10;
+                            BaseEnemies = 2;
+                            Ghosts = 0;
+                            Stuns = 10;
                             FOV = 10;
                             break;
                         case 3:
                             size = 20;
-                            numEnemies = 4;
-                            numPowerups = 5;
+                            BaseEnemies = 3;
+                            Ghosts = 1;
+                            Stuns = 5;
                             FOV = 10;
                             break;
                         case 4:
                             size = 25;
-                            numEnemies = 6;
-                            numPowerups = 5;
+                            BaseEnemies = 3;
+                            Ghosts = 3;
+                            Stuns = 4;
                             FOV = 8;
                             break;
                         case 5:
-                            size = 25;
-                            numEnemies = 10;
-                            numPowerups = 3;
+                            size = 25; 
+                            BaseEnemies = 6;
+                            Ghosts = 4;
+                            Stuns = 3;
                             FOV = 5;
                             break;
                     }
@@ -413,7 +425,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                         Console.SetCursorPosition(30, i);
                         Console.WriteLine($"{theseNames[i]}: ");
                         Console.SetCursorPosition(60, i);
-                        Console.WriteLine($"{formatTime(theseTimes[i])}");
+                        Console.WriteLine($"{FormatTime(theseTimes[i])}");
                         Console.SetCursorPosition(90, i);
                         Console.WriteLine($"{theseDifficulties[i]} difficulty");
                     }
@@ -489,7 +501,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.WriteLine("Just play the game dumbass");
             Console.ReadKey();
         }
-        public static string formatTime(int seconds)
+        public static string FormatTime(int seconds)
         {
             int[] times = new int[3];
             times[0] = seconds / 3600; // Hours
@@ -563,7 +575,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 Console.CursorVisible = false;
                 int choice = MainMenu();
                 Console.Clear();
-                if (choice == 1) playGame();
+                if (choice == 1) PlayGame();
                 else if (choice == 2) DisplayLeaderBoard();
                 else if (choice == 3) HowToPlay();
                 else exit = true;

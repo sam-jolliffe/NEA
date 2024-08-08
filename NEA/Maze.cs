@@ -22,23 +22,23 @@ namespace NEA
             Xsize = sizeIn * 2;
             Ysize = sizeIn;
         }
-        public void displayGraph(List<IVisible> objects, int FOV)
+        public void DisplayGraph(List<IVisible> objects, int FOV)
         {
             // ██ signifies a wall or an object
             // '  ' signifies a coridoor
             int playerPos = 0;
             foreach (IVisible obj in objects)
             {
-                if (obj.getType() == "Player")
+                if (obj.GetType() == "Player")
                 {
-                    playerPos = obj.getPosition();
+                    playerPos = obj.GetPosition();
                 }
             }
             List<int> visibleNodes = new List<int> { playerPos };
             if (!testing)
             {
                 // visibleNodes = depthFirst(playerPos, 0, visibleNodes);
-                visibleNodes = getVisibleNodes(playerPos, FOV);
+                visibleNodes = GetVisibleNodes(playerPos, FOV);
             }
             else
             {
@@ -73,29 +73,15 @@ namespace NEA
                         bool hasWritten = false;
                         foreach (IVisible obj in objects)
                         {
-                            if (obj.getPosition() == nodeNum && !hasWritten)
+                            if (obj.GetPosition() == nodeNum && !hasWritten)
                             {
                                 Console.BackgroundColor = ConsoleColor.White;
                                 isObject = true;
-                                switch (obj.getType())
+                                Console.ForegroundColor = obj.GetColour();
+                                Console.Write(obj.GetSprite());
+                                if (obj.GetType() == "Player")
                                 {
-                                    case "Power-up":
-                                        Console.ForegroundColor = ConsoleColor.Green;
-                                        Console.Write("°°");
-                                        break;
-                                    case "Enemy":
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.Write("()");
-                                        break;
-                                    case "Key":
-                                        Console.ForegroundColor = ConsoleColor.Magenta;
-                                        Console.Write("██");
-                                        break;
-                                    case "Player":
-                                        playerPos = obj.getPosition();
-                                        Console.ForegroundColor = ConsoleColor.DarkBlue;
-                                        Console.Write("██");
-                                        break;
+                                    playerPos = obj.GetPosition();
                                 }
                                 hasWritten = true;
                             }
@@ -171,7 +157,7 @@ namespace NEA
                         }
                         Console.BackgroundColor = ConsoleColor.White;
                         // The wall diagonally between nodes
-                        if (allRoomsNodes.Contains(nodeNum) && allRoomsNodes.Contains(getDirection(nodeNum, Dir.right)) && allRoomsNodes.Contains(getDirection(nodeNum, Dir.down)) && allRoomsNodes.Contains(getDirection(getDirection(nodeNum, Dir.right), Dir.down)) && visibleNodes.Contains(nodeNum))
+                        if (allRoomsNodes.Contains(nodeNum) && allRoomsNodes.Contains(GetDirection(nodeNum, Dir.right)) && allRoomsNodes.Contains(GetDirection(nodeNum, Dir.down)) && allRoomsNodes.Contains(GetDirection(GetDirection(nodeNum, Dir.right), Dir.down)) && visibleNodes.Contains(nodeNum))
                         {
                             Console.Write("  ");
                         }
@@ -181,7 +167,7 @@ namespace NEA
                 }
             }
         }
-        public Dictionary<int, List<int>> createGraph()
+        public Dictionary<int, List<int>> CreateGraph() 
         {
             // Fills the dictionary so that each node has an associated adjacency list;
             for (int nodeNum = 0; nodeNum < Xsize * Ysize; nodeNum++)
@@ -195,21 +181,21 @@ namespace NEA
                 {
                     try
                     {
-                        adjList[nodeNum].Add(getDirection(nodeNum, d));
+                        adjList[nodeNum].Add(GetDirection(nodeNum, d));
                     }
                     catch (NotInListException) { }
                 }
             }
             return adjList;
         }
-        public void generateMaze(int startNode, List<IVisible> objects)
+        public void GenerateMaze(int startNode, List<IVisible> objects)
         {
             // Creating and filling up visited with falses
             List<bool> visited = new List<bool>();
             for (int i = 0; i < adjList.Count(); i++)
                 visited.Add(false);
             // Running recursive backtracking
-            recursiveBacktracking(startNode, ref visited);
+            RecursiveBacktracking(startNode, ref visited);
             for (int i = 0; i < Xsize * Ysize; i++)
             {
                 // Checks for dead ends, breaks the ends.
@@ -226,33 +212,33 @@ namespace NEA
                     {
                         try
                         {
-                            if (!adjList[node].Contains(getDirection(node, d)))
+                            if (!adjList[node].Contains(GetDirection(node, d)))
                             {
-                                removeEdge(node, getDirection(node, directions[((int)d + 2) % 4]));
+                                RemoveEdge(node, GetDirection(node, directions[((int)d + 2) % 4]));
                             }
                         }
                         catch (NotInListException) { }
                     }
                 }
             }
-            makeRooms(ref objects);
-            makeEndPoint(startNode);
+            MakeRooms(ref objects);
+            MakeEndPoint(startNode);
 
         }
-        public void recursiveBacktracking(int startNode, ref List<bool> visited)
+        public void RecursiveBacktracking(int startNode, ref List<bool> visited)
         {
-            List<int> nodeEdges = randomize(adjList[startNode]);
+            List<int> nodeEdges = Randomize(adjList[startNode]);
             visited[startNode] = true;
             foreach (int i in nodeEdges.ToList())
             {
                 if (!visited[i])
                 {
-                    removeEdge(startNode, i);
-                    recursiveBacktracking(i, ref visited);
+                    RemoveEdge(startNode, i);
+                    RecursiveBacktracking(i, ref visited);
                 }
             }
         }
-        public bool removeEdge(int node1, int node2)
+        public bool RemoveEdge(int node1, int node2)
         {
             if (!adjList.ContainsKey(node1) || !adjList.ContainsKey(node2))
             {
@@ -280,7 +266,7 @@ namespace NEA
             return true;
 
         }
-        public bool addEdge(int node1, int node2)
+        public bool AddEdge(int node1, int node2)
         {
             if (!adjList.ContainsKey(node1) || !adjList.ContainsKey(node2))
             {
@@ -307,11 +293,11 @@ namespace NEA
             }
             return true;
         }
-        public List<int> getEdges(int node)
+        public List<int> GetEdges(int node)
         {
             return adjList[node];
         }
-        public List<int> randomize(List<int> ints)
+        public List<int> Randomize(List<int> ints)
         {
             // Based on the Fisher-Yates Shuffling algorithm. Article cited in references.
             for (int i = ints.Count - 1; i > 0; i--)
@@ -321,64 +307,64 @@ namespace NEA
             }
             return ints;
         }
-        public Dictionary<int, List<int>> getAdjList()
+        public Dictionary<int, List<int>> GetAdjList()
         {
             return adjList;
         }
-        public int getXsize()
+        public int GetXsize()
         {
             return Xsize;
         }
-        public int getYsize()
+        public int GetYsize()
         {
             return Ysize;
         }
-        public int getXcoordinate(int node)
+        public int GetXcoordinate(int node)
         {
             return node % Xsize;
         }
-        public int getYcoordinate(int node)
+        public int GetYcoordinate(int node)
         {
             return node / Xsize;
         }
-        public int getDirection(int node, Dir d)
+        public int GetDirection(int node, Dir d)
         {
             switch (d)
             {
                 case Dir.left:
-                    return getXcoordinate(node) != 0 ? node - 1 : throw new NotInListException();
+                    return GetXcoordinate(node) != 0 ? node - 1 : throw new NotInListException();
                 case Dir.right:
-                    return getXcoordinate(node) < Xsize - 1 ? node + 1 : throw new NotInListException();
+                    return GetXcoordinate(node) < Xsize - 1 ? node + 1 : throw new NotInListException();
                 case Dir.up:
-                    return getYcoordinate(node) != 0 ? node - Xsize : throw new NotInListException();
+                    return GetYcoordinate(node) != 0 ? node - Xsize : throw new NotInListException();
                 case Dir.down:
-                    return getYcoordinate(node) != Ysize - 1 ? node + Xsize : throw new NotInListException();
+                    return GetYcoordinate(node) != Ysize - 1 ? node + Xsize : throw new NotInListException();
             }
             throw new NotInListException();
         }
-        public int getRandom(int maxNum)
+        public int GetRandom(int maxNum)
         {
             return r.Next(maxNum + 1);
         }
-        public int getEndPoint()
+        public int GetEndPoint()
         {
             return endPoint;
         }
-        public void makeEndPoint(int startPoint)
+        public void MakeEndPoint(int startPoint)
         {
             bool validEndPoint = false;
             endPoint = 0;
             while (!validEndPoint)
             {
-                endPoint = getRandom(Xsize * Ysize);
+                endPoint = GetRandom(Xsize * Ysize);
                 // Checks if the x and y coordinate separatley are at least a third of the grid away from the start point
-                if (Math.Abs(getXcoordinate(endPoint) - getXcoordinate(startPoint)) >= Xsize / 3 && Math.Abs(getYcoordinate(endPoint) - getYcoordinate(startPoint)) >= Ysize / 3)
+                if (Math.Abs(GetXcoordinate(endPoint) - GetXcoordinate(startPoint)) >= Xsize / 3 && Math.Abs(GetYcoordinate(endPoint) - GetYcoordinate(startPoint)) >= Ysize / 3)
                 {
                     validEndPoint = true;
                 }
             }
         }
-        public List<int> depthFirst(int node, int count, List<int> visited)
+        public List<int> DepthFirst(int node, int count, List<int> visited)
         {
             count++;
             if (count >= 15) return visited;
@@ -388,7 +374,7 @@ namespace NEA
             {
                 try
                 {
-                    adjacents.Add(getDirection(node, d));
+                    adjacents.Add(GetDirection(node, d));
                 }
                 catch (NotInListException) { }
             }
@@ -396,12 +382,12 @@ namespace NEA
             {
                 if (!adjList[node].Contains(i))
                 {
-                    visited = depthFirst(i, count, visited);
+                    visited = DepthFirst(i, count, visited);
                 }
             }
             return visited;
         }
-        public void makeRooms(ref List<IVisible> objects)
+        public void MakeRooms(ref List<IVisible> objects)
         {
             // Treasure room:
             int Node = 0;
@@ -410,40 +396,40 @@ namespace NEA
             List<int> objectPositions = new List<int>();
             foreach (IVisible obj in objects)
             {
-                objectPositions.Add(obj.getPosition());
+                objectPositions.Add(obj.GetPosition());
             }
             while (!isValid)
             {
                 Node = r.Next(0, Xsize * Ysize);
                 //      Top row                               Bottom row                        Left column                       Right column
-                if (!(getYcoordinate(Node) <= 1 || getYcoordinate(Node) >= Ysize - 2 || getXcoordinate(Node) <= 1 || getXcoordinate(Node) >= Xsize - 2) && !objectPositions.Contains(Node))
+                if (!(GetYcoordinate(Node) <= 1 || GetYcoordinate(Node) >= Ysize - 2 || GetXcoordinate(Node) <= 1 || GetXcoordinate(Node) >= Xsize - 2) && !objectPositions.Contains(Node))
                 {
                     isValid = true;
                 }
             }
-            removeEdge(getDirection(getDirection(Node, Dir.left), Dir.up), getDirection(Node, Dir.up)); // Top left, top middle
-            removeEdge(getDirection(Node, Dir.up), getDirection(getDirection(Node, Dir.right), Dir.up)); // Top middle, top right
-            removeEdge(getDirection(getDirection(Node, Dir.left), Dir.up), getDirection(Node, Dir.left)); // Top left, middle left
-            removeEdge(getDirection(Node, Dir.up), Node); // Top middle, middle
-            removeEdge(getDirection(getDirection(Node, Dir.right), Dir.up), getDirection(Node, Dir.right)); // Top right, middle right
-            removeEdge(getDirection(Node, Dir.left), Node); // Middle left, middle
-            removeEdge(Node, getDirection(Node, Dir.right)); // Middle, middle right
-            removeEdge(getDirection(Node, Dir.left), getDirection(getDirection(Node, Dir.left), Dir.down)); // Middle left, bottom left
-            removeEdge(Node, getDirection(Node, Dir.down)); // Middle, bottom middle
-            removeEdge(getDirection(Node, Dir.right), getDirection(getDirection(Node, Dir.right), Dir.down)); // Middle right, bottom right
-            removeEdge(getDirection(getDirection(Node, Dir.left), Dir.down), getDirection(Node, Dir.down)); // Bottom left, bottom middle
-            removeEdge(getDirection(Node, Dir.down), getDirection(getDirection(Node, Dir.right), Dir.down)); // Bottom middle, bottom right
+            RemoveEdge(GetDirection(GetDirection(Node, Dir.left), Dir.up), GetDirection(Node, Dir.up)); // Top left, top middle
+            RemoveEdge(GetDirection(Node, Dir.up), GetDirection(GetDirection(Node, Dir.right), Dir.up)); // Top middle, top right
+            RemoveEdge(GetDirection(GetDirection(Node, Dir.left), Dir.up), GetDirection(Node, Dir.left)); // Top left, middle left
+            RemoveEdge(GetDirection(Node, Dir.up), Node); // Top middle, middle
+            RemoveEdge(GetDirection(GetDirection(Node, Dir.right), Dir.up), GetDirection(Node, Dir.right)); // Top right, middle right
+            RemoveEdge(GetDirection(Node, Dir.left), Node); // Middle left, middle
+            RemoveEdge(Node, GetDirection(Node, Dir.right)); // Middle, middle right
+            RemoveEdge(GetDirection(Node, Dir.left), GetDirection(GetDirection(Node, Dir.left), Dir.down)); // Middle left, bottom left
+            RemoveEdge(Node, GetDirection(Node, Dir.down)); // Middle, bottom middle
+            RemoveEdge(GetDirection(Node, Dir.right), GetDirection(GetDirection(Node, Dir.right), Dir.down)); // Middle right, bottom right
+            RemoveEdge(GetDirection(GetDirection(Node, Dir.left), Dir.down), GetDirection(Node, Dir.down)); // Bottom left, bottom middle
+            RemoveEdge(GetDirection(Node, Dir.down), GetDirection(GetDirection(Node, Dir.right), Dir.down)); // Bottom middle, bottom right
             treasureRoomNodes = new List<int>
             {
                 Node,
-                getDirection(getDirection(Node, Dir.up), Dir.left),
-                getDirection(Node, Dir.up),
-                getDirection(getDirection(Node, Dir.right), Dir.up),
-                getDirection(Node, Dir.left),
-                getDirection(Node, Dir.right),
-                getDirection(getDirection(Node, Dir.left), Dir.down),
-                getDirection(Node, Dir.down),
-                getDirection(getDirection(Node, Dir.right), Dir.down)
+                GetDirection(GetDirection(Node, Dir.up), Dir.left),
+                GetDirection(Node, Dir.up),
+                GetDirection(GetDirection(Node, Dir.right), Dir.up),
+                GetDirection(Node, Dir.left),
+                GetDirection(Node, Dir.right),
+                GetDirection(GetDirection(Node, Dir.left), Dir.down),
+                GetDirection(Node, Dir.down),
+                GetDirection(GetDirection(Node, Dir.right), Dir.down)
             };
             allRoomsNodes = new List<int>(treasureRoomNodes);
 
@@ -453,55 +439,55 @@ namespace NEA
             {
                 Node = r.Next(0, Xsize * Ysize);
                 //      Top row                               Bottom row                        Left column                       Right column
-                if (!(getYcoordinate(Node) <= 1 || getYcoordinate(Node) >= Ysize - 2 || getXcoordinate(Node) <= 1 || getXcoordinate(Node) >= Xsize - 2) && !allRoomsNodes.Contains(Node) && !objectPositions.Contains(Node))
+                if (!(GetYcoordinate(Node) <= 1 || GetYcoordinate(Node) >= Ysize - 2 || GetXcoordinate(Node) <= 1 || GetXcoordinate(Node) >= Xsize - 2) && !allRoomsNodes.Contains(Node) && !objectPositions.Contains(Node))
                 {
                     isValid = true;
                 }
             }
-            removeEdge(getDirection(getDirection(Node, Dir.left), Dir.up), getDirection(Node, Dir.up)); // Top left, top middle
-            removeEdge(getDirection(Node, Dir.up), getDirection(getDirection(Node, Dir.right), Dir.up)); // Top middle, top right
-            removeEdge(getDirection(getDirection(Node, Dir.left), Dir.up), getDirection(Node, Dir.left)); // Top left, middle left
-            removeEdge(getDirection(Node, Dir.up), Node); // Top middle, middle
-            removeEdge(getDirection(getDirection(Node, Dir.right), Dir.up), getDirection(Node, Dir.right)); // Top right, middle right
-            removeEdge(getDirection(Node, Dir.left), Node); // Middle left, middle
-            removeEdge(Node, getDirection(Node, Dir.right)); // Middle, middle right
-            removeEdge(getDirection(Node, Dir.left), getDirection(getDirection(Node, Dir.left), Dir.down)); // Middle left, bottom left
-            removeEdge(Node, getDirection(Node, Dir.down)); // Middle, bottom middle
-            removeEdge(getDirection(Node, Dir.right), getDirection(getDirection(Node, Dir.right), Dir.down)); // Middle right, bottom right
-            removeEdge(getDirection(getDirection(Node, Dir.left), Dir.down), getDirection(Node, Dir.down)); // Bottom left, bottom middle
-            removeEdge(getDirection(Node, Dir.down), getDirection(getDirection(Node, Dir.right), Dir.down)); // Bottom middle, bottom right
+            RemoveEdge(GetDirection(GetDirection(Node, Dir.left), Dir.up), GetDirection(Node, Dir.up)); // Top left, top middle
+            RemoveEdge(GetDirection(Node, Dir.up), GetDirection(GetDirection(Node, Dir.right), Dir.up)); // Top middle, top right
+            RemoveEdge(GetDirection(GetDirection(Node, Dir.left), Dir.up), GetDirection(Node, Dir.left)); // Top left, middle left
+            RemoveEdge(GetDirection(Node, Dir.up), Node); // Top middle, middle
+            RemoveEdge(GetDirection(GetDirection(Node, Dir.right), Dir.up), GetDirection(Node, Dir.right)); // Top right, middle right
+            RemoveEdge(GetDirection(Node, Dir.left), Node); // Middle left, middle
+            RemoveEdge(Node, GetDirection(Node, Dir.right)); // Middle, middle right
+            RemoveEdge(GetDirection(Node, Dir.left), GetDirection(GetDirection(Node, Dir.left), Dir.down)); // Middle left, bottom left
+            RemoveEdge(Node, GetDirection(Node, Dir.down)); // Middle, bottom middle
+            RemoveEdge(GetDirection(Node, Dir.right), GetDirection(GetDirection(Node, Dir.right), Dir.down)); // Middle right, bottom right
+            RemoveEdge(GetDirection(GetDirection(Node, Dir.left), Dir.down), GetDirection(Node, Dir.down)); // Bottom left, bottom middle
+            RemoveEdge(GetDirection(Node, Dir.down), GetDirection(GetDirection(Node, Dir.right), Dir.down)); // Bottom middle, bottom right
             allRoomsNodes.AddRange(new List<int>
             {
                 Node,
-                getDirection(getDirection(Node, Dir.up), Dir.left),
-                getDirection(Node, Dir.up),
-                getDirection(getDirection(Node, Dir.right), Dir.up),
-                getDirection(Node, Dir.left),
-                getDirection(Node, Dir.right),
-                getDirection(getDirection(Node, Dir.left), Dir.down),
-                getDirection(Node, Dir.down),
-                getDirection(getDirection(Node, Dir.right), Dir.down)
+                GetDirection(GetDirection(Node, Dir.up), Dir.left),
+                GetDirection(Node, Dir.up),
+                GetDirection(GetDirection(Node, Dir.right), Dir.up),
+                GetDirection(Node, Dir.left),
+                GetDirection(Node, Dir.right),
+                GetDirection(GetDirection(Node, Dir.left), Dir.down),
+                GetDirection(Node, Dir.down),
+                GetDirection(GetDirection(Node, Dir.right), Dir.down)
             });
             keyPosition = Node;
         }
-        public List<int> getTreasureRoomNodes()
+        public List<int> GetTreasureRoomNodes()
         {
             return treasureRoomNodes;
         }
-        public List<int> getAllRoomsNodes()
+        public List<int> GetAllRoomsNodes()
         {
             return allRoomsNodes;
         }
-        public int getKeyPosition()
+        public int GetKeyPosition()
         {
             return keyPosition;
         }
-        public List<int> getVisibleNodes(int Node, int FOV)
+        public List<int> GetVisibleNodes(int Node, int FOV)
         {
             List<int> nodes = new List<int>();
             for (int i = 0; i < Xsize * Ysize; i++)
             {
-                if (Math.Pow(Math.Abs(getXcoordinate(Node) - getXcoordinate(i)), 2) + Math.Pow(Math.Abs(getYcoordinate(Node) - getYcoordinate(i)), 2) <= Math.Pow(FOV, 2))
+                if (Math.Pow(Math.Abs(GetXcoordinate(Node) - GetXcoordinate(i)), 2) + Math.Pow(Math.Abs(GetYcoordinate(Node) - GetYcoordinate(i)), 2) <= Math.Pow(FOV, 2))
                 {
                     nodes.Add(i);
                 }

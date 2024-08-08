@@ -17,23 +17,31 @@ namespace NEA
         {
             r = ran;
             Maze = maze;
-            spawn(new List<int>());
+            Spawn();
             Inventory = new List<Power_Up>();
             hasKey = false;
         }
-        public int getPosition()
+        public string GetSprite()
+        {
+            return "██";
+        }
+        public ConsoleColor GetColour()
+        {
+            return ConsoleColor.DarkBlue;
+        }
+        public int GetPosition()
         {
             return Position;
         }
-        public void setPosition(int newPos)
+        public void SetPosition(int newPos)
         {
             Position = newPos;
         }
-        public List<Power_Up> getInventory()
+        public List<Power_Up> GetInventory()
         {
             return Inventory;
         }
-        public void showInventory()
+        public void ShowInventory()
         {
             int yPos = 3;
             Console.BackgroundColor = ConsoleColor.Black;
@@ -42,8 +50,8 @@ namespace NEA
             Console.WriteLine("You have: \n\n");
             foreach (Power_Up powerup in Inventory)
             {
-                Console.WriteLine($@"   {powerup.getName()}:
-   {powerup.getDescription()}
+                Console.WriteLine($@"   {powerup.GetName()}:
+   {powerup.GetDescription()}
 ");
             }
                 ConsoleKeyInfo key;
@@ -56,8 +64,10 @@ namespace NEA
                 key = Console.ReadKey(true);
                 if (key.Key == ConsoleKey.Enter)
                 {
+
+                    if (Inventory.Count() == 0) return;
                     // If the user presses enter, it uses that power-up
-                    Inventory[yPos / 3 - 1].use();
+                    Inventory[yPos / 3 - 1].Use();
                     Inventory.Remove(Inventory[yPos / 3 - 1]);
                     return;
                 }
@@ -76,40 +86,40 @@ namespace NEA
                 }
             }
         }
-        public void addToInventory(Power_Up powerup)
+        public void AddToInventory(Power_Up powerup)
         {
             Inventory.Add(powerup);
         }
-        public void removeFromInventory(Power_Up powerup)
+        public void RemoveFromInventory(Power_Up powerup)
         {
             Inventory.Remove(powerup);
         }
-        public string getType()
+        new public string GetType()
         {
             return "Player";
         }
-        public int getXpos()
+        public int GetXpos()
         {
             return Xpos;
         }
-        public int getYpos()
+        public int GetYpos()
         {
             return Ypos;
         }
-        public bool getHasKey()
+        public bool GetHasKey()
         {
             return hasKey;
         }
-        public void gotKey()
+        public void GotKey()
         {
             hasKey = true;
         }
-        public void spawn(List<int> objectPositions)
+        public void Spawn()
         {
             // ObjectPositions is justy a blank list, as the player is always the first objects created, so there is nowhere it can't spawn
-            Position = r.Next(0, Maze.getXsize() * Maze.getYsize() - 1);
-            Xpos = Maze.getXcoordinate(Position);
-            Ypos = Maze.getYcoordinate(Position);
+            Position = r.Next(0, Maze.GetXsize() * Maze.GetYsize() - 1);
+            Xpos = Maze.GetXcoordinate(Position);
+            Ypos = Maze.GetYcoordinate(Position);
         }
     }
 }

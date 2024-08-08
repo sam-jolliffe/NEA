@@ -19,56 +19,65 @@ namespace NEA
             numOfEnemies++;
             r = ran;
             maze = mazeIn;
-            spawn(objectPositions, playerPos);
+            Spawn(objectPositions, playerPos);
         }
-        public int getPosition()
+        public string GetSprite()
+        {
+            return "[]";
+        }
+        public virtual ConsoleColor GetColour()
+        {
+            return ConsoleColor.Red;
+        }
+        public int GetPosition()
         {
             return Position;
         }
-        public int getXpos()
+        public int GetXpos()
         {
             return Xpos;
         }
-        public int getYpos()
+        public int GetYpos()
         {
             return Ypos;
         }
-        public void spawn(List<int> objectPositions, int playerPos)
+        public void Spawn(List<int> objectPositions, int playerPos)
         {
             bool valid = false;
             while (!valid)
             {
-                Position = r.Next(0, maze.getXsize() * maze.getYsize() - 1);
-                if (!objectPositions.Contains(Position) && Math.Abs(maze.getXcoordinate(Position) - maze.getXcoordinate(playerPos)) >= maze.getXsize() / 4 && Math.Abs(maze.getYcoordinate(Position) - maze.getYcoordinate(playerPos)) >= maze.getYsize() / 4)
+                Position = r.Next(0, maze.GetXsize() * maze.GetYsize() - 1);
+                if (!objectPositions.Contains(Position) && Math.Abs(maze.GetXcoordinate(Position) - maze.GetXcoordinate(playerPos)) >= maze.GetXsize() / 4 && Math.Abs(maze.GetYcoordinate(Position) - maze.GetYcoordinate(playerPos)) >= maze.GetXsize() / 4)
                 {
                     valid = true;
                 }
             }
-            Xpos = maze.getXcoordinate(Position);
-            Ypos = maze.getYcoordinate(Position);
+            Xpos = maze.GetXcoordinate(Position);
+            Ypos = maze.GetYcoordinate(Position);
         }
-        public string getType()
+        new public string GetType()
         {
             return "Enemy";
         }
-        public virtual void move(int playerPos)
+        public virtual void Move(int playerPos)
         {
             // CanMove is static, so all of the enemies move every other time, but not all at once.
             canMove += r.Next(0, 2);
             if (canMove % 2 == 0 || canMove < 0) return;
             Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
+            int NumNodes = maze.GetXsize() * maze.GetYsize();
             // H distances will be the manhattan distance between the player position and the given node
-            int[] Hdistances = new int[maze.getXsize() * maze.getYsize()];
+            int[] Hdistances = new int[NumNodes];
             // G distances will be the current shortest distance discovered to get to that node
-            int[] Gdistances = new int[maze.getXsize() * maze.getYsize()];
+            int[] Gdistances = new int[NumNodes];
             // F distances will be the sum of the P and H distances for that node. 
             // This makes it so that the algorithm will try to search in the vague direction of the end point (the player)
-            int[] Fdistances = new int[maze.getXsize() * maze.getYsize()];
-            int[] previous = new int[maze.getXsize() * maze.getYsize()];
+            int[] Fdistances = new int[NumNodes];
+            int[] previous = new int[NumNodes];
             List<int> unvisitedNodes = new List<int>();
-            for (int i = 0; i < maze.getXsize() * maze.getYsize(); i++)
+            for (int i = 0; i < NumNodes; i++)
             {
-                Hdistances[i] = Math.Abs(maze.getXcoordinate(playerPos) - maze.getXcoordinate(i)) + Math.Abs(maze.getYcoordinate(playerPos) - maze.getYcoordinate(i));
+                Hdistances[i] = Math.Abs(maze.GetXcoordinate(playerPos) - maze.GetXcoordinate(i)) + Math.Abs(maze.GetYcoordinate(playerPos) - maze.GetYcoordinate(i));
                 Gdistances[i] = 1000;
                 Fdistances[i] = 1000;
                 previous[i] = -1;
@@ -98,8 +107,8 @@ namespace NEA
                 {
                     try
                     {
-                        int Temp = maze.getDirection(node, d);
-                        if (unvisitedNodes.Contains(Temp) && !maze.getAdjList()[node].Contains(Temp))
+                        int Temp = maze.GetDirection(node, d);
+                        if (unvisitedNodes.Contains(Temp) && !maze.GetAdjList()[node].Contains(Temp))
                         {
                             possibleMoves.Add(Temp);
                         }
@@ -135,11 +144,11 @@ namespace NEA
                 temp = previous[temp];
             }
         }
-        public static void changeCanMove(int newVal)
+        public static void ChangeCanMove(int newVal)
         {
             canMove = newVal;
         }
-        public static int getNumOfEnemies()
+        public static int GetNumOfEnemies()
         {
             return numOfEnemies;
         }

@@ -8,7 +8,7 @@ namespace NEA
 {
     internal class Key : IVisible
     {
-        private int Position;
+        private readonly int Position;
         private int Xpos;
         private int Ypos;
         private readonly Maze maze;
@@ -17,31 +17,38 @@ namespace NEA
             Position = position;
             maze = Maze;
         }
-
-        public int getPosition()
+        public string GetSprite()
+        {
+            return "██";
+        }
+        public ConsoleColor GetColour()
+        {
+            return ConsoleColor.Magenta;
+        }
+        public int GetPosition()
         {
             return Position;
         }
 
-        public string getType()
+        new public string GetType()
         {
             return "Key";
         }
 
-        public int getXpos()
+        public int GetXpos()
         {
             return Xpos;
         }
 
-        public int getYpos()
+        public int GetYpos()
         {
             return Ypos;
         }
 
-        public void spawn(List<int> objectPositions)
+        public void Spawn()
         {
-            Xpos = maze.getXcoordinate(Position);
-            Ypos = maze.getYcoordinate(Position);
+            Xpos = maze.GetXcoordinate(Position);
+            Ypos = maze.GetYcoordinate(Position);
         }
     }
 }

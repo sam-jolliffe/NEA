@@ -8,18 +8,24 @@ namespace NEA
         public GhostEnemy(Maze mazeIn, Random ran, List<int> objectPositions, int playerPos) : base(mazeIn, ran, objectPositions, playerPos)
         {
         }
-        public override void move(int playerPos)
+        public override ConsoleColor GetColour()
+        {
+            return ConsoleColor.Cyan;
+        }
+        public override void Move(int playerPos)
         {
             if (r.Next(0, 11) < 5)
             {
-                base.move(playerPos);
+                base.Move(playerPos);
             }
             else
             {
-                int enemyX = maze.getXcoordinate(Position);
-                int enemyY = maze.getYcoordinate(Position);
-                int playerX = maze.getXcoordinate(playerPos);
-                int playerY = maze.getYcoordinate(playerPos);
+                canMove += r.Next(0, 2);
+                if (canMove % 2 == 0 || canMove < 0) return;
+                int enemyX = maze.GetXcoordinate(Position);
+                int enemyY = maze.GetYcoordinate(Position);
+                int playerX = maze.GetXcoordinate(playerPos);
+                int playerY = maze.GetYcoordinate(playerPos);
                 List<Dir> directions = new List<Dir> { Dir.left, Dir.right, Dir.up, Dir.down };
                 if (enemyX > playerX)
                 {
@@ -58,7 +64,7 @@ namespace NEA
                         }
                     }
                 }
-                Position = maze.getDirection(Position, direction);
+                Position = maze.GetDirection(Position, direction);
             }
         }
     }
