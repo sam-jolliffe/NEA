@@ -14,9 +14,10 @@ namespace NEA
         static Player player;
         static int size;
         static int FOV;
-        static int BaseEnemies = 0;
-        static int Ghosts = 0;
-        static int Stuns = 0;
+        static int BaseEnemies;
+        static int Ghosts;
+        static int Stuns;
+        static int Blinders;
         static void PlayGame()
         {
             int difficulty = SetDifficulty();
@@ -34,6 +35,11 @@ namespace NEA
             for (int i = 0; i < Ghosts; i++)
             {
                 objects.Add(new GhostEnemy(maze, random, objectPositions, player.GetPosition()));
+                objectPositions.Add(objects[i].GetPosition());
+            }
+            for (int i = 0; i < Blinders; i++)
+            {
+                objects.Add(new BlindingEnemy(maze, random, objectPositions, player.GetPosition()));
                 objectPositions.Add(objects[i].GetPosition());
             }
             // Adding power-ups
@@ -330,8 +336,9 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             break;
                         case 5:
                             size = 25; 
-                            BaseEnemies = 6;
+                            BaseEnemies = 2;
                             Ghosts = 4;
+                            Blinders = 5;
                             Stuns = 3;
                             FOV = 5;
                             break;
@@ -539,7 +546,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             times[1] = (seconds - (times[0] * 3600)) / 60; // Minutes
             times[2] = seconds - (times[0] * 3600) - (times[1] * 60); // Seconds
             string[] isPlural = new string[3];
-            bool[] exists = new bool[5];
+            bool[] exists = new bool[3];
             string[] names = { "hour", "minute", "second" };
             for (int i = 0; i < 3; i++)
             {
@@ -567,6 +574,10 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 }
             }
             return returnString;
+        }
+        public static void SetFOV(int InFOV)
+        {
+            FOV = InFOV;
         }
         static List<string> InsertionSort(string name, int time, string difficulty, List<string> list)
         {
