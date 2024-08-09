@@ -14,7 +14,7 @@ namespace NEA
         }
         public override void Move(int playerPos)
         {
-            if (r.Next(0, 11) < 5)
+            if (r.Next(0, 10) < 7)
             {
                 base.Move(playerPos);
             }

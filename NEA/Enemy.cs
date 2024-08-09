@@ -25,6 +25,10 @@ namespace NEA
         {
             return "[]";
         }
+        public string GetDescription()
+        {
+            return "Base enemy";
+        }
         public virtual ConsoleColor GetColour()
         {
             return ConsoleColor.Red;

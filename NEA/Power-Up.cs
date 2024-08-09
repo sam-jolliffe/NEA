@@ -25,7 +25,7 @@ namespace NEA
         }
         public string GetSprite()
         {
-            return "°°";
+            return "()";
         }
         public virtual ConsoleColor GetColour()
         {

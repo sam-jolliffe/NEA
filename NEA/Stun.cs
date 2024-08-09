@@ -19,9 +19,14 @@ namespace NEA
         {
             Enemy.ChangeCanMove(-2 * Enemy.GetNumOfEnemies());
         }
+        public override ConsoleColor GetColour()
+        {
+            return ConsoleColor.Green;
+        }
+
         public override string GetDescription()
         {
-            return "A stun ability which will temporarily make all enemies pause where they are for one move.";
+            return " Freezes all enemies for an average of two turns.";
         }
         public override string GetName()
         {

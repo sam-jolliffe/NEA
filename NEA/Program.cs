@@ -233,6 +233,11 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 player.ShowInventory();
                 throw new NotInListException();
             }
+            else if (key.Key == ConsoleKey.Escape)
+            {
+                HowToPlay();
+                throw new NotInListException();
+            }
 
             return pos;
         }
@@ -498,7 +503,33 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
         }
         static void HowToPlay()
         {
-            Console.WriteLine("Just play the game dumbass");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
+            Console.Write($"██");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($": You\n");
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.Write($"██");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($": The key. You will need to pick this up before you can go through the exit.\n");
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.Write($"██");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($": The exit. Get to this with the key to win.\n");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write($"[]");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($": The base enemy which moves on average every two turns and will kill you if it is on the same square as you.\n");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write($"[]");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($": A ghost enemy that has a 1 in 3 chance to be able to pass through a wall in the direction of the player each move.\n");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write($"()");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($": A stun Power-Up which when used will freeze all enemies for an average of two turns.\n");
             Console.ReadKey();
         }
         public static string FormatTime(int seconds)
