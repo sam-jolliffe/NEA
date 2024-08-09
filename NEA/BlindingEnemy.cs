@@ -18,8 +18,20 @@ namespace NEA
         {
             return ConsoleColor.DarkMagenta;
         }
+        public override string GetName()
+        {
+            return "Blinder";
+        }
+        public void SetTimeBlinded(int InTimeBlinded)
+        {
+            TimeBlinded = InTimeBlinded;
+        }
         public override void Move(int playerPos)
         {
+            if (TimeBlinded >= 0)
+            {
+                Program.SetDefaultFOV();
+            }
             if (TimeBlinded > 0)
             {
                 TimeBlinded--;
@@ -118,6 +130,21 @@ namespace NEA
                     isFound = true;
                 }
                 temp = previous[temp];
+            }
+            IsNextToPlayer = false;
+            foreach (Dir direction in directions)
+            {
+
+                if (Position == maze.GetDirection(playerPos, direction))
+                {
+                    IsNextToPlayer = true;
+                }
+            }
+            if (IsNextToPlayer)
+            {
+                // Shorten FOV
+                TimeBlinded = 5;
+                Program.SetFOV(3);
             }
         }
     }

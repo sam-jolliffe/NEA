@@ -10,6 +10,7 @@ namespace NEA
         int GetYpos();
         int GetXpos();
         string GetType();
+        string GetName();
         string GetSprite();
         ConsoleColor GetColour();
     }

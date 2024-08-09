@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Navigation;
 
 namespace NEA
 {
@@ -29,7 +30,10 @@ namespace NEA
         {
             return Position;
         }
-
+        public string GetName()
+        {
+            return "Key";
+        }
         new public string GetType()
         {
             return "Key";

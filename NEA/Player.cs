@@ -29,6 +29,10 @@ namespace NEA
         {
             return ConsoleColor.DarkBlue;
         }
+        public string GetName()
+        {
+            return "Player";
+        }
         public int GetPosition()
         {
             return Position;

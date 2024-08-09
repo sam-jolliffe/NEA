@@ -8,6 +8,10 @@ namespace NEA
         public GhostEnemy(Maze mazeIn, Random ran, List<int> objectPositions, int playerPos) : base(mazeIn, ran, objectPositions, playerPos)
         {
         }
+        public override string GetName()
+        {
+            return "Ghost";
+        }
         public override ConsoleColor GetColour()
         {
             return ConsoleColor.Cyan;

@@ -25,6 +25,10 @@ namespace NEA
         {
             return "[]";
         }
+        public virtual string GetName()
+        {
+            return "";
+        }
         public string GetDescription()
         {
             return "Base enemy";

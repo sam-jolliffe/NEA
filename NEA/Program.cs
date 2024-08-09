@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace NEA
         static Maze maze;
         static Player player;
         static int size;
+        static int DefaultFOV;
         static int FOV;
         static int BaseEnemies;
         static int Ghosts;
@@ -88,13 +90,14 @@ namespace NEA
                     }
                     // Making a list of the positions of all enemies and power-ups
                     List<int> enemyPositions = new List<int>();
+                    List<int> blinderPositions = new List<int>();
                     List<int> powerupPositions = new List<int>();
                     List<Enemy> enemies = new List<Enemy>();
                     List<Power_Up> powerUps = new List<Power_Up>();
                     int keyPos = -1;
                     foreach (IVisible obj in objects)
                     {
-                        if (obj.GetType() == "Enemy")
+                        if (obj.GetType() == "Enemy" && obj.GetName() != "Blinder")
                         {
                             enemies.Add((Enemy)obj);
                             try
@@ -106,6 +109,19 @@ namespace NEA
                                 hasLost = true;
                             }
                             enemyPositions.Add(obj.GetPosition());
+                        }
+                        else if (obj.GetType() == "Enemy" && obj.GetName() == "Blinder")
+                        {
+                            try
+                            {
+                                ((Enemy)obj).Move(player.GetPosition());
+                            }
+                            catch
+                            {
+                                ((BlindingEnemy)obj).SetTimeBlinded(5);
+                                FOV = 3;
+                            }
+                            blinderPositions.Add(obj.GetPosition());
                         }
                         else if (obj.GetType() == "Power-up")
                         {
@@ -120,6 +136,10 @@ namespace NEA
                     if (enemyPositions.Contains(player.GetPosition()))
                     {
                         hasLost = true;
+                    }
+                    if (blinderPositions.Contains(player.GetPosition()))
+                    {
+                        FOV = 3;
                     }
                     else if (powerupPositions.Contains(player.GetPosition()))
                     {
@@ -311,28 +331,28 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             BaseEnemies = 0;
                             Ghosts = 0;
                             Stuns = 10;
-                            FOV = 15;
+                            DefaultFOV = 15;
                             break;
                         case 2:
                             size = 15;
                             BaseEnemies = 2;
                             Ghosts = 0;
                             Stuns = 10;
-                            FOV = 10;
+                            DefaultFOV = 10;
                             break;
                         case 3:
                             size = 20;
                             BaseEnemies = 3;
                             Ghosts = 1;
                             Stuns = 5;
-                            FOV = 10;
+                            DefaultFOV = 10;
                             break;
                         case 4:
                             size = 25;
                             BaseEnemies = 3;
                             Ghosts = 3;
                             Stuns = 4;
-                            FOV = 8;
+                            DefaultFOV = 8;
                             break;
                         case 5:
                             size = 25; 
@@ -340,9 +360,10 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Ghosts = 4;
                             Blinders = 5;
                             Stuns = 3;
-                            FOV = 5;
+                            DefaultFOV = 5;
                             break;
                     }
+                    FOV = DefaultFOV;
                     maze = new Maze(size, random);
                     player = new Player(maze, random);
                     return yPos;
@@ -539,7 +560,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.WriteLine($": A stun Power-Up which when used will freeze all enemies for an average of two turns.\n");
             Console.ReadKey();
         }
-        public static string FormatTime(int seconds)
+        static string FormatTime(int seconds)
         {
             int[] times = new int[3];
             times[0] = seconds / 3600; // Hours
@@ -578,6 +599,10 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
         public static void SetFOV(int InFOV)
         {
             FOV = InFOV;
+        }
+        public static void SetDefaultFOV()
+        {
+            FOV = DefaultFOV;
         }
         static List<string> InsertionSort(string name, int time, string difficulty, List<string> list)
         {
