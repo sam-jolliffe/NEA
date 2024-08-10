@@ -10,10 +10,19 @@ namespace NEA
     internal class BlindingEnemy : Enemy
     {
         static int TimeBlinded = 0;
+        static int BlindersCount = 0;
         public BlindingEnemy(Maze mazeIn, Random ran, List<int> objectPositions, int playerPos) : base(mazeIn, ran, objectPositions, playerPos)
         {
+            BlindersCount++;
         }
-
+        public static int GetCountBlinders()
+        {
+            return BlindersCount;
+        }
+        public static void BlinderRemoved()
+        {
+            BlindersCount--;
+        }
         public override ConsoleColor GetColour()
         {
             return ConsoleColor.DarkMagenta;
@@ -22,13 +31,13 @@ namespace NEA
         {
             return "Blinder";
         }
-        public void SetTimeBlinded(int InTimeBlinded)
+        public static void SetTimeBlinded(int InTimeBlinded)
         {
             TimeBlinded = InTimeBlinded;
         }
         public override void Move(int playerPos)
         {
-            if (TimeBlinded >= 0)
+            if (TimeBlinded <= 0)
             {
                 Program.SetDefaultFOV();
             }

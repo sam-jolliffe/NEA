@@ -92,8 +92,10 @@ namespace NEA
                     List<int> enemyPositions = new List<int>();
                     List<int> blinderPositions = new List<int>();
                     List<int> powerupPositions = new List<int>();
+                    List<BlindingEnemy> blinders = new List<BlindingEnemy>();
                     List<Enemy> enemies = new List<Enemy>();
                     List<Power_Up> powerUps = new List<Power_Up>();
+                    List<IVisible> toRemove = new List<IVisible>();
                     int keyPos = -1;
                     foreach (IVisible obj in objects)
                     {
@@ -118,9 +120,12 @@ namespace NEA
                             }
                             catch
                             {
-                                ((BlindingEnemy)obj).SetTimeBlinded(5);
+                                BlindingEnemy.BlinderRemoved();
+                                BlindingEnemy.SetTimeBlinded(5 * (Blinders - 1));
                                 FOV = 3;
+                                toRemove.Add(obj);
                             }
+                            blinders.Add((BlindingEnemy)obj);
                             blinderPositions.Add(obj.GetPosition());
                         }
                         else if (obj.GetType() == "Power-up")
@@ -133,13 +138,23 @@ namespace NEA
                             keyPos = obj.GetPosition();
                         }
                     }
+                    foreach (BlindingEnemy blinder in blinders)
+                    {
+                        if (blinder.GetPosition() == player.GetPosition())
+                        {
+                            BlindingEnemy.BlinderRemoved();
+                            BlindingEnemy.SetTimeBlinded(5 * BlindingEnemy.GetCountBlinders());
+                            FOV = 3;
+                            toRemove.Add(blinder);
+                        }
+                    }
+                    foreach (IVisible obj in toRemove)
+                    {
+                        objects.Remove(obj);
+                    }
                     if (enemyPositions.Contains(player.GetPosition()))
                     {
                         hasLost = true;
-                    }
-                    if (blinderPositions.Contains(player.GetPosition()))
-                    {
-                        FOV = 3;
                     }
                     else if (powerupPositions.Contains(player.GetPosition()))
                     {
@@ -330,6 +345,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             size = 25;
                             BaseEnemies = 0;
                             Ghosts = 0;
+                            Blinders = 0;
                             Stuns = 10;
                             DefaultFOV = 15;
                             break;
@@ -337,6 +353,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             size = 15;
                             BaseEnemies = 2;
                             Ghosts = 0;
+                            Blinders = 1;
                             Stuns = 10;
                             DefaultFOV = 10;
                             break;
@@ -344,6 +361,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             size = 20;
                             BaseEnemies = 3;
                             Ghosts = 1;
+                            Blinders = 2;
                             Stuns = 5;
                             DefaultFOV = 10;
                             break;
@@ -351,6 +369,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             size = 25;
                             BaseEnemies = 3;
                             Ghosts = 3;
+                            Blinders = 3;
                             Stuns = 4;
                             DefaultFOV = 8;
                             break;
@@ -360,7 +379,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Ghosts = 4;
                             Blinders = 5;
                             Stuns = 3;
-                            DefaultFOV = 5;
+                            DefaultFOV = 10;
                             break;
                     }
                     FOV = DefaultFOV;
@@ -554,6 +573,10 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.Write($"[]");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($": A ghost enemy that has a 1 in 3 chance to be able to pass through a wall in the direction of the player each move.\n");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write($"[]");
+            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            Console.WriteLine($": A blinding enemy that, when within a space of you will blind you for five turns.\n");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write($"()");
             Console.ForegroundColor = ConsoleColor.White;

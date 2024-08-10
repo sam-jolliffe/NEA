@@ -6,6 +6,7 @@ namespace NEA
 {
     public class Player : IVisible
     {
+        static int TimeBlinded = 0;
         private static Random r;
         private readonly List<Power_Up> Inventory;
         private int Position;
