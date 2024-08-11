@@ -18,15 +18,17 @@ namespace NEA
         static int FOV;
         static int BaseEnemies;
         static int Ghosts;
-        static int Stuns;
         static int Blinders;
+        static int Stuns;
+        static int Hammers;
+        static List<IVisible> objects;
         static void PlayGame()
         {
             int difficulty = SetDifficulty();
             int TotalEnemies = BaseEnemies + Ghosts;
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
-            List<IVisible> objects = new List<IVisible>();
+            objects = new List<IVisible>();
             List<int> objectPositions = new List<int>(player.GetPosition());
             // Adding enemies
             for (int i = 0; i < BaseEnemies; i++)
@@ -47,8 +49,15 @@ namespace NEA
             // Adding power-ups
             for (int i = 0; i < Stuns; i++)
             {
-                objects.Add(new Stun(maze, random, objectPositions));
-                objectPositions.Add(objects[i + TotalEnemies].GetPosition());
+                Stun tempStun = new Stun(maze, random, objectPositions);
+                objects.Add(tempStun);
+                objectPositions.Add(tempStun.GetPosition());
+            }
+            for (int i = 0; i < Hammers; i++)
+            {
+                Hammer tempHammer = new Hammer(maze, random, objectPositions);
+                objects.Add(tempHammer);
+                objectPositions.Add(tempHammer.GetPosition());
             }
             maze.CreateGraph();
             maze.GenerateMaze(player.GetPosition(), objects);
@@ -69,6 +78,10 @@ namespace NEA
             stopwatch.Start();
             while (!hasWon && !hasLost)
             {
+                if (BlindingEnemy.GetBlindersCount() <= 0)
+                {
+                    FOV = DefaultFOV;
+                }
                 oldPos = player.GetPosition();
                 bool invalidTurn = false;
                 Console.SetCursorPosition(0, 0);
@@ -143,7 +156,7 @@ namespace NEA
                         if (blinder.GetPosition() == player.GetPosition())
                         {
                             BlindingEnemy.BlinderRemoved();
-                            BlindingEnemy.SetTimeBlinded(5 * BlindingEnemy.GetCountBlinders());
+                            BlindingEnemy.SetTimeBlinded(5 * BlindingEnemy.GetBlindersCount());
                             FOV = 3;
                             toRemove.Add(blinder);
                         }
@@ -252,7 +265,6 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.SetCursorPosition(0, 0);
             Console.CursorVisible = false;
             ConsoleKeyInfo key = Console.ReadKey(true);
-
             if (key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow)
             {
                 pos = maze.GetDirection(pos, Dir.up);
@@ -347,6 +359,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Ghosts = 0;
                             Blinders = 0;
                             Stuns = 10;
+                            Hammers = 5;
                             DefaultFOV = 15;
                             break;
                         case 2:
@@ -355,6 +368,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Ghosts = 0;
                             Blinders = 1;
                             Stuns = 10;
+                            Hammers = 4;
                             DefaultFOV = 10;
                             break;
                         case 3:
@@ -363,6 +377,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Ghosts = 1;
                             Blinders = 2;
                             Stuns = 5;
+                            Hammers = 3;
                             DefaultFOV = 10;
                             break;
                         case 4:
@@ -371,6 +386,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Ghosts = 3;
                             Blinders = 3;
                             Stuns = 4;
+                            Hammers = 2;
                             DefaultFOV = 8;
                             break;
                         case 5:
@@ -379,7 +395,8 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Ghosts = 4;
                             Blinders = 5;
                             Stuns = 3;
-                            DefaultFOV = 10;
+                            Hammers = 1;
+                            DefaultFOV = 5;
                             break;
                     }
                     FOV = DefaultFOV;
@@ -573,14 +590,18 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.Write($"[]");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($": A ghost enemy that has a 1 in 3 chance to be able to pass through a wall in the direction of the player each move.\n");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write($"[]");
             Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            Console.Write($"[]");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($": A blinding enemy that, when within a space of you will blind you for five turns.\n");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write($"()");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($": A stun Power-Up which when used will freeze all enemies for an average of two turns.\n");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.Write($"()");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($": A hammer Power-Up which when used allow you to break any wall adjacent wall.\n");
             Console.ReadKey();
         }
         static string FormatTime(int seconds)
@@ -670,6 +691,10 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 else if (choice == 3) HowToPlay();
                 else exit = true;
             }
+        }
+        public static void DisplayMaze()
+        {
+            maze.DisplayGraph(objects, FOV);
         }
     }
 }

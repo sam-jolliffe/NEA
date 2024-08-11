@@ -10,12 +10,12 @@ namespace NEA
         private int Position;
         private int Xpos;
         private int Ypos;
-        private readonly Maze maze;
-        public Power_Up(Maze mazeIn, Random ran, List<int> objectPositions)
+        protected readonly Maze maze;
+        public Power_Up(Maze mazeIn, Random ran, List<int> InObjectPositions)
         {
             r = ran;
             maze = mazeIn;
-            Spawn(objectPositions);
+            Spawn(InObjectPositions);
         }
         public Power_Up(Maze mazeIn, Random ran, int position)
         {
@@ -55,7 +55,7 @@ namespace NEA
         {
             return "Base Powerup";
         }
-        public virtual void Use()
+        public virtual void Use(int playerPos)
         {
 
         }

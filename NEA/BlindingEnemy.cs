@@ -15,7 +15,7 @@ namespace NEA
         {
             BlindersCount++;
         }
-        public static int GetCountBlinders()
+        public static int GetBlindersCount()
         {
             return BlindersCount;
         }

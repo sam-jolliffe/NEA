@@ -6,7 +6,6 @@ namespace NEA
 {
     public class Player : IVisible
     {
-        static int TimeBlinded = 0;
         private static Random r;
         private readonly List<Power_Up> Inventory;
         private int Position;
@@ -72,7 +71,7 @@ namespace NEA
 
                     if (Inventory.Count() == 0) return;
                     // If the user presses enter, it uses that power-up
-                    Inventory[yPos / 3 - 1].Use();
+                    Inventory[yPos / 3 - 1].Use(Position);
                     Inventory.Remove(Inventory[yPos / 3 - 1]);
                     return;
                 }

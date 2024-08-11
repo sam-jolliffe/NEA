@@ -13,9 +13,8 @@ namespace NEA
         }
         public Stun(Maze maze, Random ran, int position) : base(maze, ran, position)
         {
-
         }
-        public override void Use()
+        public override void Use(int playerPos)
         {
             Enemy.ChangeCanMove(-2 * Enemy.GetNumOfEnemies());
         }
