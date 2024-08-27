@@ -25,7 +25,6 @@ namespace NEA
         static void PlayGame()
         {
             int difficulty = SetDifficulty();
-            int TotalEnemies = BaseEnemies + Ghosts;
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
             objects = new List<IVisible>();
@@ -359,7 +358,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Ghosts = 0;
                             Blinders = 0;
                             Stuns = 10;
-                            Hammers = 5;
+                            Hammers = 10;
                             DefaultFOV = 15;
                             break;
                         case 2:
@@ -435,7 +434,6 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             int yPos = 1;
             while (true)
             {
-
                 Console.SetCursorPosition(0, 0);
                 Console.WriteLine($@"Would you like to see:
   All times
