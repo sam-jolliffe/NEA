@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace NEA
 {
@@ -30,28 +30,35 @@ namespace NEA
             while (!isValid)
             {
                 ConsoleKeyInfo key = Console.ReadKey(true);
+                Dir direction = Dir.up;
                 if (key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow)
                 {
-                    maze.RemoveEdge(playerPos, maze.GetDirection(playerPos, Dir.up));
+                    direction = Dir.up;
                     isValid = true;
                 }
                 else if (key.Key == ConsoleKey.A || key.Key == ConsoleKey.LeftArrow)
                 {
-                    maze.RemoveEdge(playerPos, maze.GetDirection(playerPos, Dir.left));
+                    direction = Dir.left;
                     isValid = true;
                 }
                 else if (key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow)
                 {
-                    maze.RemoveEdge(playerPos, maze.GetDirection(playerPos, Dir.down));
+                    direction = Dir.down;
                     isValid = true;
                 }
                 else if (key.Key == ConsoleKey.D || key.Key == ConsoleKey.RightArrow)
                 {
-                    maze.RemoveEdge(playerPos, maze.GetDirection(playerPos, Dir.right));
+                    direction= Dir.right;
                     isValid = true;
                 }
+                if (isValid)
+                {
+                    maze.RemoveEdge(playerPos, maze.GetDirection(playerPos, direction));
+                }
             }
-            Console.Clear();
+            Console.SetCursorPosition(0, Console.WindowHeight - 1);
+            Console.WriteLine("                                                          ");
+            Console.SetCursorPosition(0, 0);
         }
         public override ConsoleColor GetColour()
         {

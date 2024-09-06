@@ -111,9 +111,6 @@ namespace NEA
                     // To the right of the node
                     if (x != Xsize - 1)
                     {
-                        if (!visibleNodes.Contains(nodeNum) || !visibleNodes.Contains(nodeNum + 1))
-                        {
-                        }
                         if (!adjList[nodeNum].Contains(nodeNum + 1) && visibleNodes.Contains(nodeNum) && visibleNodes.Contains(nodeNum + 1))
                         {
                             Console.Write("  ");
@@ -167,7 +164,7 @@ namespace NEA
                 }
             }
         }
-        public Dictionary<int, List<int>> CreateGraph() 
+        public Dictionary<int, List<int>> CreateGraph()
         {
             // Fills the dictionary so that each node has an associated adjacency list;
             for (int nodeNum = 0; nodeNum < Xsize * Ysize; nodeNum++)
