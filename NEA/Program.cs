@@ -489,11 +489,11 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                     Console.Clear();
                     for (int i = 0; i < theseNames.Count(); i++)
                     {
-                        Console.SetCursorPosition(30, i);
-                        Console.WriteLine($"{theseNames[i]}: ");
-                        Console.SetCursorPosition(60, i);
-                        Console.WriteLine($"{FormatTime(theseTimes[i])}");
-                        Console.SetCursorPosition(90, i);
+                        Console.CursorLeft = 30;
+                        Console.Write($"{theseNames[i]}: ");
+                        Console.CursorLeft = 60;
+                        Console.Write($"{FormatTime(theseTimes[i])}");
+                        Console.CursorLeft = 90;
                         Console.WriteLine($"{theseDifficulties[i]} difficulty");
                     }
                 }
@@ -599,7 +599,11 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.Write($"()");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($": A hammer Power-Up which when used allow you to break any wall adjacent wall.\n");
+            Console.WriteLine($": A hammer Power-Up which when used will allow you to break any wall adjacent wall.\n");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write($"()");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($": A torch Power-Up which when used increases your FOV, allowing you to see more of the maze.\n");
             Console.ReadKey();
         }
         static string FormatTime(int seconds)
@@ -641,6 +645,10 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
         public static void SetFOV(int InFOV)
         {
             FOV = InFOV;
+        }
+        public static void IncreaseFOV()
+        {
+            FOV = FOV += 5;
         }
         public static void SetDefaultFOV()
         {
