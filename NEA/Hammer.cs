@@ -57,7 +57,7 @@ namespace NEA
                 }
             }
             Console.SetCursorPosition(0, Console.WindowHeight - 1);
-            Console.WriteLine("                                                          ");
+            Console.WriteLine("                                                                                                               ");
             Console.SetCursorPosition(0, 0);
         }
         public override ConsoleColor GetColour()

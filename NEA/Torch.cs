@@ -8,8 +8,7 @@ namespace NEA
 {
     internal class Torch : Power_Up
     {
-        int TimeWithSight = 0;
-        public Torch(Maze maze, Random ran, List<int> objectPositions) : base(maze, ran, objectPositions)
+          public Torch(Maze maze, Random ran, List<int> objectPositions) : base(maze, ran, objectPositions)
         {
         }
         public Torch(Maze maze, Random ran, int position) : base(maze, ran, position)
@@ -17,11 +16,11 @@ namespace NEA
         }
         public override ConsoleColor GetColour()
         {
-            return ConsoleColor.Red;
+            return ConsoleColor.Blue;
         }
         public override string GetDescription()
         {
-            return "Temporarily grants the user a wider FOV to see more";
+            return "Grants the user a wider FOV to see more";
         }
         public override string GetName()
         {
@@ -29,7 +28,6 @@ namespace NEA
         }
         public override void Use(int playerPos)
         {
-            TimeWithSight = 5;
             Program.IncreaseFOV();
         }
     }

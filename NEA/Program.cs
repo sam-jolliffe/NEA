@@ -58,12 +58,29 @@ namespace NEA
                 objects.Add(tempHammer);
                 objectPositions.Add(tempHammer.GetPosition());
             }
+            Torch tempTorch = new Torch(maze, random, objectPositions);
+            objects.Add(tempTorch);
+            objectPositions.Add(tempTorch.GetPosition());
+
             maze.CreateGraph();
             maze.GenerateMaze(player.GetPosition(), objects);
             List<int> treasureRoomNodes = maze.GetTreasureRoomNodes();
             foreach (int roomNode in treasureRoomNodes)
             {
-                objects.Add(new Stun(maze, random, roomNode));
+                int PowerUpType = random.Next(1, 4);
+                switch (PowerUpType)
+                {
+                    case 1:
+                        objects.Add(new Stun(maze, random, roomNode));
+                        break;
+                    case 2:
+                        objects.Add(new Hammer(maze, random, roomNode));
+                        break;
+                    // CHANGE THIS ONCE MORE POWER-UPS ARE ADDED:
+                    case 3:
+                        objects.Add(new Stun(maze, random, roomNode));
+                        break;
+                }
             }
             objects.Add(new Key(maze.GetKeyPosition(), maze));
             objects.Add(player);
@@ -600,7 +617,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.Write($"()");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($": A hammer Power-Up which when used will allow you to break any wall adjacent wall.\n");
-            Console.ForegroundColor = ConsoleColor.Red;
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write($"()");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($": A torch Power-Up which when used increases your FOV, allowing you to see more of the maze.\n");
@@ -649,6 +666,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
         public static void IncreaseFOV()
         {
             FOV = FOV += 5;
+            DefaultFOV = FOV;
         }
         public static void SetDefaultFOV()
         {

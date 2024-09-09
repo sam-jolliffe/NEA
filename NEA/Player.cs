@@ -73,6 +73,7 @@ namespace NEA
                     // If the user presses enter, it uses that power-up
                     Inventory[yPos / 3 - 1].Use(Position);
                     Inventory.Remove(Inventory[yPos / 3 - 1]);
+                    Console.Clear();
                     return;
                 }
                 else if (key.Key == ConsoleKey.Escape)
