@@ -21,6 +21,7 @@ namespace NEA
         static int Blinders;
         static int Stuns;
         static int Hammers;
+        static int Knives;
         static List<IVisible> objects;
         static void PlayGame()
         {
@@ -57,6 +58,12 @@ namespace NEA
                 Hammer tempHammer = new Hammer(maze, random, objectPositions);
                 objects.Add(tempHammer);
                 objectPositions.Add(tempHammer.GetPosition());
+            }
+            for (int i = 0; i < Knives; i++)
+            {
+                Knife tempKnife = new Knife(maze, random, objectPositions);
+                objects.Add(tempKnife);
+                objectPositions.Add(tempKnife.GetPosition());
             }
             Torch tempTorch = new Torch(maze, random, objectPositions);
             objects.Add(tempTorch);
@@ -376,6 +383,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Blinders = 0;
                             Stuns = 10;
                             Hammers = 10;
+                            Knives = 5;
                             DefaultFOV = 15;
                             break;
                         case 2:
@@ -385,6 +393,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Blinders = 1;
                             Stuns = 10;
                             Hammers = 4;
+                            Knives = 5;
                             DefaultFOV = 10;
                             break;
                         case 3:
@@ -394,6 +403,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Blinders = 2;
                             Stuns = 5;
                             Hammers = 3;
+                            Knives = 2;
                             DefaultFOV = 10;
                             break;
                         case 4:
@@ -403,6 +413,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Blinders = 3;
                             Stuns = 4;
                             Hammers = 2;
+                            Knives = 2;
                             DefaultFOV = 8;
                             break;
                         case 5:
@@ -412,6 +423,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             Blinders = 5;
                             Stuns = 3;
                             Hammers = 1;
+                            Knives = 1;
                             DefaultFOV = 5;
                             break;
                     }
@@ -621,6 +633,10 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.Write($"()");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($": A torch Power-Up which when used increases your FOV, allowing you to see more of the maze.\n");
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.Write($"()");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($": A knife powerup which allows you to kill an enemy if it is directly adjacent to you.\n");
             Console.ReadKey();
         }
         static string FormatTime(int seconds)
@@ -723,6 +739,10 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
         public static List<IVisible> GetObjects()
         {
             return objects;
+        }
+        public static void RemoveFromObjects(IVisible obj)
+        {
+            objects.Remove(obj);
         }
     }
 }

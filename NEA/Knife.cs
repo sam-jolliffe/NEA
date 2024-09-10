@@ -32,7 +32,7 @@ namespace NEA
             {
                 foreach (Dir d in Directions)
                 {
-                    if (maze.GetDirection(enemy.GetPosition(), d) == playerPos && !maze.GetAdjList()[playerPos].Contains(enemy.GetPosition()))
+                    if (maze.GetDirection(playerPos, d) == enemy.GetPosition() && !maze.GetAdjList()[playerPos].Contains(enemy.GetPosition()))
                     {
                         AdjacentEnemies.Add(enemy);
                         AdjacentEnemyDirections.Add(d);
@@ -48,15 +48,17 @@ namespace NEA
             Console.SetCursorPosition(0, Console.WindowHeight - 1);
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
+            bool isValid = false;
             if (AdjacentEnemies.Count == 0)
             {
                 Console.WriteLine("There are no enemies adjacent to you");
+                isValid = true;
+                Console.ReadKey();
             }
             else
             {
                 Console.WriteLine("Use WASD or arrow keys to choose an enemy around you to kill");
             }
-            bool isValid = false;
             while (!isValid)
             {
                 ConsoleKeyInfo key = Console.ReadKey(true);
@@ -88,7 +90,7 @@ namespace NEA
                     {
                         if (enemy.GetPosition() == maze.GetDirection(playerPos, direction))
                         {
-
+                            Program.RemoveFromObjects(enemy);
                         }
                     }
                 }
