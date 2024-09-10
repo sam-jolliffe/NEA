@@ -52,6 +52,7 @@
     <Compile Include="Hammer.cs" />
     <Compile Include="IVisible.cs" />
     <Compile Include="Key.cs" />
+    <Compile Include="Knife.cs" />
     <Compile Include="Maze.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Power-Up.cs" />

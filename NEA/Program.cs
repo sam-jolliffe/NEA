@@ -720,5 +720,9 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
         {
             maze.DisplayGraph(objects, FOV);
         }
+        public static List<IVisible> GetObjects()
+        {
+            return objects;
+        }
     }
 }
