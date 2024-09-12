@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -10,15 +9,24 @@ namespace NEA
     public enum Dir { up, right, down, left }
     internal class Program
     {
+        // These numbers are: Size, BaseEnemies, Ghosts, Blinders, Freezers, Stuns, Hammers, Knives, DefaultFOV
+        static int[][] DifficultyStats = {
+            new int[] { 25, 0, 0, 0, 0, 10, 10, 5, 15}, // Practice
+            new int[] { 15, 2, 0, 1, 1, 10, 4, 5, 10}, // Easy
+            new int[] { 20, 3, 1, 2, 1, 5, 3, 2, 10}, // Medium
+            new int[] { 25, 3, 3, 3, 3, 4, 2, 2, 8}, // Hard
+            new int[] { 25, 2, 4, 5, 3, 3, 1, 1, 5} }; // Insane
         static readonly Random random = new Random();
         static Maze maze;
         static Player player;
         static int size;
+        static int timeFrozen;
         static int DefaultFOV;
         static int FOV;
         static int BaseEnemies;
         static int Ghosts;
         static int Blinders;
+        static int Freezers;
         static int Stuns;
         static int Hammers;
         static int Knives;
@@ -28,47 +36,7 @@ namespace NEA
             int difficulty = SetDifficulty();
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
-            objects = new List<IVisible>();
-            List<int> objectPositions = new List<int>(player.GetPosition());
-            // Adding enemies
-            for (int i = 0; i < BaseEnemies; i++)
-            {
-                objects.Add(new BaseEnemy(maze, random, objectPositions, player.GetPosition()));
-                objectPositions.Add(objects[i].GetPosition());
-            }
-            for (int i = 0; i < Ghosts; i++)
-            {
-                objects.Add(new GhostEnemy(maze, random, objectPositions, player.GetPosition()));
-                objectPositions.Add(objects[i].GetPosition());
-            }
-            for (int i = 0; i < Blinders; i++)
-            {
-                objects.Add(new BlindingEnemy(maze, random, objectPositions, player.GetPosition()));
-                objectPositions.Add(objects[i].GetPosition());
-            }
-            // Adding power-ups
-            for (int i = 0; i < Stuns; i++)
-            {
-                Stun tempStun = new Stun(maze, random, objectPositions);
-                objects.Add(tempStun);
-                objectPositions.Add(tempStun.GetPosition());
-            }
-            for (int i = 0; i < Hammers; i++)
-            {
-                Hammer tempHammer = new Hammer(maze, random, objectPositions);
-                objects.Add(tempHammer);
-                objectPositions.Add(tempHammer.GetPosition());
-            }
-            for (int i = 0; i < Knives; i++)
-            {
-                Knife tempKnife = new Knife(maze, random, objectPositions);
-                objects.Add(tempKnife);
-                objectPositions.Add(tempKnife.GetPosition());
-            }
-            Torch tempTorch = new Torch(maze, random, objectPositions);
-            objects.Add(tempTorch);
-            objectPositions.Add(tempTorch.GetPosition());
-
+            objects = AddObjects();
             maze.CreateGraph();
             maze.GenerateMaze(player.GetPosition(), objects);
             List<int> treasureRoomNodes = maze.GetTreasureRoomNodes();
@@ -83,9 +51,8 @@ namespace NEA
                     case 2:
                         objects.Add(new Hammer(maze, random, roomNode));
                         break;
-                    // CHANGE THIS ONCE MORE POWER-UPS ARE ADDED:
                     case 3:
-                        objects.Add(new Stun(maze, random, roomNode));
+                        objects.Add(new Knife(maze, random, roomNode));
                         break;
                 }
             }
@@ -94,6 +61,7 @@ namespace NEA
             int oldPos;
             bool hasWon = false;
             bool hasLost = false;
+            timeFrozen = 0;
             // Keeps taking a move and re-displaying the board until the user reaches the end
             Console.SetCursorPosition(0, 0);
             maze.DisplayGraph(objects, FOV);
@@ -101,6 +69,10 @@ namespace NEA
             stopwatch.Start();
             while (!hasWon && !hasLost)
             {
+                if (timeFrozen > 0)
+                {
+                    timeFrozen--;
+                }
                 if (BlindingEnemy.GetBlindersCount() <= 0)
                 {
                     FOV = DefaultFOV;
@@ -118,7 +90,7 @@ namespace NEA
                     player.SetPosition(oldPos);
                     invalidTurn = true;
                 }
-                if (!maze.GetAdjList()[oldPos].Contains(player.GetPosition()) && !invalidTurn)
+                if (!maze.GetAdjList()[oldPos].Contains(player.GetPosition()) && !invalidTurn && timeFrozen <= 0)
                 {
                     if (player.GetPosition() == maze.GetEndPoint() && player.GetHasKey() == true)
                     {
@@ -372,61 +344,37 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 Console.SetCursorPosition(0, yPos);
                 Console.Write(">");
                 key = Console.ReadKey(true);
+                int DifficultyNum = -1;
                 if (key.Key == ConsoleKey.Enter)
                 {
                     switch (yPos)
                     {
                         case 1:
-                            size = 25;
-                            BaseEnemies = 0;
-                            Ghosts = 0;
-                            Blinders = 0;
-                            Stuns = 10;
-                            Hammers = 10;
-                            Knives = 5;
-                            DefaultFOV = 15;
+                            DifficultyNum = 0;
                             break;
                         case 2:
-                            size = 15;
-                            BaseEnemies = 2;
-                            Ghosts = 0;
-                            Blinders = 1;
-                            Stuns = 10;
-                            Hammers = 4;
-                            Knives = 5;
-                            DefaultFOV = 10;
+                            DifficultyNum = 1;
                             break;
                         case 3:
-                            size = 20;
-                            BaseEnemies = 3;
-                            Ghosts = 1;
-                            Blinders = 2;
-                            Stuns = 5;
-                            Hammers = 3;
-                            Knives = 2;
-                            DefaultFOV = 10;
+                            DifficultyNum = 2;
                             break;
                         case 4:
-                            size = 25;
-                            BaseEnemies = 3;
-                            Ghosts = 3;
-                            Blinders = 3;
-                            Stuns = 4;
-                            Hammers = 2;
-                            Knives = 2;
-                            DefaultFOV = 8;
+                            DifficultyNum = 3;
                             break;
                         case 5:
-                            size = 25; 
-                            BaseEnemies = 2;
-                            Ghosts = 4;
-                            Blinders = 5;
-                            Stuns = 3;
-                            Hammers = 1;
-                            Knives = 1;
-                            DefaultFOV = 5;
+                            DifficultyNum = 4;
                             break;
                     }
+                    size = DifficultyStats[DifficultyNum][0];
+                    BaseEnemies = DifficultyStats[DifficultyNum][1];
+                    Ghosts = DifficultyStats[DifficultyNum][2];
+                    Blinders = DifficultyStats[DifficultyNum][3];
+                    Freezers = DifficultyStats[DifficultyNum][4];
+                    Stuns = DifficultyStats[DifficultyNum][5];
+                    Hammers = DifficultyStats[DifficultyNum][6];
+                    Knives = DifficultyStats[DifficultyNum][7];
+                    DefaultFOV = DifficultyStats[DifficultyNum][8];
+
                     FOV = DefaultFOV;
                     maze = new Maze(size, random);
                     player = new Player(maze, random);
@@ -740,9 +688,62 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
         {
             return objects;
         }
+        static List<IVisible> AddObjects()
+        {
+            objects = new List<IVisible>();
+            List<int> objectPositions = new List<int>(player.GetPosition());
+            // Adding enemies
+            for (int i = 0; i < BaseEnemies; i++)
+            {
+                objects.Add(new BaseEnemy(maze, random, objectPositions, player.GetPosition()));
+                objectPositions.Add(objects[i].GetPosition());
+            }
+            for (int i = 0; i < Ghosts; i++)
+            {
+                objects.Add(new GhostEnemy(maze, random, objectPositions, player.GetPosition()));
+                objectPositions.Add(objects[i].GetPosition());
+            }
+            for (int i = 0; i < Blinders; i++)
+            {
+                objects.Add(new BlindingEnemy(maze, random, objectPositions, player.GetPosition()));
+                objectPositions.Add(objects[i].GetPosition());
+            }
+            for (int i = 0; i < Freezers; i++)
+            {
+                objects.Add(new FreezingEnemy(maze, random, objectPositions, player.GetPosition()));
+                objectPositions.Add(objects[i].GetPosition());
+            }
+            // Adding power-ups
+            for (int i = 0; i < Stuns; i++)
+            {
+                Stun tempStun = new Stun(maze, random, objectPositions);
+                objects.Add(tempStun);
+                objectPositions.Add(tempStun.GetPosition());
+            }
+            for (int i = 0; i < Hammers; i++)
+            {
+                Hammer tempHammer = new Hammer(maze, random, objectPositions);
+                objects.Add(tempHammer);
+                objectPositions.Add(tempHammer.GetPosition());
+            }
+            for (int i = 0; i < Knives; i++)
+            {
+                Knife tempKnife = new Knife(maze, random, objectPositions);
+                objects.Add(tempKnife);
+                objectPositions.Add(tempKnife.GetPosition());
+            }
+            Torch tempTorch = new Torch(maze, random, objectPositions);
+            objects.Add(tempTorch);
+            objectPositions.Add(tempTorch.GetPosition());
+            return objects;
+        }
         public static void RemoveFromObjects(IVisible obj)
         {
             objects.Remove(obj);
+        }
+        public static void SetTimeFrozen(int TimeFrozen)
+        {
+            timeFrozen = TimeFrozen;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace NEA
         }
         public override ConsoleColor GetColour()
         {
-            return ConsoleColor.Cyan;
+            return ConsoleColor.DarkCyan;
         }
         public override void Move(int playerPos)
         {

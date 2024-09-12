@@ -6,7 +6,7 @@ namespace NEA
 {
     public class Maze
     {
-        private readonly bool testing = false;
+        private readonly bool testing = true;
         private static Random r;
         private readonly int Xsize;
         private readonly int Ysize;
@@ -86,7 +86,7 @@ namespace NEA
                                 hasWritten = true;
                             }
                         }
-                        if (nodeNum == endPoint)
+                        if (nodeNum == endPoint && !hasWritten)
                         {
                             Console.ForegroundColor = ConsoleColor.DarkYellow;
                             Console.Write("██");

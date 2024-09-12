@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NEA
 {
     internal class Torch : Power_Up
     {
-          public Torch(Maze maze, Random ran, List<int> objectPositions) : base(maze, ran, objectPositions)
+        public Torch(Maze maze, Random ran, List<int> objectPositions) : base(maze, ran, objectPositions)
         {
         }
         public Torch(Maze maze, Random ran, int position) : base(maze, ran, position)

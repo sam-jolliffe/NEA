@@ -50,7 +50,6 @@ namespace NEA
             bool IsNextToPlayer = false;
             foreach (Dir direction in directions)
             {
-
                 if (Position == maze.GetDirection(playerPos, direction))
                 {
                     IsNextToPlayer = true;
