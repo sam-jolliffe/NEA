@@ -6,7 +6,7 @@ namespace NEA
 {
     public class Maze
     {
-        private readonly bool testing = true;
+        private readonly bool testing = false;
         private static Random r;
         private readonly int Xsize;
         private readonly int Ysize;
@@ -484,7 +484,7 @@ namespace NEA
             List<int> nodes = new List<int>();
             for (int i = 0; i < Xsize * Ysize; i++)
             {
-                if (Math.Pow(Math.Abs(GetXcoordinate(Node) - GetXcoordinate(i)), 2) + Math.Pow(Math.Abs(GetYcoordinate(Node) - GetYcoordinate(i)), 2) <= Math.Pow(FOV, 2))
+                if (Math.Pow(GetXcoordinate(Node) - GetXcoordinate(i), 2) + Math.Pow(GetYcoordinate(Node) - GetYcoordinate(i), 2) <= Math.Pow(FOV, 2))
                 {
                     nodes.Add(i);
                 }

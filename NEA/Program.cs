@@ -140,6 +140,10 @@ namespace NEA
                         {
                             powerupPositions.Add(obj.GetPosition());
                             powerUps.Add((Power_Up)obj);
+                            if (((Power_Up)obj).GetName() == "")
+                            {
+
+                            }
                         }
                         else if (obj.GetType() == "Key")
                         {

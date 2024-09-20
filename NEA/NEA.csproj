@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="BaseEnemy.cs" />
     <Compile Include="BlindingEnemy.cs" />
+    <Compile Include="Compass.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="FreezingEnemy.cs" />
