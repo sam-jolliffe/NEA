@@ -15,7 +15,7 @@ namespace NEA
         }
         public override ConsoleColor GetColour()
         {
-            return ConsoleColor.Blue;
+            return ConsoleColor.Red;
         }
         public override string GetDescription()
         {
@@ -25,6 +25,17 @@ namespace NEA
         {
             return "Compass";
         }
+        public override int GetPosition()
+        {
+            if (isVisible)
+            {
+                return DisplayPosition;
+            }
+            else
+            {
+                return base.GetPosition();
+            }
+        }
         public int GetDisplayNode(int playerPos, int endPos, int FOV)
         {
             if (Math.Pow(maze.GetXcoordinate(playerPos) - maze.GetXcoordinate(endPos), 2) + Math.Pow(maze.GetYcoordinate(playerPos) - maze.GetYcoordinate(endPos), 2) <= Math.Pow(FOV, 2))
@@ -32,6 +43,7 @@ namespace NEA
                 isVisible = false;
                 return 0;
             }
+            // Vectors from the user to various places around the edge of the FOV
             List<(double, double)> EdgeVectors = new List<(double, double)>();
             for (int i = 0; i < 360; i++)
             {
@@ -46,19 +58,23 @@ namespace NEA
                 angles.Add(((doubleDouble.Item1 * exitVector.Item1) + (doubleDouble.Item2 * exitVector.Item2))
                     /
                     (Math.Sqrt(Math.Pow(doubleDouble.Item1, 2) + Math.Pow(doubleDouble.Item2, 2)) * Math.Sqrt(Math.Pow(exitVector.Item1, 2) + Math.Pow(exitVector.Item2, 2))));
+
             }
             double greatestNum = 0;
+            (double, double) DoubleVector = (-1, -1);
             foreach (double angle in angles)
             {
                 if (angle > greatestNum)
                 {
                     greatestNum = angle;
+                    DoubleVector = EdgeVectors[angles.IndexOf(angle)];
                 }
             }
-            // Works out the angle from the user to the end.
-            double angleFromUser = Math.Acos(greatestNum) * 180/Math.PI;
-
-            return 2;
+            // Making the doubles into integers
+            (int, int) NodeVector = ((int)DoubleVector.Item1, (int)DoubleVector.Item2);
+            // Adding the vector to the player's position
+            int node = (playerPos + NodeVector.Item1) + (playerPos + (maze.GetXsize() * NodeVector.Item2));
+            return node;
         }
         public override void Use(int playerPos)
         {

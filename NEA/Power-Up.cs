@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Controls;
 using System.Windows.Documents;
 
 namespace NEA
@@ -39,7 +40,7 @@ namespace NEA
         {
             return "Base powerup";
         }
-        public int GetPosition()
+        public virtual int GetPosition()
         {
             return Position;
         }

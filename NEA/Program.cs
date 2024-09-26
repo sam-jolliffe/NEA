@@ -11,7 +11,7 @@ namespace NEA
     {
         // These numbers are: Size, BaseEnemies, Ghosts, Blinders, Freezers, Stuns, Hammers, Knives, DefaultFOV
         static int[][] DifficultyStats = {
-            new int[] { 25, 0, 0, 0, 0, 10, 10, 5, 15}, // Practice
+            new int[] { 25, 0, 0, 0, 0, 10, 10, 5, 10}, // Practice
             new int[] { 15, 2, 0, 1, 1, 10, 4, 5, 10}, // Easy
             new int[] { 20, 3, 1, 2, 1, 5, 3, 2, 10}, // Medium
             new int[] { 25, 3, 3, 3, 3, 4, 2, 2, 8}, // Hard
@@ -140,10 +140,6 @@ namespace NEA
                         {
                             powerupPositions.Add(obj.GetPosition());
                             powerUps.Add((Power_Up)obj);
-                            if (((Power_Up)obj).GetName() == "")
-                            {
-
-                            }
                         }
                         else if (obj.GetType() == "Key")
                         {
@@ -175,7 +171,10 @@ namespace NEA
                             if (powerUp.GetPosition() == player.GetPosition())
                             {
                                 player.AddToInventory(powerUp);
-                                objects.Remove(powerUp);
+                                if (powerUp.GetName() != "Compass")
+                                {
+                                    objects.Remove(powerUp);
+                                }
                             }
                         }
                     }
@@ -739,6 +738,10 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Torch tempTorch = new Torch(maze, random, objectPositions);
             objects.Add(tempTorch);
             objectPositions.Add(tempTorch.GetPosition());
+
+            Compass tempCompass = new Compass(maze, random, objectPositions);
+            objects.Add(tempCompass);
+            objectPositions.Add(tempCompass.GetPosition());
             return objects;
         }
         public static void RemoveFromObjects(IVisible obj)

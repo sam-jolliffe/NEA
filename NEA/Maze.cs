@@ -27,11 +27,16 @@ namespace NEA
             // ██ signifies a wall or an object
             // '  ' signifies a coridoor
             int playerPos = 0;
+            Compass compass = null;
             foreach (IVisible obj in objects)
             {
                 if (obj.GetType() == "Player")
                 {
                     playerPos = obj.GetPosition();
+                }
+                if (obj.GetName() == "Compass")
+                {
+                    compass = (Compass)obj;
                 }
             }
             List<int> visibleNodes = new List<int> { playerPos };
@@ -68,7 +73,7 @@ namespace NEA
                     int nodeNum = y * Xsize + x;
                     // Writing node
                     bool isObject = false;
-                    if (visibleNodes.Contains(nodeNum))
+                    if (visibleNodes.Contains(nodeNum) || nodeNum == compass.GetPosition())
                     {
                         bool hasWritten = false;
                         foreach (IVisible obj in objects)
