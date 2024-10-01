@@ -3,10 +3,9 @@ using System.Collections.Generic;
 
 namespace NEA
 {
-    internal class Compass : Power_Up
+    public class Compass : Power_Up
     {
-        bool isVisible = false;
-        private int DisplayPosition;
+        private bool isVisible = false;
         public Compass(Maze maze, Random ran, List<int> objectPositions) : base(maze, ran, objectPositions)
         {
         }
@@ -25,16 +24,20 @@ namespace NEA
         {
             return "Compass";
         }
-        public override int GetPosition()
+        public int GetPosition(int playerPos, int endPos, int FOV)
         {
             if (isVisible)
             {
-                return DisplayPosition;
+                return GetDisplayNode(playerPos, endPos, FOV);
             }
             else
             {
                 return base.GetPosition();
             }
+        }
+        public bool GetIsVisible()
+        {
+            return isVisible;
         }
         public int GetDisplayNode(int playerPos, int endPos, int FOV)
         {
@@ -73,7 +76,9 @@ namespace NEA
             // Making the doubles into integers
             (int, int) NodeVector = ((int)DoubleVector.Item1, (int)DoubleVector.Item2);
             // Adding the vector to the player's position
-            int node = (playerPos + NodeVector.Item1) + (playerPos + (maze.GetXsize() * NodeVector.Item2));
+            int node = playerPos + NodeVector.Item1 + playerPos + (maze.GetXsize() * NodeVector.Item2);
+            Position = node;
+            // Console.WriteLine(node);
             return node;
         }
         public override void Use(int playerPos)

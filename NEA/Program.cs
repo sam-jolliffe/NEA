@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 
 namespace NEA
 {
@@ -170,11 +171,8 @@ namespace NEA
                         {
                             if (powerUp.GetPosition() == player.GetPosition())
                             {
+                                objects.Remove(powerUp);
                                 player.AddToInventory(powerUp);
-                                if (powerUp.GetName() != "Compass")
-                                {
-                                    objects.Remove(powerUp);
-                                }
                             }
                         }
                     }
@@ -739,10 +737,17 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             objects.Add(tempTorch);
             objectPositions.Add(tempTorch.GetPosition());
 
-            Compass tempCompass = new Compass(maze, random, objectPositions);
-            objects.Add(tempCompass);
-            objectPositions.Add(tempCompass.GetPosition());
-            return objects;
+            for (int i = 0; i < 10; i++)
+            {
+                Compass tempCompass = new Compass(maze, random, objectPositions);
+                objects.Add(tempCompass);
+                objectPositions.Add(tempCompass.GetPosition());
+            }
+            return objects;  
+        }
+        public static void AddObject(IVisible obj)
+        {
+            objects.Add(obj);
         }
         public static void RemoveFromObjects(IVisible obj)
         {

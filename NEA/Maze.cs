@@ -24,19 +24,20 @@ namespace NEA
         }
         public void DisplayGraph(List<IVisible> objects, int FOV)
         {
-            // ██ signifies a wall or an object
-            // '  ' signifies a coridoor
             int playerPos = 0;
-            Compass compass = null;
+            int CompassPos = -1;
             foreach (IVisible obj in objects)
             {
                 if (obj.GetType() == "Player")
                 {
                     playerPos = obj.GetPosition();
                 }
-                if (obj.GetName() == "Compass")
+            }
+            foreach (IVisible obj in objects)
+            {
+                if (obj.GetName() == "Compass" && ((Compass)obj).GetIsVisible())
                 {
-                    compass = (Compass)obj;
+                    CompassPos = ((Compass)obj).GetPosition(playerPos, endPoint, FOV);
                 }
             }
             List<int> visibleNodes = new List<int> { playerPos };
@@ -70,15 +71,23 @@ namespace NEA
                 // Writes each node 
                 for (int x = 0; x < Xsize; x++)
                 {
+                    bool hasWritten = false;
                     int nodeNum = y * Xsize + x;
                     // Writing node
                     bool isObject = false;
-                    if (visibleNodes.Contains(nodeNum) || nodeNum == compass.GetPosition())
+                    if (CompassPos == nodeNum)
                     {
-                        bool hasWritten = false;
+                        Console.BackgroundColor = ConsoleColor.White;
+                        isObject = true;
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write("██");
+                        hasWritten = true;
+                    }
+                    if (visibleNodes.Contains(nodeNum))
+                    {
                         foreach (IVisible obj in objects)
                         {
-                            if (obj.GetPosition() == nodeNum && !hasWritten)
+                            if ((obj.GetName() != "Compass" || !((Compass)obj).GetIsVisible()) && obj.GetPosition() == nodeNum && !hasWritten)
                             {
                                 Console.BackgroundColor = ConsoleColor.White;
                                 isObject = true;

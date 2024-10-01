@@ -58,7 +58,7 @@ namespace NEA
    {powerup.GetDescription()}
 ");
             }
-                ConsoleKeyInfo key;
+            ConsoleKeyInfo key;
             while (true)
             {
                 Console.CursorLeft = 0;
@@ -68,10 +68,13 @@ namespace NEA
                 key = Console.ReadKey(true);
                 if (key.Key == ConsoleKey.Enter)
                 {
-
                     if (Inventory.Count() == 0) return;
                     // If the user presses enter, it uses that power-up
                     Inventory[yPos / 3 - 1].Use(Position);
+                    if (Inventory[yPos / 3 - 1].GetName() == "Compass")
+                    {
+                        Program.AddObject(Inventory[yPos / 3 - 1]);
+                    }
                     Inventory.Remove(Inventory[yPos / 3 - 1]);
                     Console.Clear();
                     return;

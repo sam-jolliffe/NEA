@@ -8,7 +8,7 @@ namespace NEA
     public abstract class Power_Up : IVisible
     {
         private static Random r;
-        private int Position;
+        protected int Position;
         private int Xpos;
         private int Ypos;
         protected readonly Maze maze;
