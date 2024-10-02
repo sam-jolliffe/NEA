@@ -75,8 +75,18 @@ namespace NEA
             }
             // Making the doubles into integers
             (int, int) NodeVector = ((int)DoubleVector.Item1, (int)DoubleVector.Item2);
+            Console.WriteLine($"X: {(int)DoubleVector.Item1}, Y:{(int)DoubleVector.Item2} ");
+            Console.ReadKey();
             // Adding the vector to the player's position
-            int node = playerPos + NodeVector.Item1 + playerPos + (maze.GetXsize() * NodeVector.Item2);
+
+
+
+            //THIS LINE NEEDS FIXING
+            int node = playerPos + NodeVector.Item1 + (maze.GetXsize() * NodeVector.Item2);
+
+
+
+
             Position = node;
             // Console.WriteLine(node);
             return node;

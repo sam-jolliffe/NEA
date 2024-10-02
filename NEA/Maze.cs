@@ -40,6 +40,11 @@ namespace NEA
                     CompassPos = ((Compass)obj).GetPosition(playerPos, endPoint, FOV);
                 }
             }
+            if (CompassPos != -1)
+            {
+                Console.Write($"{CompassPos}");
+                Console.ReadKey();
+            }
             List<int> visibleNodes = new List<int> { playerPos };
             if (!testing)
             {
