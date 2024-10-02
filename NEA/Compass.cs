@@ -55,7 +55,7 @@ namespace NEA
             {
                 EdgeVectors.Add((FOV * Math.Cos(i), FOV * Math.Sin(i)));
             }
-            (double, double) exitVector = (FOV * Math.Cos(endPos), FOV * Math.Sin(endPos));
+            (double, double) exitVector = (maze.GetXcoordinate(endPos) - maze.GetXcoordinate(playerPos), maze.GetYcoordinate(playerPos) - maze.GetYcoordinate(endPos));
             // Working out angles: 
             List<double> angles = new List<double>();
             foreach ((double, double) doubleDouble in EdgeVectors)
@@ -80,13 +80,13 @@ namespace NEA
             // Console.WriteLine($"Final decided vector: X: {DoubleVector.Item1} Y: {DoubleVector.Item2}");
             // Making the doubles into integers
             (int, int) NodeVector = ((int)Math.Round(DoubleVector.Item1, MidpointRounding.AwayFromZero), (int)Math.Round(DoubleVector.Item2, MidpointRounding.AwayFromZero));
-            Console.WriteLine($"X: {NodeVector.Item1}, Y:{NodeVector.Item2} ");
+            //Console.WriteLine($"X: {NodeVector.Item1}, Y:{NodeVector.Item2} ");
             // Console.ReadKey();
             // Adding the vector to the player's position
             int node = playerPos + NodeVector.Item1 + (maze.GetXsize() * -NodeVector.Item2);
 
-            Console.WriteLine($"PlayerPos: {playerPos}, Node: {node}");
-            Console.ReadKey();
+            //Console.WriteLine($"PlayerPos: {playerPos}, Node: {node}");
+            //Console.ReadKey();
 
             Position = node;
             // Console.WriteLine(node);

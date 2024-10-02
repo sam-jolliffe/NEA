@@ -80,9 +80,10 @@ namespace NEA
                         Console.BackgroundColor = ConsoleColor.White;
                         isObject = true;
                         Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write("██");
                         hasWritten = true;
                     }
-                    if (visibleNodes.Contains(nodeNum))
+                    else if (visibleNodes.Contains(nodeNum))
                     {
                         foreach (IVisible obj in objects)
                         {
