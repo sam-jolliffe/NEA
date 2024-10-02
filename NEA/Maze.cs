@@ -40,11 +40,6 @@ namespace NEA
                     CompassPos = ((Compass)obj).GetPosition(playerPos, endPoint, FOV);
                 }
             }
-            if (CompassPos != -1)
-            {
-                Console.Write($"{CompassPos}");
-                Console.ReadKey();
-            }
             List<int> visibleNodes = new List<int> { playerPos };
             if (!testing)
             {
@@ -85,7 +80,6 @@ namespace NEA
                         Console.BackgroundColor = ConsoleColor.White;
                         isObject = true;
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.Write("██");
                         hasWritten = true;
                     }
                     if (visibleNodes.Contains(nodeNum))
