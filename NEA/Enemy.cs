@@ -55,7 +55,7 @@ namespace NEA
             while (!valid)
             {
                 Position = r.Next(0, maze.GetXsize() * maze.GetYsize() - 1);
-                if (!objectPositions.Contains(Position) && Math.Abs(maze.GetXcoordinate(Position) - maze.GetXcoordinate(playerPos)) >= maze.GetXsize() / 4 && Math.Abs(maze.GetYcoordinate(Position) - maze.GetYcoordinate(playerPos)) >= maze.GetXsize() / 4)
+                if (!objectPositions.Contains(Position) && Math.Abs(maze.GetXcoordinate(Position) - maze.GetXcoordinate(playerPos)) >= maze.GetXsize() / 6 && Math.Abs(maze.GetYcoordinate(Position) - maze.GetYcoordinate(playerPos)) >= maze.GetXsize() / 6)
                 {
                     valid = true;
                 }

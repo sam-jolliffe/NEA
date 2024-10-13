@@ -21,20 +21,21 @@ namespace NEA
         }
         public override void Move(int playerPos)
         {
-            Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
             bool IsNextToPlayer = false;
-            foreach (Dir direction in directions)
+            if (Position == playerPos)
             {
-                if (Position == maze.GetDirection(playerPos, direction) && maze.GetAdjList()[Position].Contains(playerPos))
-                {
-                    IsNextToPlayer = true;
-                }
+                IsNextToPlayer = true;
+            }
+            base.Move(playerPos);
+            if (Position == playerPos)
+            {
+                IsNextToPlayer = true;
             }
             if (IsNextToPlayer)
             {
                 Program.SetTimeFrozen(3);
+                throw new IsOnPlayerException();
             }
-            base.Move(playerPos);
         }
     }
 }

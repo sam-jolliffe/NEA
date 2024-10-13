@@ -6,7 +6,7 @@ namespace NEA
 {
     public class Maze
     {
-        private readonly bool testing = false;
+        private readonly bool testing = true;
         private static Random r;
         private readonly int Xsize;
         private readonly int Ysize;
@@ -78,10 +78,8 @@ namespace NEA
                     if (CompassPos == nodeNum)
                     {
                         Console.BackgroundColor = ConsoleColor.White;
-                        isObject = true;
-                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.Write("██");
-                        hasWritten = true;
                     }
                     else if (visibleNodes.Contains(nodeNum))
                     {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Principal;
 
 namespace NEA
 {
@@ -11,12 +10,13 @@ namespace NEA
     internal class Program
     {
         // These numbers are: Size, BaseEnemies, Ghosts, Blinders, Freezers, Stuns, Hammers, Knives, DefaultFOV
-        static int[][] DifficultyStats = {
+        static readonly int[][] DifficultyStats = {
             new int[] { 25, 0, 0, 0, 0, 10, 10, 5, 10}, // Practice
             new int[] { 15, 2, 0, 1, 1, 10, 4, 5, 10}, // Easy
             new int[] { 20, 3, 1, 2, 1, 5, 3, 2, 10}, // Medium
             new int[] { 25, 3, 3, 3, 3, 4, 2, 2, 8}, // Hard
-            new int[] { 25, 2, 4, 5, 3, 3, 1, 1, 5} }; // Insane
+            // new int[] { 25, 2, 4, 5, 3, 3, 1, 1, 5} }; // Insane
+            new int[] { 25, 0, 0, 0, 25, 3, 1, 1, 5} }; // Insane
         static readonly Random random = new Random();
         static Maze maze;
         static Player player;
@@ -32,6 +32,22 @@ namespace NEA
         static int Hammers;
         static int Knives;
         static List<IVisible> objects;
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Please maximise the window before running the game");
+            Console.ReadKey();
+            bool exit = false;
+            while (!exit)
+            {
+                Console.CursorVisible = false;
+                int choice = MainMenu();
+                Console.Clear();
+                if (choice == 1) PlayGame();
+                else if (choice == 2) DisplayLeaderBoard();
+                else if (choice == 3) HowToPlay();
+                else exit = true;
+            }
+        }
         static void PlayGame()
         {
             int difficulty = SetDifficulty();
@@ -108,43 +124,62 @@ namespace NEA
                     int keyPos = -1;
                     foreach (IVisible obj in objects)
                     {
-                        if (obj.GetType() == "Enemy" && obj.GetName() != "Blinder")
+                        switch (obj.GetType())
                         {
-                            enemies.Add((Enemy)obj);
-                            try
-                            {
-                                ((Enemy)obj).Move(player.GetPosition());
-                            }
-                            catch
-                            {
-                                hasLost = true;
-                            }
-                            enemyPositions.Add(obj.GetPosition());
-                        }
-                        else if (obj.GetType() == "Enemy" && obj.GetName() == "Blinder")
-                        {
-                            try
-                            {
-                                ((Enemy)obj).Move(player.GetPosition());
-                            }
-                            catch
-                            {
-                                BlindingEnemy.BlinderRemoved();
-                                BlindingEnemy.SetTimeBlinded(5 * (Blinders - 1));
-                                FOV = 3;
-                                toRemove.Add(obj);
-                            }
-                            blinders.Add((BlindingEnemy)obj);
-                            blinderPositions.Add(obj.GetPosition());
-                        }
-                        else if (obj.GetType() == "Power-up")
-                        {
-                            powerupPositions.Add(obj.GetPosition());
-                            powerUps.Add((Power_Up)obj);
-                        }
-                        else if (obj.GetType() == "Key")
-                        {
-                            keyPos = obj.GetPosition();
+                            case "Enemy":
+                                switch (obj.GetName())
+                                {
+                                    case "Blinder":
+                                        try
+                                        {
+                                            ((Enemy)obj).Move(player.GetPosition());
+                                        }
+                                        catch
+                                        {
+                                            Console.WriteLine("OnFreeze");
+                                            Console.ReadKey();
+                                            BlindingEnemy.BlinderRemoved();
+                                            BlindingEnemy.SetTimeBlinded(5 * (Blinders - 1));
+                                            FOV = 3;
+                                            toRemove.Add(obj);
+                                        }
+                                        blinders.Add((BlindingEnemy)obj);
+                                        blinderPositions.Add(obj.GetPosition());
+                                        break;
+                                    case "Freezer":
+                                        try
+                                        {
+                                            ((Enemy)obj).Move(player.GetPosition());
+                                        }
+                                        catch
+                                        {
+                                            timeFrozen = 3;
+                                            toRemove.Add(obj);
+                                        }
+                                        break;
+                                    default:
+                                        enemies.Add((Enemy)obj);
+                                        try
+                                        {
+                                            ((Enemy)obj).Move(player.GetPosition());
+                                        }
+                                        catch
+                                        {
+                                            hasLost = true;
+                                        }
+                                        enemyPositions.Add(obj.GetPosition());
+                                        break;
+                                }
+                                break;
+                            case "Power-up":
+                                powerupPositions.Add(obj.GetPosition());
+                                powerUps.Add((Power_Up)obj);
+                                break;
+                            case "Key":
+                                keyPos = obj.GetPosition();
+                                break;
+                            default:
+                                break;
                         }
                     }
                     foreach (BlindingEnemy blinder in blinders)
@@ -667,20 +702,6 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             }
             return returnList;
         }
-        static void Main(string[] args)
-        {
-            bool exit = false;
-            while (!exit)
-            {
-                Console.CursorVisible = false;
-                int choice = MainMenu();
-                Console.Clear();
-                if (choice == 1) PlayGame();
-                else if (choice == 2) DisplayLeaderBoard();
-                else if (choice == 3) HowToPlay();
-                else exit = true;
-            }
-        }
         public static void DisplayMaze()
         {
             maze.DisplayGraph(objects, FOV);
@@ -737,13 +758,11 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             objects.Add(tempTorch);
             objectPositions.Add(tempTorch.GetPosition());
 
-            for (int i = 0; i < 10; i++)
-            {
-                Compass tempCompass = new Compass(maze, random, objectPositions);
-                objects.Add(tempCompass);
-                objectPositions.Add(tempCompass.GetPosition());
-            }
-            return objects;  
+            Compass tempCompass = new Compass(maze, random, objectPositions);
+            objects.Add(tempCompass);
+            objectPositions.Add(tempCompass.GetPosition());
+
+            return objects;
         }
         public static void AddObject(IVisible obj)
         {
