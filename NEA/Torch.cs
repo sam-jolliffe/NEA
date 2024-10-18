@@ -11,13 +11,16 @@ namespace NEA
         public Torch(Maze maze, Random ran, int position) : base(maze, ran, position)
         {
         }
+        public Torch() : base()
+        {
+        }
         public override ConsoleColor GetColour()
         {
             return ConsoleColor.Blue;
         }
         public override string GetDescription()
         {
-            return "Grants the user a wider FOV to see more";
+            return "A Torch which grants the you a wider FOV to see more";
         }
         public override string GetName()
         {

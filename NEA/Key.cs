@@ -18,9 +18,17 @@ namespace NEA
             Position = position;
             maze = Maze;
         }
+        public Key()
+        {
+
+        }
         public string GetSprite()
         {
             return "██";
+        }
+        public string GetDescription()
+        {
+            return "The Key. You will need to get this before you can go through the exit.";
         }
         public ConsoleColor GetColour()
         {

@@ -21,6 +21,13 @@ namespace NEA
             Inventory = new List<Power_Up>();
             hasKey = false;
         }
+        public Player()
+        {
+        }
+        public string GetDescription()
+        {
+            return "You";
+        }
         public string GetSprite()
         {
             return "██";

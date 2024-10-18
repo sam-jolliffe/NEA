@@ -6,33 +6,33 @@ using System.Threading.Tasks;
 
 namespace NEA
 {
-    internal class Stun : Power_Up
+    internal class Shield : Power_Up
     {
-        public Stun(Maze maze, Random ran, List<int> objectPositions) : base(maze, ran, objectPositions)
+        public Shield(Maze maze, Random ran, List<int> objectPositions) : base(maze, ran, objectPositions)
         {
         }
-        public Stun(Maze maze, Random ran, int position) : base(maze, ran, position)
+        public Shield(Maze maze, Random ran, int position) : base(maze, ran, position)
         {
         }
-        public Stun() : base()
+        public Shield() : base()
         {
         }
         public override void Use(int playerPos)
         {
-            Enemy.ChangeCanMove(-2 * Enemy.GetNumOfEnemies());
+
         }
         public override ConsoleColor GetColour()
         {
-            return ConsoleColor.Green;
+            return ConsoleColor.DarkMagenta;
         }
 
         public override string GetDescription()
         {
-            return " Freezes all enemies for an average of two turns.";
+            return "Automatically activates when any type of enemy attacks you, and knocks them back two places in the maze.";
         }
         public override string GetName()
         {
-            return "Stun";
+            return "Shield";
         }
     }
 }

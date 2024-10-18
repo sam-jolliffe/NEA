@@ -21,6 +21,10 @@ namespace NEA
             maze = mazeIn;
             Spawn(objectPositions, playerPos);
         }
+        public Enemy()
+        {
+
+        }
         public string GetSprite()
         {
             return "[]";
@@ -29,7 +33,7 @@ namespace NEA
         {
             return "";
         }
-        public string GetDescription()
+        public virtual string GetDescription()
         {
             return "Base enemy";
         }

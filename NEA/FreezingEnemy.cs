@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Shapes;
 
 namespace NEA
 {
@@ -10,6 +11,13 @@ namespace NEA
     {
         public FreezingEnemy(Maze mazeIn, Random ran, List<int> objectPositions, int playerPos) : base(mazeIn, ran, objectPositions, playerPos)
         {
+        }
+        public FreezingEnemy() : base()
+        {
+        }
+        public override string GetDescription()
+        {
+            return "A freezing enemy, that when it hits you will freeze you in place for three turns.";
         }
         public override string GetName()
         {

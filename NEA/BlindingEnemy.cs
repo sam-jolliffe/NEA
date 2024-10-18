@@ -15,6 +15,9 @@ namespace NEA
         {
             BlindersCount++;
         }
+        public BlindingEnemy() : base()
+        {
+        }
         public static int GetBlindersCount()
         {
             return BlindersCount;
@@ -34,6 +37,10 @@ namespace NEA
         public static void SetTimeBlinded(int InTimeBlinded)
         {
             TimeBlinded = InTimeBlinded;
+        }
+        public override string GetDescription()
+        {
+            return "A blinding enemy that, when within a space of you will blind you for five turns.";
         }
         public override void Move(int playerPos)
         {

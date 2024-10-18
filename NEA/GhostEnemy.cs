@@ -8,9 +8,16 @@ namespace NEA
         public GhostEnemy(Maze mazeIn, Random ran, List<int> objectPositions, int playerPos) : base(mazeIn, ran, objectPositions, playerPos)
         {
         }
+        public GhostEnemy() : base()
+        {
+        }
         public override string GetName()
         {
             return "Ghost";
+        }
+        public override string GetDescription()
+        {
+            return "A ghost enemy that has a 1 in 3 chance to be able to pass through a wall in the direction of the player each move.";
         }
         public override ConsoleColor GetColour()
         {

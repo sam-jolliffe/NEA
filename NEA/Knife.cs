@@ -14,6 +14,9 @@ namespace NEA
         public Knife(Maze maze, Random ran, int position) : base(maze, ran, position)
         {
         }
+        public Knife() : base()
+        {
+        }
         public override void Use(int playerPos)
         {
             Dir[] Directions = {Dir.left, Dir.right, Dir.up, Dir.down};
@@ -101,12 +104,12 @@ namespace NEA
         }
         public override ConsoleColor GetColour()
         {
-            return ConsoleColor.Black;
+            return ConsoleColor.DarkRed;
         }
 
         public override string GetDescription()
         {
-            return "Can be used to kill an enemy which is directly next to the user.";
+            return "A knife which can be used to kill an enemy which is directly next to the user.";
         }
         public override string GetName()
         {

@@ -15,8 +15,7 @@ namespace NEA
             new int[] { 15, 2, 0, 1, 1, 10, 4, 5, 10}, // Easy
             new int[] { 20, 3, 1, 2, 1, 5, 3, 2, 10}, // Medium
             new int[] { 25, 3, 3, 3, 3, 4, 2, 2, 8}, // Hard
-            // new int[] { 25, 2, 4, 5, 3, 3, 1, 1, 5} }; // Insane
-            new int[] { 25, 0, 0, 0, 25, 3, 1, 1, 5} }; // Insane
+            new int[] { 25, 2, 4, 5, 3, 3, 1, 1, 5} }; // Insane
         static readonly Random random = new Random();
         static Maze maze;
         static Player player;
@@ -199,6 +198,14 @@ namespace NEA
                     if (enemyPositions.Contains(player.GetPosition()))
                     {
                         hasLost = true;
+                        foreach (Power_Up PowerUp in player.GetInventory())
+                        {
+                            if (PowerUp.GetName() == "Shield")
+                            {
+                                hasLost = false;
+                                PowerUp.Use(player.GetPosition());
+                            }
+                        }
                     }
                     else if (powerupPositions.Contains(player.GetPosition()))
                     {
@@ -578,49 +585,20 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
         }
         static void HowToPlay()
         {
-            Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.DarkBlue;
-            Console.Write($"██");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($": You\n");
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.Write($"██");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($": The key. You will need to pick this up before you can go through the exit.\n");
+            IVisible[] allTypes = { new Player(), new Key(), new BaseEnemy(), new GhostEnemy(), new BlindingEnemy(), new FreezingEnemy(), new Stun(), new Hammer(), new Torch(), new Knife(), new Compass(), new Shield() };
+            foreach (IVisible obj in allTypes)
+            {
+                Console.ForegroundColor = obj.GetColour();
+                Console.Write(obj.GetSprite());
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write($":  {obj.GetDescription()}\n\n");
+            }
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.Write($"██");
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($": The exit. Get to this with the key to win.\n");
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write($"[]");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($": The base enemy which moves on average every two turns and will kill you if it is on the same square as you.\n");
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Write($"[]");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($": A ghost enemy that has a 1 in 3 chance to be able to pass through a wall in the direction of the player each move.\n");
-            Console.ForegroundColor = ConsoleColor.DarkMagenta;
-            Console.Write($"[]");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($": A blinding enemy that, when within a space of you will blind you for five turns.\n");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write($"()");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($": A stun Power-Up which when used will freeze all enemies for an average of two turns.\n");
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Write($"()");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($": A hammer Power-Up which when used will allow you to break any wall adjacent wall.\n");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write($"()");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($": A torch Power-Up which when used increases your FOV, allowing you to see more of the maze.\n");
-            Console.ForegroundColor = ConsoleColor.Black;
-            Console.Write($"()");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine($": A knife powerup which allows you to kill an enemy if it is directly adjacent to you.\n");
+            Console.WriteLine($":  The exit. Get to this with the key to win.\n");
             Console.ReadKey();
         }
         static string FormatTime(int seconds)

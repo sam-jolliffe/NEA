@@ -13,5 +13,6 @@ namespace NEA
         string GetName();
         string GetSprite();
         ConsoleColor GetColour();
+        string GetDescription();
     }
 }

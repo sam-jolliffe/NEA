@@ -9,7 +9,13 @@ namespace NEA
         {
         }
 
-
+        public BaseEnemy() : base()
+        {
+        }
+        public override string GetDescription()
+        {
+            return "The base enemy which moves on average every two turns and will kill you if it is on the same square as you.";
+        }
         public override ConsoleColor GetColour()
         {
             return ConsoleColor.Red;

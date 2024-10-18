@@ -24,6 +24,9 @@ namespace NEA
             maze = mazeIn;
             Spawn(position);
         }
+        public Power_Up()
+        {
+        }
         public string GetSprite()
         {
             return "()";

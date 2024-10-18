@@ -13,13 +13,16 @@ namespace NEA
         public Compass(Maze maze, Random ran, int position) : base(maze, ran, position)
         {
         }
+        public Compass() : base()
+        {
+        }
         public override ConsoleColor GetColour()
         {
             return ConsoleColor.Red;
         }
         public override string GetDescription()
         {
-            return "Allows the user to see a dot on the outside of their FOV to see the direction of the exit.";
+            return "A torch which allows you to see a red dot on the outside of your FOV to see the direction of the exit.";
         }
         public override string GetName()
         {

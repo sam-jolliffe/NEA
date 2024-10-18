@@ -6,7 +6,7 @@ namespace NEA
 {
     public class Maze
     {
-        private readonly bool testing = true;
+        private readonly bool testing = false;
         private static Random r;
         private readonly int Xsize;
         private readonly int Ysize;
@@ -43,7 +43,6 @@ namespace NEA
             List<int> visibleNodes = new List<int> { playerPos };
             if (!testing)
             {
-                // visibleNodes = depthFirst(playerPos, 0, visibleNodes);
                 visibleNodes = GetVisibleNodes(playerPos, FOV);
             }
             else

@@ -14,6 +14,9 @@ namespace NEA
         public Hammer(Maze maze, Random ran, int position) : base(maze, ran, position)
         {
         }
+        public Hammer() : base()
+        {
+        }
         public override void Use(int playerPos)
         {
             Console.BackgroundColor = ConsoleColor.Black;
@@ -62,7 +65,7 @@ namespace NEA
         }
         public override ConsoleColor GetColour()
         {
-            return ConsoleColor.Gray;
+            return ConsoleColor.DarkGray;
         }
 
         public override string GetDescription()
