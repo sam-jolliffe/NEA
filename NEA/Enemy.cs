@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 
 namespace NEA
 {
@@ -11,6 +9,7 @@ namespace NEA
         protected static int canMove = -1;
         protected static Random r;
         protected int Position;
+        protected int[] PreviousPositions = new int[2];
         protected int Xpos;
         protected int Ypos;
         protected readonly Maze maze;
@@ -53,6 +52,10 @@ namespace NEA
         {
             return Ypos;
         }
+        public int GetSecondPreviousposition()
+        {
+            return PreviousPositions[1];
+        }
         public void Spawn(List<int> objectPositions, int playerPos)
         {
             bool valid = false;
@@ -64,6 +67,8 @@ namespace NEA
                     valid = true;
                 }
             }
+            PreviousPositions[1] = PreviousPositions[0];
+            PreviousPositions[0] = Position;
             Xpos = maze.GetXcoordinate(Position);
             Ypos = maze.GetYcoordinate(Position);
         }
@@ -76,6 +81,8 @@ namespace NEA
             // CanMove is static, so all of the enemies move every other time, but not all at once.
             canMove += r.Next(0, 2);
             if (canMove % 2 == 0 || canMove < 0) return;
+            PreviousPositions[1] = PreviousPositions[0];
+            PreviousPositions[0] = Position;
             Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
             int NumNodes = maze.GetXsize() * maze.GetYsize();
             // H distances will be the manhattan distance between the player position and the given node
@@ -163,6 +170,10 @@ namespace NEA
         public static int GetNumOfEnemies()
         {
             return numOfEnemies;
+        }
+        public void SetPosition(int pos)
+        {
+            Position = pos;
         }
     }
 }

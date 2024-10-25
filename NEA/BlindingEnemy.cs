@@ -53,6 +53,8 @@ namespace NEA
                 TimeBlinded--;
             }
             if (canMove < 0) return;
+            PreviousPositions[1] = PreviousPositions[0];
+            PreviousPositions[0] = Position;
             Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
             bool IsNextToPlayer = false;
             foreach (Dir direction in directions)

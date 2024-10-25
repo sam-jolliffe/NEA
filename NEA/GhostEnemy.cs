@@ -33,6 +33,8 @@ namespace NEA
             {
                 canMove += r.Next(0, 2);
                 if (canMove % 2 == 0 || canMove < 0) return;
+                PreviousPositions[1] = PreviousPositions[0];
+                PreviousPositions[0] = Position;
                 int enemyX = maze.GetXcoordinate(Position);
                 int enemyY = maze.GetYcoordinate(Position);
                 int playerX = maze.GetXcoordinate(playerPos);

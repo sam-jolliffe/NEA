@@ -70,7 +70,7 @@ namespace NEA
 
         public override string GetDescription()
         {
-            return "Can be used to break a wall that is directly adjacent to the user.";
+            return "A hammer which can be used to break a wall that is directly adjacent to the user.";
         }
         public override string GetName()
         {

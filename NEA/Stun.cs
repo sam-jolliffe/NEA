@@ -28,7 +28,7 @@ namespace NEA
 
         public override string GetDescription()
         {
-            return " Freezes all enemies for an average of two turns.";
+            return "A Stun which freezes all enemies for an average of two turns.";
         }
         public override string GetName()
         {
