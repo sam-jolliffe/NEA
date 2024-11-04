@@ -20,18 +20,8 @@ namespace NEA
         static Maze maze;
         static Player player;
         static int DifficultyNum;
-        static int size;
         static int timeFrozen;
-        static int DefaultFOV;
         static int FOV;
-        static int BaseEnemies;
-        static int Ghosts;
-        static int Blinders;
-        static int Freezers;
-        static int Stuns;
-        static int Hammers;
-        static int Knives;
-        static int Shields;
         static List<IVisible> objects;
         static void Main(string[] args)
         {
@@ -93,7 +83,7 @@ namespace NEA
                 }
                 if (BlindingEnemy.GetBlindersCount() <= 0)
                 {
-                    FOV = DefaultFOV;
+                    FOV = DifficultyStats[DifficultyNum][9];
                 }
                 oldPos = player.GetPosition();
                 bool invalidTurn = false;
@@ -137,10 +127,10 @@ namespace NEA
                                         }
                                         catch
                                         {
-                                            Console.WriteLine("OnFreeze");
-                                            Console.ReadKey();
+                                            //Console.WriteLine("OnFreeze");
+                                            //Console.ReadKey();
                                             BlindingEnemy.BlinderRemoved();
-                                            BlindingEnemy.SetTimeBlinded(5 * (Blinders - 1));
+                                            BlindingEnemy.SetTimeBlinded(5 * (DifficultyStats[DifficultyNum][3] - 1));
                                             FOV = 3;
                                             toRemove.Add(obj);
                                         }
@@ -416,10 +406,8 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                             DifficultyNum = 4;
                             break;
                     }
-                    size = DifficultyStats[DifficultyNum][0];
-                    DefaultFOV = DifficultyStats[DifficultyNum][9];
-                    FOV = DefaultFOV;
-                    maze = new Maze(size, random);
+                    FOV = DifficultyStats[DifficultyNum][9];
+                    maze = new Maze(DifficultyStats[DifficultyNum][0], random);
                     player = new Player(maze, random);
                     return yPos;
                 }
@@ -638,12 +626,8 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             return returnString;
         }
         public static void SetFOV(int InFOV) => FOV = InFOV;
-        public static void IncreaseFOV()
-        {
-            FOV = FOV += 5;
-            DefaultFOV = FOV;
-        }
-        public static void SetDefaultFOV() => FOV = DefaultFOV;
+        public static void IncreaseFOV() => FOV += 5;
+        public static void SetDefaultFOV() => FOV = DifficultyStats[DifficultyNum][9];
         static List<string> InsertionSort(string name, int time, string difficulty, List<string> list)
         {
             List<int> times = new List<int>();
