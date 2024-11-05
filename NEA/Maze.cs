@@ -82,6 +82,13 @@ namespace NEA
                     }
                     else if (visibleNodes.Contains(nodeNum))
                     {
+                        if (nodeNum == endPoint)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.Write("██");
+                            isObject = true;
+                            hasWritten = true;
+                        }
                         foreach (IVisible obj in objects)
                         {
                             if ((obj.GetName() != "Compass" || !((Compass)obj).GetIsVisible()) && obj.GetPosition() == nodeNum && !hasWritten)
@@ -96,12 +103,6 @@ namespace NEA
                                 }
                                 hasWritten = true;
                             }
-                        }
-                        if (nodeNum == endPoint && !hasWritten)
-                        {
-                            Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            Console.Write("██");
-                            isObject = true;
                         }
                         if (isObject)
                         {
