@@ -205,32 +205,8 @@ namespace NEA
                 visited.Add(false);
             // Running recursive backtracking
             RecursiveBacktracking(startNode, ref visited);
-            for (int i = 0; i < Xsize * Ysize; i++)
-            {
-                // Checks for dead ends, breaks the ends.
-
-                // Use this one to have some dead ends still
-                // int node = getRandom(Xsize * Ysize - 1);
-
-                // Use this one for all dead ends to be removed
-                int node = i;
-
-                if (adjList[node].Count() == 3)
-                {
-                    foreach (Dir d in directions)
-                    {
-                        try
-                        {
-                            if (!adjList[node].Contains(GetDirection(node, d)))
-                            {
-                                RemoveEdge(node, GetDirection(node, directions[((int)d + 2) % 4]));
-                            }
-                        }
-                        catch (NotInListException) { }
-                    }
-                }
-            }
-            MakeRooms(ref objects);
+            BreakDeadEnds();
+            MakeRooms(objects);
             MakeEndPoint(startNode);
 
         }
@@ -275,37 +251,6 @@ namespace NEA
             return true;
 
         }
-        public bool AddEdge(int node1, int node2)
-        {
-            if (!adjList.ContainsKey(node1) || !adjList.ContainsKey(node2))
-            {
-                Console.WriteLine($"NotInDict");
-                return false;
-            }
-            if (!adjList[node1].Contains(node2))
-            {
-                adjList[node1].Add(node2);
-            }
-            else
-            {
-                Console.WriteLine($"AlreadyInList. {node1}, {node2}");
-                return false;
-            }
-            if (!adjList[node2].Contains(node1))
-            {
-                adjList[node2].Add(node1);
-            }
-            else
-            {
-                Console.WriteLine($"AlreadyInList. {node1}, {node2}");
-                return false;
-            }
-            return true;
-        }
-        public List<int> GetEdges(int node)
-        {
-            return adjList[node];
-        }
         public List<int> Randomize(List<int> ints)
         {
             // Based on the Fisher-Yates Shuffling algorithm. Article cited in references.
@@ -316,26 +261,11 @@ namespace NEA
             }
             return ints;
         }
-        public Dictionary<int, List<int>> GetAdjList()
-        {
-            return adjList;
-        }
-        public int GetXsize()
-        {
-            return Xsize;
-        }
-        public int GetYsize()
-        {
-            return Ysize;
-        }
-        public int GetXcoordinate(int node)
-        {
-            return node % Xsize;
-        }
-        public int GetYcoordinate(int node)
-        {
-            return node / Xsize;
-        }
+        public Dictionary<int, List<int>> GetAdjList() => adjList;
+        public int GetXsize() => Xsize;
+        public int GetYsize() => Ysize;
+        public int GetXcoordinate(int node) => node % Xsize;
+        public int GetYcoordinate(int node) => node / Xsize;
         public int GetDirection(int node, Dir d)
         {
             switch (d)
@@ -351,14 +281,8 @@ namespace NEA
             }
             throw new NotInListException();
         }
-        public int GetRandom(int maxNum)
-        {
-            return r.Next(maxNum + 1);
-        }
-        public int GetEndPoint()
-        {
-            return endPoint;
-        }
+        public int GetRandom(int maxNum) => r.Next(maxNum + 1);
+        public int GetEndPoint() => endPoint;
         public void MakeEndPoint(int startPoint)
         {
             bool validEndPoint = false;
@@ -373,30 +297,7 @@ namespace NEA
                 }
             }
         }
-        public List<int> DepthFirst(int node, int count, List<int> visited)
-        {
-            count++;
-            if (count >= 15) return visited;
-            visited.Add(node);
-            List<int> adjacents = new List<int>();
-            foreach (Dir d in directions)
-            {
-                try
-                {
-                    adjacents.Add(GetDirection(node, d));
-                }
-                catch (NotInListException) { }
-            }
-            foreach (int i in adjacents)
-            {
-                if (!adjList[node].Contains(i))
-                {
-                    visited = DepthFirst(i, count, visited);
-                }
-            }
-            return visited;
-        }
-        public void MakeRooms(ref List<IVisible> objects)
+        public void MakeRooms(List<IVisible> objects)
         {
             // Treasure room:
             int Node = 0;
@@ -483,10 +384,6 @@ namespace NEA
         {
             return treasureRoomNodes;
         }
-        public List<int> GetAllRoomsNodes()
-        {
-            return allRoomsNodes;
-        }
         public int GetKeyPosition()
         {
             return keyPosition;
@@ -502,6 +399,27 @@ namespace NEA
                 }
             }
             return nodes;
+        }
+        private void BreakDeadEnds()
+        {
+            for (int i = 0; i < Xsize * Ysize; i++)
+            {
+                int node = i;
+                if (adjList[node].Count() == 3)
+                {
+                    foreach (Dir d in directions)
+                    {
+                        try
+                        {
+                            if (!adjList[node].Contains(GetDirection(node, d)))
+                            {
+                                RemoveEdge(node, GetDirection(node, directions[((int)d + 2) % 4]));
+                            }
+                        }
+                        catch (NotInListException) { }
+                    }
+                }
+            }
         }
     }
 }

@@ -29,6 +29,7 @@ namespace NEA
         public override void Use(int playerPos)
         {
             Program.IncreaseFOV();
+            Program.SetDefaultFOV();
         }
     }
 }

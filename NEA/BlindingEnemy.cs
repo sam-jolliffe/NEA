@@ -56,7 +56,7 @@ namespace NEA
             PreviousPositions[1] = PreviousPositions[0];
             PreviousPositions[0] = Position;
             Dir[] directions = { Dir.up, Dir.right, Dir.down, Dir.left };
-            bool IsNextToPlayer = false;
+            /*bool IsNextToPlayer = false;
             foreach (Dir direction in directions)
             {
                 if (Position == maze.GetDirection(playerPos, direction))
@@ -69,7 +69,7 @@ namespace NEA
                 // Shorten FOV
                 TimeBlinded = 5;
                 Program.SetFOV(3);
-            }
+            }*/
             int NumNodes = maze.GetXsize() * maze.GetYsize();
             // H distances will be the manhattan distance between the player position and the given node
             int[] Hdistances = new int[NumNodes];
@@ -147,21 +147,6 @@ namespace NEA
                     isFound = true;
                 }
                 temp = previous[temp];
-            }
-            IsNextToPlayer = false;
-            foreach (Dir direction in directions)
-            {
-
-                if (Position == maze.GetDirection(playerPos, direction))
-                {
-                    IsNextToPlayer = true;
-                }
-            }
-            if (IsNextToPlayer)
-            {
-                // Shorten FOV
-                TimeBlinded = 5;
-                Program.SetFOV(3);
             }
         }
     }

@@ -10,9 +10,9 @@ namespace NEA
     internal class Program
     {
         // These numbers are: Size, BaseEnemies, Ghosts, Blinders, Freezers, Stuns, Hammers, Knives, Shields, DefaultFOV
-        static readonly int[][] DifficultyStats = {
+        static int[][] DifficultyStats = {
             new int[] { 25, 0, 0, 0, 0, 10, 10, 5, 5, 10}, // Practice
-            new int[] { 15, 2, 0, 1, 1, 10, 4, 5, 5, 10}, // Easy
+            new int[] { 15, 2, 0, 5, 1, 10, 4, 5, 5, 10}, // Easy
             new int[] { 20, 3, 1, 2, 1, 5, 3, 2, 3, 10}, // Medium
             new int[] { 25, 3, 3, 3, 3, 4, 2, 2, 2, 8}, // Hard
             new int[] { 25, 2, 4, 5, 3, 3, 1, 1, 1, 5} }; // Insane
@@ -41,7 +41,8 @@ namespace NEA
         }
         static void PlayGame()
         {
-            int difficulty = SetDifficulty();
+            SetDifficulty();
+            if (DifficultyNum == 5) return;
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
             objects = AddObjects();
@@ -50,7 +51,7 @@ namespace NEA
             List<int> treasureRoomNodes = maze.GetTreasureRoomNodes();
             foreach (int roomNode in treasureRoomNodes)
             {
-                int PowerUpType = random.Next(1, 4);
+                int PowerUpType = random.Next(1, 5);
                 switch (PowerUpType)
                 {
                     case 1:
@@ -61,6 +62,9 @@ namespace NEA
                         break;
                     case 3:
                         objects.Add(new Knife(maze, random, roomNode));
+                        break;
+                    case 4:
+                        objects.Add(new Shield(maze, random, roomNode));
                         break;
                 }
             }
@@ -127,8 +131,6 @@ namespace NEA
                                         }
                                         catch
                                         {
-                                            //Console.WriteLine("OnFreeze");
-                                            //Console.ReadKey();
                                             BlindingEnemy.BlinderRemoved();
                                             BlindingEnemy.SetTimeBlinded(5 * (DifficultyStats[DifficultyNum][3] - 1));
                                             FOV = 3;
@@ -178,7 +180,7 @@ namespace NEA
                         if (blinder.GetPosition() == player.GetPosition())
                         {
                             BlindingEnemy.BlinderRemoved();
-                            BlindingEnemy.SetTimeBlinded(5 * BlindingEnemy.GetBlindersCount());
+                            BlindingEnemy.SetTimeBlinded(5 * (DifficultyStats[DifficultyNum][3] - 1));
                             FOV = 3;
                             toRemove.Add(blinder);
                         }
@@ -241,7 +243,7 @@ namespace NEA
             Console.Clear();
             if (hasWon)
             {
-                AddToLeaderboard((int)stopwatch.Elapsed.TotalSeconds, difficulty);
+                AddToLeaderboard((int)stopwatch.Elapsed.TotalSeconds, DifficultyNum - 1);
                 Console.WriteLine($@"
                                                                                                                                                 
                                                                                                                                                 
@@ -367,7 +369,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 }
             }
         }
-        static int SetDifficulty()
+        static void SetDifficulty()
         {
             int yPos = 1;
             Console.Clear();
@@ -376,7 +378,8 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
   Easy
   Meduim
   Hard
-  Insane");
+  Insane
+  Return to menu");
             ConsoleKeyInfo key;
             while (true)
             {
@@ -388,34 +391,20 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 DifficultyNum = -1;
                 if (key.Key == ConsoleKey.Enter)
                 {
-                    switch (yPos)
+                    DifficultyNum = yPos - 1;
+                    if (DifficultyNum != 5)
                     {
-                        case 1:
-                            DifficultyNum = 0;
-                            break;
-                        case 2:
-                            DifficultyNum = 1;
-                            break;
-                        case 3:
-                            DifficultyNum = 2;
-                            break;
-                        case 4:
-                            DifficultyNum = 3;
-                            break;
-                        case 5:
-                            DifficultyNum = 4;
-                            break;
+                        FOV = DifficultyStats[DifficultyNum][9];
+                        maze = new Maze(DifficultyStats[DifficultyNum][0], random);
+                        player = new Player(maze, random);
                     }
-                    FOV = DifficultyStats[DifficultyNum][9];
-                    maze = new Maze(DifficultyStats[DifficultyNum][0], random);
-                    player = new Player(maze, random);
-                    return yPos;
+                    return;
                 }
                 else if ((key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow) && yPos > 1)
                 {
                     yPos--;
                 }
-                else if ((key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow) && yPos < 5)
+                else if ((key.Key == ConsoleKey.S || key.Key == ConsoleKey.DownArrow) && yPos < 6)
                 {
                     yPos++;
                 }
@@ -521,19 +510,19 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             string strDifficulty = "";
             switch (difficulty)
             {
-                case 1:
+                case 0:
                     strDifficulty = "Practice";
                     break;
-                case 2:
+                case 1:
                     strDifficulty = "Easy";
                     break;
-                case 3:
+                case 2:
                     strDifficulty = "Medium";
                     break;
-                case 4:
+                case 3:
                     strDifficulty = "Hard";
                     break;
-                case 5:
+                case 4:
                     strDifficulty = "Insane";
                     break;
             }
@@ -587,6 +576,13 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             Console.Write($"██");
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine($":  The exit. Get to this with the key to win.\n");
+            Console.WriteLine(@"Controls:
+W/Up Arrow : Move Up
+A/Left Arrow : Move Left
+S/Down Arrrow : Move Down
+D/Right Arrrow : Move Right
+E : Open Inventory
+Escape : Open Help Menu");
             Console.ReadKey();
         }
         static string FormatTime(int seconds)
@@ -626,7 +622,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
             return returnString;
         }
         public static void SetFOV(int InFOV) => FOV = InFOV;
-        public static void IncreaseFOV() => FOV += 5;
+        public static void IncreaseFOV() => DifficultyStats[DifficultyNum][9] += 5;
         public static void SetDefaultFOV() => FOV = DifficultyStats[DifficultyNum][9];
         static List<string> InsertionSort(string name, int time, string difficulty, List<string> list)
         {
@@ -651,10 +647,9 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 returnList.Add(list[index]);
                 index++;
             }
-            while (index < list.Count)
+            for (int i = index; i < list.Count; i++)
             {
                 returnList.Add(list[index]);
-                index++;
             }
             return returnList;
         }
