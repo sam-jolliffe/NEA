@@ -22,7 +22,7 @@ namespace NEA
         }
         public override string GetDescription()
         {
-            return "A torch which allows you to see a red dot on the outside of your FOV to see the direction of the exit.";
+            return "A compass which when used will create a red dot on thew outside of you FOV in the direction of the exit.";
         }
         public override string GetName()
         {

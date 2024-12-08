@@ -78,6 +78,8 @@ namespace NEA
         }
         public virtual void Move(int playerPos)
         {
+            //Console.BackgroundColor = ConsoleColor.Black;
+            //Console.ForegroundColor = ConsoleColor.White;
             // CanMove is static, so all of the enemies move every other time, but not all at once.
             canMove += r.Next(0, 2);
             if (canMove % 2 == 0 || canMove < 0) return;
@@ -94,19 +96,33 @@ namespace NEA
             int[] Fdistances = new int[NumNodes];
             int[] previous = new int[NumNodes];
             List<int> unvisitedNodes = new List<int>();
+            int count = 15;
+            //Console.SetCursorPosition(0, count+=2);
+            //Console.Write($"goal node: {playerPos}");
+            //Console.SetCursorPosition(0, count +=2);
+            //Console.Write($"Node:");
+            //Console.SetCursorPosition(0, count+=2);
+            //Console.Write($"fdist:");
+            count = 16;
             for (int i = 0; i < NumNodes; i++)
             {
+                //Console.SetCursorPosition(4 * i + 10, count);
+                //Console.Write($"{i}");
                 Hdistances[i] = Math.Abs(maze.GetXcoordinate(playerPos) - maze.GetXcoordinate(i)) + Math.Abs(maze.GetYcoordinate(playerPos) - maze.GetYcoordinate(i));
                 Gdistances[i] = 1000;
-                Fdistances[i] = 1000;
+                // Fdistances[i] = 1000;
+                Fdistances[i] = 1000 + Hdistances[i];
                 previous[i] = -1;
                 unvisitedNodes.Add(i);
+                //Console.SetCursorPosition(4 * i + 10, count + 1);
+                //Console.Write($"{Fdistances[i]}");
             }
             Gdistances[Position] = 0;
             Fdistances[Position] = Hdistances[Position];
             unvisitedNodes.Remove(0);
             while (unvisitedNodes.Count > 0 && unvisitedNodes.Contains(playerPos))
             {
+                count++;
                 // Getting node with shortest distance:
                 // Has to be in unvisitedNodes, have lowest corresponding distance
                 int nodeVal = 1001;
@@ -134,7 +150,6 @@ namespace NEA
                     }
                     catch (NotInListException) { }
                 }
-
                 // thisPath is the same for each one as the distance is the same each time.
 
                 int thisPath = Gdistances[node] + 1;
@@ -148,8 +163,16 @@ namespace NEA
                         previous[i] = node;
                     }
                 }
+                //count += 2;
+                //for (int i = 0; i < NumNodes; i++)
+                //{
+                //    Console.SetCursorPosition(4 * i + 10, count);
+                //    Console.Write(Fdistances[i]);
+                //}
             }
 
+            //Console.ReadKey();
+            //Console.Clear();
             // Backtracking until it finds what it's next move should be.
             bool isFound = false;
             int temp = playerPos;
@@ -162,6 +185,8 @@ namespace NEA
                 }
                 temp = previous[temp];
             }
+            //Console.BackgroundColor = ConsoleColor.White;
+            //Console.ForegroundColor = ConsoleColor.Black;
         }
         public static void ChangeCanMove(int newVal)
         {
@@ -175,5 +200,6 @@ namespace NEA
         {
             Position = pos;
         }
+
     }
 }

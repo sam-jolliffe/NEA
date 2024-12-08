@@ -76,13 +76,16 @@ namespace NEA
                 if (key.Key == ConsoleKey.Enter)
                 {
                     if (Inventory.Count() == 0) return;
-                    // If the user presses enter, it uses that power-up
-                    Inventory[yPos / 3 - 1].Use(Position);
                     if (Inventory[yPos / 3 - 1].GetName() == "Compass")
                     {
                         Program.AddObject(Inventory[yPos / 3 - 1]);
                     }
-                    Inventory.Remove(Inventory[yPos / 3 - 1]);
+                    // If the user presses enter, it uses that power-up
+                    if (Inventory[yPos / 3 - 1].GetName() != "Shield")
+                    {
+                        Inventory[yPos / 3 - 1].Use(Position);
+                        Inventory.Remove(Inventory[yPos / 3 - 1]);
+                    }
                     Console.Clear();
                     return;
                 }

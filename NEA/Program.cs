@@ -10,17 +10,18 @@ namespace NEA
     internal class Program
     {
         // These numbers are: Size, BaseEnemies, Ghosts, Blinders, Freezers, Stuns, Hammers, Knives, Shields, DefaultFOV
-        static int[][] DifficultyStats = {
+        static readonly int[][] DifficultyStats = {
             new int[] { 25, 0, 0, 0, 0, 10, 10, 5, 5, 10}, // Practice
-            new int[] { 15, 2, 0, 5, 1, 10, 4, 5, 5, 10}, // Easy
+            new int[] { 15, 2, 0, 2, 2, 10, 5, 5, 5, 10}, // Easy
             new int[] { 20, 3, 1, 2, 1, 5, 3, 2, 3, 10}, // Medium
             new int[] { 25, 3, 3, 3, 3, 4, 2, 2, 2, 8}, // Hard
-            new int[] { 25, 2, 4, 5, 3, 3, 1, 1, 1, 5} }; // Insane
+            new int[] { 25, 3, 4, 5, 3, 3, 1, 1, 1, 5} }; // Insane
         static readonly Random random = new Random();
         static Maze maze;
         static Player player;
         static int DifficultyNum;
         static int timeFrozen;
+        static int timeBlinded;
         static int FOV;
         static List<IVisible> objects;
         static void Main(string[] args)
@@ -74,6 +75,7 @@ namespace NEA
             bool hasWon = false;
             bool hasLost = false;
             timeFrozen = 0;
+            timeBlinded = 0;
             // Keeps taking a move and re-displaying the board until the user reaches the end
             Console.SetCursorPosition(0, 0);
             maze.DisplayGraph(objects, FOV);
@@ -85,9 +87,13 @@ namespace NEA
                 {
                     timeFrozen--;
                 }
-                if (BlindingEnemy.GetBlindersCount() <= 0)
+                if (timeBlinded > 0)
                 {
-                    FOV = DifficultyStats[DifficultyNum][9];
+                    timeBlinded--;
+                }
+                else
+                {
+                    SetDefaultFOV();
                 }
                 oldPos = player.GetPosition();
                 bool invalidTurn = false;
@@ -102,15 +108,18 @@ namespace NEA
                     player.SetPosition(oldPos);
                     invalidTurn = true;
                 }
-                if (!maze.GetAdjList()[oldPos].Contains(player.GetPosition()) && !invalidTurn && timeFrozen <= 0)
+                if (!maze.GetAdjList()[oldPos].Contains(player.GetPosition()) && !invalidTurn)
                 {
+                    if (timeFrozen > 0)
+                    {
+                        player.SetPosition(oldPos);
+                    }
                     if (player.GetPosition() == maze.GetEndPoint() && player.GetHasKey() == true)
                     {
                         hasWon = true;
                     }
                     // Making a list of the positions of all enemies and power-ups
                     List<int> enemyPositions = new List<int>();
-                    List<int> blinderPositions = new List<int>();
                     List<int> powerupPositions = new List<int>();
                     List<BlindingEnemy> blinders = new List<BlindingEnemy>();
                     List<Enemy> enemies = new List<Enemy>();
@@ -128,16 +137,15 @@ namespace NEA
                                         try
                                         {
                                             ((Enemy)obj).Move(player.GetPosition());
+                                            blinders.Add((BlindingEnemy)obj);
                                         }
                                         catch
                                         {
-                                            BlindingEnemy.BlinderRemoved();
-                                            BlindingEnemy.SetTimeBlinded(5 * (DifficultyStats[DifficultyNum][3] - 1));
                                             FOV = 3;
+                                            timeBlinded = 5;
                                             toRemove.Add(obj);
                                         }
                                         blinders.Add((BlindingEnemy)obj);
-                                        blinderPositions.Add(obj.GetPosition());
                                         break;
                                     case "Freezer":
                                         try
@@ -146,7 +154,7 @@ namespace NEA
                                         }
                                         catch
                                         {
-                                            timeFrozen = 3;
+                                            timeFrozen = 5;
                                             toRemove.Add(obj);
                                         }
                                         break;
@@ -175,16 +183,6 @@ namespace NEA
                                 break;
                         }
                     }
-                    foreach (BlindingEnemy blinder in blinders)
-                    {
-                        if (blinder.GetPosition() == player.GetPosition())
-                        {
-                            BlindingEnemy.BlinderRemoved();
-                            BlindingEnemy.SetTimeBlinded(5 * (DifficultyStats[DifficultyNum][3] - 1));
-                            FOV = 3;
-                            toRemove.Add(blinder);
-                        }
-                    }
                     foreach (IVisible obj in toRemove)
                     {
                         objects.Remove(obj);
@@ -195,7 +193,7 @@ namespace NEA
                         Power_Up shield = new Shield();
                         foreach (Power_Up PowerUp in player.GetInventory())
                         {
-                            if (PowerUp.GetName() == "Shield")
+                            if (PowerUp.GetName() == "Shield" && hasLost == true)
                             {
                                 hasLost = false;
                                 ((Shield)PowerUp).Use(player.GetPosition(), ref objects);
@@ -243,7 +241,7 @@ namespace NEA
             Console.Clear();
             if (hasWon)
             {
-                AddToLeaderboard((int)stopwatch.Elapsed.TotalSeconds, DifficultyNum - 1);
+                AddToLeaderboard((int)stopwatch.Elapsed.TotalSeconds, DifficultyNum);
                 Console.WriteLine($@"
                                                                                                                                                 
                                                                                                                                                 
@@ -490,8 +488,14 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                         Console.Write($"{theseNames[i]}: ");
                         Console.CursorLeft = 60;
                         Console.Write($"{FormatTime(theseTimes[i])}");
-                        Console.CursorLeft = 90;
-                        Console.WriteLine($"{theseDifficulties[i]} difficulty");
+                        Console.CursorLeft = 120;
+                        Console.Write($"{theseDifficulties[i]} difficulty \n");
+                        Console.CursorLeft = 30;
+                        for (int j = 0; j < 110; j++)
+                        {
+                            Console.Write("-");
+                        }
+                        Console.Write("\n");
                     }
                 }
                 else if ((key.Key == ConsoleKey.W || key.Key == ConsoleKey.UpArrow) && yPos > 1)
@@ -539,7 +543,7 @@ YYY:::::Y   Y:::::YYY   ooooooooooo     uuuuuu    uuuuuu         L:::::L        
                 else
                 {
                     Console.Clear();
-                    Console.WriteLine("Please enter another name. Your name must have at between 1 and 25 characters, and not include any spaces.");
+                    Console.WriteLine("Please enter another name. Your name must have between 1 and 25 characters, and not include any spaces.");
                 }
             }
             const string fileName = "Leaderboard.txt";
@@ -587,41 +591,64 @@ Escape : Open Help Menu");
         }
         static string FormatTime(int seconds)
         {
-            int[] times = new int[3];
-            times[0] = seconds / 3600; // Hours
-            times[1] = (seconds - (times[0] * 3600)) / 60; // Minutes
-            times[2] = seconds - (times[0] * 3600) - (times[1] * 60); // Seconds
-            string[] isPlural = new string[3];
-            bool[] exists = new bool[3];
-            string[] names = { "hour", "minute", "second" };
-            for (int i = 0; i < 3; i++)
+            int[] times = new int[5];
+            times[0] = seconds / 31536000; // Years
+            times[1] = (seconds - (times[0] * 31536000)) / 86400; // Days
+            times[2] = (seconds - (times[0] * 31536000) - (times[1] * 86400)) / 3600; // Hours
+            times[3] = (seconds - (times[0] * 31536000) - (times[1] * 86400) - (times[2] * 3600)) / 60; // Minutes
+            times[4] = seconds - (times[0] * 31536000) - (times[1] * 86400) - (times[2] * 3600) - (times[3] * 60);
+            string[] isPlural = new string[5];
+            bool[] exists = new bool[5];
+            string[] names = { "year", "day", "hour", "minute", "second" };
+            for (int i = 0; i < 5; i++) isPlural[i] = "";
+            for (int i = 0; i < 5; i++)
             {
-                isPlural[i] = times[i] != 1 ? "s" : "";
-                exists[i] = times[i] != 0;
-            }
-            int lastIndex = 0;
-            for (int i = 0; i < 3; i++)
-            {
-                if (exists[i]) lastIndex = i;
-            }
-            int secondLastIndex = 0;
-            for (int i = 0; i < lastIndex; i++)
-            {
-                if (exists[i]) secondLastIndex = i;
-            }
-            string returnString = "";
-            for (int i = 0; i < exists.Length; i++)
-            {
-                if (exists[i])
+                if (times[i] != 1)
                 {
-                    returnString += $"{times[i]} {names[i]}{isPlural[i]}";
-                    if (i == secondLastIndex) returnString += " and ";
-                    else if (i != lastIndex) returnString += ", ";
+                    isPlural[i] = "s";
+                }
+                if (times[i] == 0)
+                {
+                    exists[i] = false;
+                }
+                else
+                {
+                    exists[i] = true;
+                }
+            }
+            int count = -1;
+            string returnString = "";
+            int lastCount = 0;
+            int secondLastCount = 0;
+            for (int i = 0; i < 5; i++)
+            {
+                if (exists[i]) lastCount = i;
+            }
+            for (int i = 0; i < lastCount; i++)
+            {
+                if (exists[i]) secondLastCount = i;
+            }
+            foreach (bool b in exists)
+            {
+                count++;
+                if (b)
+                {
+                    if (count == lastCount)
+                    {
+                        returnString += $"{times[count]} {names[count]}{isPlural[count]}";
+                    }
+                    else if (count == secondLastCount)
+                    {
+                        returnString += $"{times[count]} {names[count]}{isPlural[count]} and ";
+                    }
+                    else
+                    {
+                        returnString += $"{times[count]} {names[count]}{isPlural[count]}, ";
+                    }
                 }
             }
             return returnString;
         }
-        public static void SetFOV(int InFOV) => FOV = InFOV;
         public static void IncreaseFOV() => DifficultyStats[DifficultyNum][9] += 5;
         public static void SetDefaultFOV() => FOV = DifficultyStats[DifficultyNum][9];
         static List<string> InsertionSort(string name, int time, string difficulty, List<string> list)
@@ -635,21 +662,17 @@ Escape : Open Help Menu");
                 times.Add(int.Parse(tempArr[1]));
             }
             // Inserts value
-            bool done = false;
             int index = 0;
-            while (!done)
+            bool hasAdded = false;
+            while (index < list.Count())
             {
-                if (time <= times[index])
+                if ((index >= times.Count || time <= times[index]) && !hasAdded)
                 {
-                    done = true;
                     returnList.Add($"{name} {time} {difficulty}");
+                    hasAdded = true;
                 }
                 returnList.Add(list[index]);
                 index++;
-            }
-            for (int i = index; i < list.Count; i++)
-            {
-                returnList.Add(list[index]);
             }
             return returnList;
         }
